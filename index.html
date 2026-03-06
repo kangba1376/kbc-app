@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-title" content="康巴仓">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>康巴仓</title>
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <style>
+        :root { --bg: #f2f2f7; --card: #ffffff; --accent: #d35400; --today-bg: #fff9db; --text-main: #1c1c1e; --text-sec: #8e8e93; --active-bg: #e67e22; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; width: 100%; overflow: hidden; background: var(--bg); font-family: -apple-system, sans-serif; }
+        .wrapper { display: flex; flex-direction: column; height: 100vh; width: 100vw; padding: 10px env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); padding-top: env(safe-area-inset-top); }
+        header { flex: 0 0 auto; text-align: center; padding: 5px 0; }
+        .t-name { font-size: 1.2rem; font-weight: bold; color: var(--accent); }
+        #status-box { flex: 0 0 auto; background: var(--card); border-radius: 12px; padding: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 8px; border: 1px solid #eee; }
+        #clock { font-size: 0.8rem; color: var(--text-sec); font-family: monospace; }
+        #msg { font-size: 1.1rem; font-weight: 600; color: #27ae60; margin-top: 2px; }
+        .btn { flex: 0 0 auto; width: 100%; padding: 14px; background: #34c759; color: #fff; border: none; border-radius: 10px; font-weight: bold; margin-bottom: 8px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        .content-area { flex: 1 1 auto; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+        .section-group { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+        .section-title { flex: 0 0 auto; font-size: 0.95rem; font-weight: bold; padding: 4px 5px; display: flex; align-items: center; }
+        .section-title::before { content: ""; width: 4px; height: 14px; background: var(--accent); margin-right: 8px; border-radius: 2px; }
+        .table-card { flex: 1; background: var(--card); border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; border: 1px solid #efeff4; }
+        table { width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed; }
+        th, td { border: 1px solid #f2f2f7; text-align: center; font-size: clamp(0.75rem, 2.5vw, 1rem); overflow: hidden; word-break: break-all; }
+        th { background: #f8f9fa; color: var(--text-sec); height: 30px; font-size: 0.8rem; }
+        .col-today { background-color: var(--today-bg) !important; }
+        .is-me { color: var(--accent); font-weight: bold; }
+        .active-cell { background-color: var(--active-bg) !important; color: white !important; font-weight: bold; }
+        .weekend-view { display: none; height: 100vh; width: 100vw; flex-direction: column; justify-content: center; align-items: center; background: white; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="wrapper" id="app-content">
+    <header><div class="t-name">教师：康巴仓</div></header>
+    <button class="btn" onclick="activateAudio()">点此激活离线提醒</button>
+    <div id="status-box">
+        <div id="clock">00:00:00</div>
+        <div id="msg">加载中...</div>
+    </div>
+    <div class="content-area">
+        <div class="section-group">
+            <div class="section-title">上午课程</div>
+            <div class="table-card"><table><thead><tr><th style="width: 20%;">节次</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th></tr></thead><tbody id="tb-morning"></tbody></table></div>
+        </div>
+        <div class="section-group">
+            <div class="section-title">下午课程</div>
+            <div class="table-card"><table><thead><tr><th style="width: 20%;">节次</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th></tr></thead><tbody id="tb-afternoon"></tbody></table></div>
+        </div>
+    </div>
+</div>
+<div id="weekend-ui" class="weekend-view"><h2 style="color: #7f8c8d;">休息日</h2><p style="margin-top:10px;">康巴仓老师，周末愉快！</p></div>
+<audio id="beep" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YTdvT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19v"></audio>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').then(reg => console.log('OK')).catch(err => console.log('ERR', err));
+        });
+    }
+    const cfg = { mS: "09:30", aS: "15:00", dur: 40, myKeys: ["美术", "音乐", "书法"] };
+    const morningData = [["第一节", "", "", "", "", ""], ["第二节", "", "", "", "", ""], ["第三节", "美术1", "", "", "美术2", ""], ["第四节", "", "", "", "", "书法1 2"]];
+    const afternoonData = [["第一节", "", "美术2", "", "", ""], ["第二节", "", "", "音乐2", "", ""], ["第三节", "", "美术1", "", "", ""]];
+    function timeAdd(t, m) { let [h, min] = t.split(':').map(Number); let d = new Date(); d.setHours(h, min + m); return d.toTimeString().slice(0, 5); }
+    const slots = [];
+    let cm = cfg.mS; for(let i=0; i<4; i++) { let s = cm, e = timeAdd(s, cfg.dur); slots.push({s, e}); cm = timeAdd(e, i===1 ? 20 : 15); }
+    let ca = cfg.aS; for(let i=0; i<3; i++) { let s = ca, e = timeAdd(s, cfg.dur); slots.push({s, e}); ca = timeAdd(e, 15); }
+    const day = new Date().getDay();
+    function renderTable(id, data, start) {
+        const body = document.getElementById(id);
+        data.forEach((r, idx) => {
+            const gIdx = start + idx;
+            let tr = document.createElement('tr');
+            tr.innerHTML = `<td style="background:#fcfcfc; font-weight:bold;">${r[0]}<br><small style="font-weight:normal; font-size:0.6rem; color:#999">${slots[gIdx].s}</small></td>`;
+            for(let i=1; i<=5; i++) {
+                let td = document.createElement('td'); td.innerText = r[i] || ""; td.id = `c-${gIdx}-${i}`;
+                if(i === day) td.classList.add('col-today');
+                if(cfg.myKeys.some(k => r[i].includes(k))) td.classList.add('is-me');
+                tr.appendChild(td);
+            }
+            body.appendChild(tr);
+        });
+    }
+    renderTable('tb-morning', morningData, 0); renderTable('tb-afternoon', afternoonData, 4);
+    let a40 = new Set(), a5 = new Set();
+    function activateAudio() { document.getElementById('beep').play(); alert("提醒已激活！"); }
+    function refresh() {
+        const now = new Date(); const nowS = now.toTimeString().slice(0, 5); const wk = now.getDay();
+        document.getElementById('clock').innerText = now.toLocaleTimeString('zh-CN', {hour12:false});
+        if(wk === 0 || wk === 6) { document.getElementById('app-content').style.display = 'none'; document.getElementById('weekend-ui').style.display = 'flex'; return; }
+        let msg = "当前无课程"; let lastE = slots[slots.length-1].e;
+        if(nowS >= lastE) { msg = "今日课程已结束"; } else {
+            let next = null; const full = [...morningData, ...afternoonData];
+            slots.forEach((t, i) => {
+                const cell = document.getElementById(`c-${i}-${wk}`); const name = full[i][wk]; const isMe = cfg.myKeys.some(k => name.includes(k));
+                if(nowS >= t.s && nowS < t.e) { cell.classList.add('active-cell'); if(isMe) msg = `正在上课：${name}`; } else { cell.classList.remove('active-cell'); }
+                if(isMe && t.s > nowS && !next) next = { n: name, s: t.s, i: i };
+            });
+            if(msg === "当前无课程" && next) {
+                msg = `下节课：${next.n} (${next.s})`;
+                let diff = (new Date(now.toDateString() + " " + next.s) - now) / 60000;
+                if(diff <= 40 && diff > 39 && !a40.has(next.i)) { notify(next.n + " 40分后上课"); a40.add(next.i); }
+                if(diff <= 5 && diff > 4 && !a5.has(next.i)) { notify(next.n + " 5分后上课！"); a5.add(next.i); }
+            }
+        }
+        document.getElementById('msg').innerText = msg;
+    }
+    function notify(m) { document.getElementById('beep').play(); alert(m); }
+    setInterval(refresh, 1000); refresh();
+</script>
+</body>
+</html>
