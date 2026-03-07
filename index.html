@@ -7,7 +7,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    
     <title>སློབ་ཚན་རེའུ་མིག</title>
     <style>
         @font-face {
@@ -35,7 +34,8 @@
             flex-direction: column;
             height: 100vh;
             width: 100vw;
-            padding: env(safe-area-inset-top) 12px calc(env(safe-area-inset-bottom) + 20px) 12px;
+            /* 关键修改：底部不再预留多余的 20px，仅保留系统安全边距 */
+            padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
             background: linear-gradient(rgba(248,249,250,0.92), rgba(248,249,250,0.92)), url('apple-touch-icon.png') no-repeat center;
             background-size: 50%;
         }
@@ -75,6 +75,7 @@
             flex-direction: column;
             gap: 10px;
             min-height: 0; 
+            margin-bottom: 5px; /* 给最底部留一点点呼吸感 */
         }
 
         .section-group {
@@ -199,17 +200,14 @@
         const nowS = now.toTimeString().slice(0, 5);
         const wk = now.getDay(); 
         const realWk = (wk === 0) ? 7 : wk; 
-        
         document.getElementById('clock').innerText = now.toLocaleTimeString('zh-CN', {hour12:false});
         const msgEl = document.getElementById('msg');
-        
         slots.forEach((_, i) => {
             for(let j=1; j<=7; j++) {
                 const cell = document.getElementById(`c-${i}-${j}`);
                 if (cell) cell.classList.remove('col-today', 'active-cell');
             }
         });
-
         slots.forEach((t, i) => {
             for(let j=1; j<=7; j++) {
                 const cell = document.getElementById(`c-${i}-${j}`);
@@ -221,7 +219,6 @@
                 }
             }
         });
-
         if (realWk >= 6) {
             msgEl.innerText = (realWk === 6) ? "དེ་རིང་གཟའ་སྤེན་པ་རེད། གཟའ་མཇུག་སྤྲོ།" : "དེ་རིང་གཟའ་ཉི་མ་རེད། གཟའ་མཇུག་སྤྲོ།";
         } else {
@@ -235,7 +232,6 @@
             msgEl.innerText = currentCourse ? `ད་ལྟ།: ${currentCourse}` : "ད་ལྟ་སློབ་ཚན་མེད།";
         }
     }
-    
     setInterval(refresh, 1000); 
     refresh();
 
