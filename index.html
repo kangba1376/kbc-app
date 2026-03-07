@@ -38,7 +38,8 @@
         .wrapper { 
             display: flex; flex-direction: column; 
             height: 100vh; width: 100vw; 
-            padding: 10px env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); 
+            /* འོག་གི་བར་སྟོང་ 20px བཞག་ནས་ཁ་པར་གྱི་མཐའ་ལ་མི་ཐུག་པར་བཟོས། */
+            padding: 10px env(safe-area-inset-right) calc(env(safe-area-inset-bottom) + 20px) env(safe-area-inset-left); 
             padding-top: env(safe-area-inset-top); 
             background-image: linear-gradient(rgba(248,249,250,0.92), rgba(248,249,250,0.92)), url('apple-touch-icon.png');
             background-size: 60%; background-repeat: no-repeat; background-position: center;
@@ -75,7 +76,6 @@
         .table-card { flex: 1; overflow: hidden; display: flex; }
         table { width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed; }
         
-        /* ཡི་གེའི་ཆེ་ཆུང་ལ་ལེགས་བཅོས་བྱས་ཏེ་མིང་ཆ་ཚང་ཤོང་བར་བཟོས། */
         th, td { border: 1px solid #f0f0f0; text-align: center; font-size: clamp(0.65rem, 2.5vw, 0.9rem); padding: 2px 0; }
         th { background: #fcfcfc; color: var(--text-sec); height: 35px; }
         
@@ -134,6 +134,15 @@
 <audio id="beep" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YTdvT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19v"></audio>
 
 <script>
+    // Service Worker རེའུ་འགོད།
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('SW Registered'))
+                .catch(err => console.log('SW Failed', err));
+        });
+    }
+
     const cfg = { mS: "09:30", aS: "15:00", dur: 40, myKeys: ["རི་མོ།", "གླུ་གཞས།", "ཡིག་གཟུགས།"] };
     
     const morningData = [
