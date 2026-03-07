@@ -79,29 +79,39 @@
             min-height: 0;
         }
 
-        .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-        .grid-row { display: flex; flex: 1; border-bottom: 1px solid #f2f2f2; min-height: 0; }
+        .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; width: 100%; table-layout: fixed; }
+        .grid-row { display: flex; flex: 1; border-bottom: 1px solid #f2f2f2; min-height: 0; width: 100%; }
         .grid-row:last-child { border-bottom: none; }
         .grid-header { background: #fafafa; flex: 0 0 auto; height: clamp(22px, 3.2vh, 34px); border-bottom: 1px solid #eee; }
 
         .cell { 
-            flex: 1; display: flex; align-items: center; justify-content: center;
+            flex: 1; 
+            width: 0; /* 强制单元格平分宽度，不被内容撑开 */
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
             border-right: 1px solid #f2f2f2; 
-            font-size: clamp(8px, 1.6vh, 15px);
+            font-size: clamp(8px, 1.5vh, 14px);
             text-align: center; 
-            line-height: 1.6; 
-            padding: 2px 1px;
-            overflow: visible;
+            line-height: 1.4; 
+            padding: 1px;
+            overflow: hidden; /* 防止溢出 */
         }
         
-        /* 核心修改：缩放星期名称字号并改为蓝色 */
+        /* 核心修改：内部容器负责强制不换行，如果太长则整体缩小 */
+        .cell-inner {
+            white-space: nowrap;
+            display: inline-block;
+            transform-origin: center;
+        }
+
         .grid-header .cell {
             font-size: clamp(7px, 1.4vh, 13px);
             color: var(--blue);
         }
 
         .cell:last-child { border-right: none; }
-        .num-col { flex: 0 0 14%; color: #8b0000; font-weight: bold; background: #fdfdfd; flex-direction: column; }
+        .num-col { flex: 0 0 14%; color: #8b0000; font-weight: bold; background: #fdfdfd; flex-direction: column; width: 14% !important; }
 
         .col-today { background-color: #fff5f5 !important; }
         .active-cell { background-color: var(--accent) !important; color: white !important; font-weight: bold; }
@@ -109,8 +119,14 @@
         @media (orientation: landscape) {
             .wrapper { padding: env(safe-area-inset-top) 40px 30px 40px; }
             .content-area { gap: 4px; }
-            .cell { font-size: clamp(10px, 4.5vh, 18px); padding: 4px 1px; }
-            .grid-header .cell { font-size: clamp(9px, 4vh, 16px); }
+            .cell { 
+                font-size: clamp(10px, 4.2vh, 16px); 
+                padding: 3px 1px; 
+                line-height: 1.5; 
+            }
+            .grid-header .cell { font-size: clamp(9px, 3.8vh, 15px); }
+            .t-name { font-size: clamp(14px, 5vh, 20px); }
+            .btn { height: clamp(24px, 6vh, 36px); font-size: clamp(12px, 3vh, 16px); }
         }
     </style>
 </head>
@@ -128,8 +144,14 @@
         <div class="section-group">
             <div class="grid-container">
                 <div class="grid-row grid-header">
-                    <div class="cell num-col" style="font-size:0.7em; color: #8b0000;">ཚོགས་ཐེངས།</div>
-                    <div class="cell">ཟླ་བ།</div><div class="cell">མིག་དམར།</div><div class="cell">ལྷག་པ།</div><div class="cell">ཕུར་བུ།</div><div class="cell">པ་སངས་།</div><div class="cell">སྤེན་པ།</div><div class="cell">ཉི་མ།</div>
+                    <div class="cell num-col" style="font-size:0.7em; color: #8b0000;"><span class="cell-inner">ཚོགས་ཐེངས།</span></div>
+                    <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div>
+                    <div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
+                    <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div>
+                    <div class="cell"><span class="cell-inner">ཕུར་བུ།</span></div>
+                    <div class="cell"><span class="cell-inner">པ་སངས་།</span></div>
+                    <div class="cell"><span class="cell-inner">སྤེན་པ།</span></div>
+                    <div class="cell"><span class="cell-inner">ཉི་མ།</span></div>
                 </div>
                 <div id="grid-morning" style="display:contents"></div>
             </div>
@@ -137,8 +159,14 @@
         <div class="section-group">
             <div class="grid-container">
                 <div class="grid-row grid-header">
-                    <div class="cell num-col" style="font-size:0.7em; color: #8b0000;">ཚོགས་ཐེངས།</div>
-                    <div class="cell">ཟླ་བ།</div><div class="cell">མིག་དམར།</div><div class="cell">ལྷག་པ།</div><div class="cell">ཕུར་བུ།</div><div class="cell">པ་སངས་།</div><div class="cell">སྤེན་པ།</div><div class="cell">ཉི་མ།</div>
+                    <div class="cell num-col" style="font-size:0.7em; color: #8b0000;"><span class="cell-inner">ཚོགས་ཐེངས།</span></div>
+                    <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div>
+                    <div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
+                    <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div>
+                    <div class="cell"><span class="cell-inner">ཕུར་བུ།</span></div>
+                    <div class="cell"><span class="cell-inner">པ་སངས་།</span></div>
+                    <div class="cell"><span class="cell-inner">སྤེན་པ།</span></div>
+                    <div class="cell"><span class="cell-inner">ཉི་མ།</span></div>
                 </div>
                 <div id="grid-afternoon" style="display:contents"></div>
             </div>
@@ -149,7 +177,7 @@
 <script>
     const cfg = { mS: "09:30", aS: "15:00", dur: 40, myKeys: ["རི་མོ།", "གླུ་གཞས།", "ཡིག་གཟུགས།"] };
     const morningData = [["༡","","","","","","",""],["༢","","","","","","",""],["༣","རི་མོ།༡","","","རི་མོ།༢","","",""],["༤","ངལ་རྩོལ།","","","","ཡིག་གཟུགས།༡༢","",""]];
-    const afternoonData = [["༡","","རི་མོ།༢","","","","",""],["༢","","","གླུ་གཞས།༢","","སློབ་གསོ།","",""],["༣","","རི་མོ།༡","","","","",""]];
+    const afternoonData = [["༡","","རི་མོ།༢","","","","",""],["༢","","","གླུ་གཞས།༡༢","","སློབ་གསོ།","",""],["༣","","རི་མོ།༡","","","","",""]];
 
     function timeAdd(t, m) { 
         let [h, min] = t.split(':').map(Number); 
@@ -166,13 +194,16 @@
         data.forEach((r, idx) => {
             let row = document.createElement('div');
             row.className = 'grid-row';
-            row.innerHTML = `<div class="cell num-col">${r[0]}</div>`;
+            row.innerHTML = `<div class="cell num-col"><span class="cell-inner">${r[0]}</span></div>`;
             for(let i=1; i<=7; i++) {
                 let cell = document.createElement('div');
                 cell.className = 'cell';
-                cell.innerText = r[i] || "";
+                let inner = document.createElement('span');
+                inner.className = 'cell-inner';
+                inner.innerText = r[i] || "";
                 cell.id = `c-${start+idx}-${i}`;
                 if(r[i] && cfg.myKeys.some(k => r[i].includes(k))) cell.style.color = "var(--accent)";
+                cell.appendChild(inner);
                 row.appendChild(cell);
             }
             container.appendChild(row);
@@ -211,6 +242,16 @@
             slots.forEach((t, i) => { if (nowS >= t.s && nowS < t.e) cur = full[i][realWk] || "ནང་སྦྱོང་།"; });
             msgEl.innerText = cur ? `ད་ལྟ།: ${cur}` : "སློབ་ཚན་མེད།";
         }
+        
+        // 动态检查所有单元格，如果内容宽度超过格子，则缩小显示
+        document.querySelectorAll('.cell').forEach(c => {
+            const inner = c.querySelector('.cell-inner');
+            if(inner && inner.innerText !== "") {
+                inner.style.transform = "scale(1)"; // 重置
+                const ratio = (c.offsetWidth - 4) / inner.offsetWidth;
+                if(ratio < 1) inner.style.transform = `scale(${ratio})`;
+            }
+        });
     }
     setInterval(refresh, 1000); refresh();
 
