@@ -24,7 +24,7 @@
         
         html, body { 
             height: 100%; width: 100%; 
-            overflow: hidden; 
+            overflow: hidden; /* 严禁滚动 */
             background: var(--bg);
             font-family: 'TibetWildYak', -apple-system, sans-serif;
         }
@@ -39,92 +39,84 @@
             background-size: 50%;
         }
 
-        header { flex: 0 0 auto; padding: 5px 0; text-align: center; }
-        .t-name { font-size: 24px; font-weight: bold; color: var(--accent); }
+        header { flex: 0 0 auto; padding: 2px 0; text-align: center; }
+        .t-name { font-size: clamp(18px, 4vh, 24px); font-weight: bold; color: var(--accent); }
 
         .btn { 
-            flex: 0 0 auto; width: 100%; height: 44px; 
+            flex: 0 0 auto; width: 100%; height: clamp(30px, 5vh, 44px); 
             background: #27ae60; color: #fff; border: none; border-radius: 10px; 
-            font-size: 18px; margin: 5px 0; font-family: 'TibetWildYak';
+            font-size: clamp(14px, 2.5vh, 18px); margin: 2px 0; font-family: 'TibetWildYak';
             cursor: pointer;
         }
 
         #status-box { 
             flex: 0 0 auto; background: #fff; border-radius: 12px; border: 1px solid #eee; 
-            padding: 6px; text-align: center; margin-bottom: 8px;
+            padding: 4px; text-align: center; margin-bottom: 4px;
         }
-        #clock { font-size: 14px; color: #8e8e93; font-family: monospace; }
+        #clock { font-size: 12px; color: #8e8e93; font-family: monospace; }
         
         #msg { 
-            font-size: 18px; 
+            font-size: clamp(14px, 2.5vh, 18px); 
             font-weight: bold; 
             color: var(--accent); 
             border: 2px solid var(--accent);
-            border-top: 5px solid var(--accent);
-            border-radius: 10px;
-            padding: 8px;
-            margin-top: 5px;
+            border-top: 4px solid var(--accent);
+            border-radius: 8px;
+            padding: 4px;
             background: #fff;
-            display: block;
         }
 
-        /* 核心修改：内容区域允许在高度不足时滚动 */
         .content-area {
-            flex: 1; 
+            flex: 1; /* 占据剩余所有高度 */
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            overflow-y: auto; /* 高度溢出时显示垂直滚动条 */
-            -webkit-overflow-scrolling: touch; /* iOS 丝滑滚动 */
-            padding-bottom: 10px;
+            gap: 6px;
+            min-height: 0; /* 允许内部元素收缩 */
         }
 
         .section-group {
-            flex: 0 0 auto; /* 改为固定高度，由内容撑开 */
-            min-height: 200px;
+            flex: 1; /* 上下午表格平分剩余高度 */
             display: flex;
             flex-direction: column;
             background: #fff;
-            border-radius: 12px;
+            border-radius: 10px;
             border: 2px solid var(--accent);
-            border-top: 5px solid var(--accent);
+            border-top: 4px solid var(--accent);
             overflow: hidden;
-            margin-bottom: 5px;
+            min-height: 0;
         }
 
         .section-title { 
-            flex: 0 0 auto; padding: 4px 0; 
-            font-size: clamp(14px, 2.2vh, 18px); 
-            display: flex; align-items: center; justify-content: center; 
+            flex: 0 0 auto; padding: 1px 0; 
+            font-size: clamp(12px, 2vh, 16px); 
             color: var(--blue); background: rgba(0,122,255,0.03); 
-            font-weight: bold;
+            font-weight: bold; text-align: center;
         }
 
-        .table-card { flex: 1; display: flex; }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .table-card { flex: 1; display: flex; min-height: 0; }
+        table { width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed; }
         
         th, td { 
             border: 1px solid #f2f2f2; text-align: center; 
-            font-size: clamp(10px, 1.7vh, 16px); 
-            padding: 4px 1px;
+            font-size: clamp(9px, 1.8vh, 15px); 
+            padding: 0;
+            line-height: 1.1;
         }
-        th { background: #fafafa; color: #8e8e93; font-size: clamp(8px, 1.3vh, 11px); }
+        th { background: #fafafa; color: #8e8e93; font-size: clamp(8px, 1.2vh, 11px); }
         
-        .num-col { color: #8b0000; font-weight: bold; background: #fdfdfd; width: 15%; }
+        .num-col { color: #8b0000; font-weight: bold; background: #fdfdfd; width: 14%; }
         .col-today { background-color: #fff5f5 !important; }
         .active-cell { background-color: var(--accent) !important; color: white !important; font-weight: bold; }
 
-        /* 横屏模式下的适配 */
         @media (orientation: landscape) {
             .wrapper { padding: env(safe-area-inset-top) 5vw 30px 5vw; }
-            .t-name { font-size: 20px; }
-            .btn { height: 36px; font-size: 16px; }
-            .section-group { min-height: auto; }
-            th, td { padding: 8px 2px; font-size: 16px; }
+            .content-area { gap: 4px; }
+            th, td { font-size: clamp(10px, 4vh, 18px); }
         }
     </style>
 </head>
 <body>
+
 <div class="wrapper">
     <header><div class="t-name">དགེན་ཁམས་པ་ཚང་།</div></header>
     <button class="btn" id="audioBtn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button>
@@ -184,7 +176,7 @@
         const body = document.getElementById(id);
         data.forEach((r, idx) => {
             let tr = document.createElement('tr');
-            tr.innerHTML = `<td class="num-col">${r[0]}<br><span style="font-size:0.75em;opacity:0.6">${slots[start+idx].s}</span></td>`;
+            tr.innerHTML = `<td class="num-col">${r[0]}<br><span style="font-size:0.7em;opacity:0.6">${slots[start+idx].s}</span></td>`;
             for(let i=1; i<=7; i++) {
                 let td = document.createElement('td');
                 td.innerText = r[i] || "";
@@ -208,32 +200,27 @@
         const realWk = (wk === 0) ? 7 : wk; 
         document.getElementById('clock').innerText = now.toLocaleTimeString('zh-CN', {hour12:false});
         const msgEl = document.getElementById('msg');
-        slots.forEach((_, i) => {
-            for(let j=1; j<=7; j++) {
-                const cell = document.getElementById(`c-${i}-${j}`);
-                if (cell) cell.classList.remove('col-today', 'active-cell');
-            }
-        });
+        
         slots.forEach((t, i) => {
             for(let j=1; j<=7; j++) {
                 const cell = document.getElementById(`c-${i}-${j}`);
-                if (cell && j === realWk) {
-                    cell.classList.add('col-today');
-                    if (nowS >= t.s && nowS < t.e) {
-                        cell.classList.add('active-cell');
+                if (cell) {
+                    cell.classList.remove('col-today', 'active-cell');
+                    if (j === realWk) {
+                        cell.classList.add('col-today');
+                        if (nowS >= t.s && nowS < t.e) cell.classList.add('active-cell');
                     }
                 }
             }
         });
+
         if (realWk >= 6) {
             msgEl.innerText = (realWk === 6) ? "དེ་རིང་གཟའ་སྤེན་པ་རེད། གཟའ་མཇུག་སྤྲོ།" : "དེ་རིང་གཟའ་ཉི་མ་རེད། གཟའ་མཇུག་སྤྲོ།";
         } else {
             const full = [...morningData, ...afternoonData];
             let currentCourse = "";
             slots.forEach((t, i) => {
-                if (nowS >= t.s && nowS < t.e) {
-                    currentCourse = full[i][realWk] || "ནང་སྦྱོང་།";
-                }
+                if (nowS >= t.s && nowS < t.e) currentCourse = full[i][realWk] || "ནང་སྦྱོང་།";
             });
             msgEl.innerText = currentCourse ? `ད་ལྟ།: ${currentCourse}` : "ད་ལྟ་སློབ་ཚན་མེད།";
         }
@@ -261,7 +248,7 @@
             btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་ཟིན།";
             btn.disabled = true;
         } catch (e) {
-            btn.innerText = "激活失败, 重试";
+            btn.innerText = "激活失败";
         }
     }
 </script>
