@@ -89,7 +89,7 @@
             border-right: 1px solid #f2f2f2; 
             font-size: clamp(8px, 1.6vh, 15px);
             text-align: center; 
-            line-height: 1.6; /* 进一步优化行高，确保藏文符号完整 */
+            line-height: 1.6; 
             padding: 2px 1px;
             overflow: visible;
         }
@@ -158,7 +158,8 @@
         data.forEach((r, idx) => {
             let row = document.createElement('div');
             row.className = 'grid-row';
-            row.innerHTML = `<div class="cell num-col">${r[0]}<span style="font-size:0.7em;opacity:0.6">${slots[start+idx].s}</span></div>`;
+            // 修改点：删除了 <span> 内的时间显示
+            row.innerHTML = `<div class="cell num-col">${r[0]}</div>`;
             for(let i=1; i<=7; i++) {
                 let cell = document.createElement('div');
                 cell.className = 'cell';
@@ -196,7 +197,7 @@
         });
 
         if (realWk >= 6) {
-            msgEl.innerText = (realWk === 6) ? "གཟའ་སྤེན་པ་བདེ་ལེགས།" : "གཟའ་ཉི་མ་བདེ་ལེགས།";
+            msgEl.innerText = (realWk === 6) ? "དེ་རིང་གཟའ་སྤེན་པ་རེད། གཟའ་མཇུག་སྤྲོ།" : "དེ་རིང་གཟའ་ཉིན་མ་རེད། གཟའ་མཇུག་སྤྲོ།";
         } else {
             const full = [...morningData, ...afternoonData];
             let cur = "";
@@ -218,7 +219,11 @@
             gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
             osc.connect(gain); gain.connect(ctx.destination);
             osc.start(); osc.stop(ctx.currentTime + 0.15);
-            btn.style.background = "#95a5a6"; btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་ཟིན།"; btn.disabled = true;
+            
+            // 修改点：激活后背景色变为红色
+            btn.style.background = "#c0392b"; 
+            btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་ཟིན།"; 
+            btn.disabled = true;
         } catch (e) { btn.innerText = "激活失败"; }
     }
 </script>
