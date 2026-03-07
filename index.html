@@ -86,7 +86,7 @@
 
         .cell { 
             flex: 1; 
-            width: 0; /* 强制单元格平分宽度，不被内容撑开 */
+            width: 0; 
             display: flex; 
             align-items: center; 
             justify-content: center;
@@ -95,10 +95,9 @@
             text-align: center; 
             line-height: 1.4; 
             padding: 1px;
-            overflow: hidden; /* 防止溢出 */
+            overflow: hidden; 
         }
         
-        /* 核心修改：内部容器负责强制不换行，如果太长则整体缩小 */
         .cell-inner {
             white-space: nowrap;
             display: inline-block;
@@ -179,6 +178,12 @@
     const morningData = [["༡","","","","","","",""],["༢","","","","","","",""],["༣","རི་མོ།༡","","","རི་མོ།༢","","",""],["༤","ངལ་རྩོལ།","","","","ཡིག་གཟུགས།༡༢","",""]];
     const afternoonData = [["༡","","རི་མོ།༢","","","","",""],["༢","","","གླུ་གཞས།༡༢","","སློབ་གསོ།","",""],["༣","","རི་མོ།༡","","","","",""]];
 
+    let audioCtx = null;
+    let isAudioMuted = false;
+    let currentReminderKey = ""; // 记录当前提醒的时间节点
+    let reminderCount = 0;
+    let reminderStartTime = 0;
+
     function timeAdd(t, m) { 
         let [h, min] = t.split(':').map(Number); 
         let d = new Date(); d.setHours(h, min + m); 
@@ -213,6 +218,17 @@
     renderGrid('grid-morning', morningData, 0);
     renderGrid('grid-afternoon', afternoonData, 4);
 
+    function playBeep() {
+        if (!audioCtx || isAudioMuted) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+    }
+
     function refresh() {
         const now = new Date();
         const nowS = now.toTimeString().slice(0, 5);
@@ -221,6 +237,7 @@
         document.getElementById('clock').innerText = now.toLocaleTimeString('zh-CN', {hour12:false});
         const msgEl = document.getElementById('msg');
         
+        let activeClassFound = false;
         slots.forEach((t, i) => {
             for(let j=1; j<=7; j++) {
                 const cell = document.getElementById(`c-${i}-${j}`);
@@ -228,11 +245,50 @@
                     cell.classList.remove('col-today', 'active-cell');
                     if (j === realWk) {
                         cell.classList.add('col-today');
-                        if (nowS >= t.s && nowS < t.e) cell.classList.add('active-cell');
+                        if (nowS >= t.s && nowS < t.e) {
+                            cell.classList.add('active-cell');
+                            activeClassFound = true;
+                        }
                     }
                 }
             }
+
+            // 声音逻辑：检查开课前40分钟和5分钟
+            if (realWk < 6) {
+                const checkTimes = [40, 5];
+                checkTimes.forEach(offset => {
+                    const triggerTime = timeAdd(t.s, -offset);
+                    const key = `slot-${i}-${offset}`;
+                    if (nowS === triggerTime) {
+                        if (currentReminderKey !== key) {
+                            currentReminderKey = key;
+                            isAudioMuted = false;
+                            reminderCount = 0;
+                            reminderStartTime = Date.now();
+                            const btn = document.getElementById('audioBtn');
+                            btn.style.background = "#e67e22";
+                            btn.innerText = "🔔 སྒྲ་མཚམས་འཇོག་པ། (关闭当前提醒)";
+                            btn.disabled = false;
+                        }
+                    }
+                });
+            }
         });
+
+        // 提醒循环控制：响1分钟停1分钟，循环3次
+        if (currentReminderKey !== "" && !isAudioMuted) {
+            const elapsed = Math.floor((Date.now() - reminderStartTime) / 60000); // 经过了几分钟
+            const cycleIndex = Math.floor(elapsed / 2); // 第几次循环 (0, 1, 2)
+            const isPlayingPhase = elapsed % 2 === 0; // 偶数分钟响，奇数分钟停
+
+            if (cycleIndex < 3) {
+                if (isPlayingPhase) {
+                    if (now.getMilliseconds() < 1000 && now.getSeconds() % 2 === 0) playBeep(); 
+                }
+            } else {
+                stopAudioRemind(); // 三次结束
+            }
+        }
 
         if (realWk >= 6) {
             msgEl.innerText = (realWk === 6) ? "དེ་རིང་གཟའ་སྤེན་པ་རེད། གཟའ་མཇུག་སྤྲོ།" : "དེ་རིང་གཟའ་ཉིན་མ་རེད། གཟའ་མཇུག་སྤྲོ།";
@@ -243,35 +299,39 @@
             msgEl.innerText = cur ? `ད་ལྟ།: ${cur}` : "སློབ་ཚན་མེད།";
         }
         
-        // 动态检查所有单元格，如果内容宽度超过格子，则缩小显示
         document.querySelectorAll('.cell').forEach(c => {
             const inner = c.querySelector('.cell-inner');
             if(inner && inner.innerText !== "") {
-                inner.style.transform = "scale(1)"; // 重置
+                inner.style.transform = "scale(1)";
                 const ratio = (c.offsetWidth - 4) / inner.offsetWidth;
                 if(ratio < 1) inner.style.transform = `scale(${ratio})`;
             }
         });
     }
-    setInterval(refresh, 1000); refresh();
+
+    function stopAudioRemind() {
+        isAudioMuted = true;
+        const btn = document.getElementById('audioBtn');
+        btn.style.background = "#27ae60";
+        btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་ཟིན།";
+    }
 
     function activateAudio() { 
+        if (currentReminderKey !== "" && !isAudioMuted) {
+            stopAudioRemind();
+            return;
+        }
         const btn = document.getElementById('audioBtn');
         try {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
-            const ctx = new AudioContext();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.frequency.setValueAtTime(880, ctx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.01);
-            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
-            osc.connect(gain); gain.connect(ctx.destination);
-            osc.start(); osc.stop(ctx.currentTime + 0.15);
+            audioCtx = new AudioContext();
+            playBeep(); 
             btn.style.background = "#c0392b"; 
             btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་ཟིན།"; 
-            btn.disabled = true;
         } catch (e) { btn.innerText = "激活失败"; }
     }
+
+    setInterval(refresh, 1000); refresh();
 </script>
 </body>
 </html>
