@@ -34,8 +34,7 @@
             flex-direction: column;
             height: 100vh;
             width: 100vw;
-            /* 关键修改：底部不再预留多余的 20px，仅保留系统安全边距 */
-            padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom) 12px;
+            padding: env(safe-area-inset-top) 12px 30px 12px;
             background: linear-gradient(rgba(248,249,250,0.92), rgba(248,249,250,0.92)), url('apple-touch-icon.png') no-repeat center;
             background-size: 50%;
         }
@@ -69,17 +68,20 @@
             display: block;
         }
 
+        /* 核心修改：内容区域允许在高度不足时滚动 */
         .content-area {
             flex: 1; 
             display: flex;
             flex-direction: column;
             gap: 10px;
-            min-height: 0; 
-            margin-bottom: 5px; /* 给最底部留一点点呼吸感 */
+            overflow-y: auto; /* 高度溢出时显示垂直滚动条 */
+            -webkit-overflow-scrolling: touch; /* iOS 丝滑滚动 */
+            padding-bottom: 10px;
         }
 
         .section-group {
-            flex: 1; 
+            flex: 0 0 auto; /* 改为固定高度，由内容撑开 */
+            min-height: 200px;
             display: flex;
             flex-direction: column;
             background: #fff;
@@ -87,38 +89,42 @@
             border: 2px solid var(--accent);
             border-top: 5px solid var(--accent);
             overflow: hidden;
+            margin-bottom: 5px;
         }
 
         .section-title { 
-            flex: 0 0 auto; padding: 2px 0; 
+            flex: 0 0 auto; padding: 4px 0; 
             font-size: clamp(14px, 2.2vh, 18px); 
             display: flex; align-items: center; justify-content: center; 
             color: var(--blue); background: rgba(0,122,255,0.03); 
             font-weight: bold;
         }
 
-        .table-card { flex: 1; display: flex; overflow: hidden; }
-        table { width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed; }
+        .table-card { flex: 1; display: flex; }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         
         th, td { 
             border: 1px solid #f2f2f2; text-align: center; 
             font-size: clamp(10px, 1.7vh, 16px); 
-            padding: 1px;
+            padding: 4px 1px;
         }
-        th { background: #fafafa; color: #8e8e93; font-size: clamp(8px, 1.3vh, 11px); height: 3vh; }
+        th { background: #fafafa; color: #8e8e93; font-size: clamp(8px, 1.3vh, 11px); }
         
         .num-col { color: #8b0000; font-weight: bold; background: #fdfdfd; width: 15%; }
         .col-today { background-color: #fff5f5 !important; }
         .active-cell { background-color: var(--accent) !important; color: white !important; font-weight: bold; }
 
+        /* 横屏模式下的适配 */
         @media (orientation: landscape) {
-            .wrapper { padding-left: 10vw; padding-right: 10vw; }
-            th, td { font-size: clamp(12px, 3vh, 20px); }
+            .wrapper { padding: env(safe-area-inset-top) 5vw 30px 5vw; }
+            .t-name { font-size: 20px; }
+            .btn { height: 36px; font-size: 16px; }
+            .section-group { min-height: auto; }
+            th, td { padding: 8px 2px; font-size: 16px; }
         }
     </style>
 </head>
 <body>
-
 <div class="wrapper">
     <header><div class="t-name">དགེན་ཁམས་པ་ཚང་།</div></header>
     <button class="btn" id="audioBtn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button>
