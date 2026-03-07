@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kbc-v2.2'; // 每次修改 HTML 后，建议微调这个版本号
+const CACHE_NAME = 'kbc-v2.3'; // 每次修改 HTML 后，建议微调这个版本号
 const ASSETS = [
   './',              // 缓存根目录访问
   './index.html',     // 缓存主文件

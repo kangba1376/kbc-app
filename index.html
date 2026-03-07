@@ -200,7 +200,6 @@
         document.getElementById('clock').innerText = now.toLocaleTimeString('zh-CN', {hour12:false});
         const msgEl = document.getElementById('msg');
         
-        // 清除旧的高亮
         slots.forEach((_, i) => {
             for(let j=1; j<=7; j++) {
                 const cell = document.getElementById(`c-${i}-${j}`);
@@ -208,7 +207,6 @@
             }
         });
 
-        // 无论周末还是平时，高亮显示当天列
         slots.forEach((t, i) => {
             for(let j=1; j<=7; j++) {
                 const cell = document.getElementById(`c-${i}-${j}`);
@@ -221,7 +219,6 @@
             }
         });
 
-        // 状态栏文字显示
         if (realWk >= 6) {
             msgEl.innerText = (realWk === 6) ? "དེ་རིང་གཟའ་སྤེན་པ་རེད། གཟའ་མཇུག་སྤྲོ།" : "དེ་རིང་གཟའ་ཉི་མ་རེད། གཟའ་མཇུག་སྤྲོ།";
         } else {
@@ -239,21 +236,30 @@
     setInterval(refresh, 1000); 
     refresh();
 
-    // 终极声音激活方案：使用 Web Audio API
+    // 终极声音激活方案：Web Audio API + 明确的“嘀”声反馈
     function activateAudio() { 
         const btn = document.getElementById('audioBtn');
         try {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             const ctx = new AudioContext();
             
-            // 创建一个无声的瞬间震荡，激活 iOS/Android 声音上下文
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
-            gain.gain.value = 0.001; // 近乎无声
+            
+            // 设置频率为 880Hz (A5音)，清脆悦耳
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            
+            // 设置音量包络，快速淡入淡出防止爆音
+            gain.gain.setValueAtTime(0, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
+            
             osc.connect(gain);
             gain.connect(ctx.destination);
-            osc.start(0);
-            osc.stop(0.1);
+            
+            osc.start();
+            osc.stop(ctx.currentTime + 0.15);
 
             btn.style.background = "#95a5a6";
             btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་ཟིན།";
