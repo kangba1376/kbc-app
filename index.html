@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    
     <title>སློབ་ཚན་རེའུ་མིག</title>
     <style>
         @font-face {
@@ -236,31 +239,22 @@
     setInterval(refresh, 1000); 
     refresh();
 
-    // 终极声音激活方案：Web Audio API + 明确的“嘀”声反馈
     function activateAudio() { 
         const btn = document.getElementById('audioBtn');
         try {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             const ctx = new AudioContext();
-            
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
-            
-            // 设置频率为 880Hz (A5音)，清脆悦耳
             osc.type = 'sine';
             osc.frequency.setValueAtTime(880, ctx.currentTime);
-            
-            // 设置音量包络，快速淡入淡出防止爆音
             gain.gain.setValueAtTime(0, ctx.currentTime);
             gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.01);
             gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
-            
             osc.connect(gain);
             gain.connect(ctx.destination);
-            
             osc.start();
             osc.stop(ctx.currentTime + 0.15);
-
             btn.style.background = "#95a5a6";
             btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་ཟིན།";
             btn.disabled = true;
