@@ -93,6 +93,13 @@
             padding: 2px 1px;
             overflow: visible;
         }
+        
+        /* 核心修改：缩放星期名称字号并改为蓝色 */
+        .grid-header .cell {
+            font-size: clamp(7px, 1.4vh, 13px);
+            color: var(--blue);
+        }
+
         .cell:last-child { border-right: none; }
         .num-col { flex: 0 0 14%; color: #8b0000; font-weight: bold; background: #fdfdfd; flex-direction: column; }
 
@@ -103,6 +110,7 @@
             .wrapper { padding: env(safe-area-inset-top) 40px 30px 40px; }
             .content-area { gap: 4px; }
             .cell { font-size: clamp(10px, 4.5vh, 18px); padding: 4px 1px; }
+            .grid-header .cell { font-size: clamp(9px, 4vh, 16px); }
         }
     </style>
 </head>
@@ -120,7 +128,7 @@
         <div class="section-group">
             <div class="grid-container">
                 <div class="grid-row grid-header">
-                    <div class="cell num-col" style="font-size:0.7em">ཚོགས་ཐེངས།</div>
+                    <div class="cell num-col" style="font-size:0.7em; color: #8b0000;">ཚོགས་ཐེངས།</div>
                     <div class="cell">ཟླ་བ།</div><div class="cell">མིག་དམར།</div><div class="cell">ལྷག་པ།</div><div class="cell">ཕུར་བུ།</div><div class="cell">པ་སངས་།</div><div class="cell">སྤེན་པ།</div><div class="cell">ཉི་མ།</div>
                 </div>
                 <div id="grid-morning" style="display:contents"></div>
@@ -129,7 +137,7 @@
         <div class="section-group">
             <div class="grid-container">
                 <div class="grid-row grid-header">
-                    <div class="cell num-col" style="font-size:0.7em">ཚོགས་ཐེངས།</div>
+                    <div class="cell num-col" style="font-size:0.7em; color: #8b0000;">ཚོགས་ཐེངས།</div>
                     <div class="cell">ཟླ་བ།</div><div class="cell">མིག་དམར།</div><div class="cell">ལྷག་པ།</div><div class="cell">ཕུར་བུ།</div><div class="cell">པ་སངས་།</div><div class="cell">སྤེན་པ།</div><div class="cell">ཉི་མ།</div>
                 </div>
                 <div id="grid-afternoon" style="display:contents"></div>
@@ -158,7 +166,6 @@
         data.forEach((r, idx) => {
             let row = document.createElement('div');
             row.className = 'grid-row';
-            // 修改点：删除了 <span> 内的时间显示
             row.innerHTML = `<div class="cell num-col">${r[0]}</div>`;
             for(let i=1; i<=7; i++) {
                 let cell = document.createElement('div');
@@ -219,8 +226,6 @@
             gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
             osc.connect(gain); gain.connect(ctx.destination);
             osc.start(); osc.stop(ctx.currentTime + 0.15);
-            
-            // 修改点：激活后背景色变为红色
             btn.style.background = "#c0392b"; 
             btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་ཟིན།"; 
             btn.disabled = true;
