@@ -6,7 +6,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <title>སློབ་ཚན་རེའུ་མིག</title>
     <style>
         @font-face {
@@ -24,7 +23,7 @@
         
         html, body { 
             height: 100%; width: 100%; 
-            overflow: hidden; /* 严禁滚动 */
+            overflow: hidden; 
             background: var(--bg);
             font-family: 'TibetWildYak', -apple-system, sans-serif;
         }
@@ -34,84 +33,76 @@
             flex-direction: column;
             height: 100vh;
             width: 100vw;
-            padding: env(safe-area-inset-top) 12px 30px 12px;
-            background: linear-gradient(rgba(248,249,250,0.92), rgba(248,249,250,0.92)), url('apple-touch-icon.png') no-repeat center;
-            background-size: 50%;
+            padding: env(safe-area-inset-top) 8px 30px 8px;
+            background: linear-gradient(rgba(248,249,250,0.95), rgba(248,249,250,0.95)), url('apple-touch-icon.png') no-repeat center;
+            background-size: contain;
         }
 
-        header { flex: 0 0 auto; padding: 2px 0; text-align: center; }
-        .t-name { font-size: clamp(18px, 4vh, 24px); font-weight: bold; color: var(--accent); }
+        header { flex: 0 0 auto; padding: 2px 0; }
+        .t-name { font-size: clamp(16px, 3.8vh, 22px); font-weight: bold; color: var(--accent); text-align: center; }
 
         .btn { 
-            flex: 0 0 auto; width: 100%; height: clamp(30px, 5vh, 44px); 
-            background: #27ae60; color: #fff; border: none; border-radius: 10px; 
-            font-size: clamp(14px, 2.5vh, 18px); margin: 2px 0; font-family: 'TibetWildYak';
-            cursor: pointer;
+            flex: 0 0 auto; width: 100%; height: clamp(28px, 4.5vh, 40px); 
+            background: #27ae60; color: #fff; border: none; border-radius: 8px; 
+            font-size: clamp(14px, 2.2vh, 18px); margin-bottom: 4px; font-family: 'TibetWildYak';
         }
 
         #status-box { 
-            flex: 0 0 auto; background: #fff; border-radius: 12px; border: 1px solid #eee; 
-            padding: 4px; text-align: center; margin-bottom: 4px;
+            flex: 0 0 auto; background: #fff; border-radius: 8px; border: 1px solid #eee; 
+            padding: 2px; text-align: center; margin-bottom: 4px;
         }
-        #clock { font-size: 12px; color: #8e8e93; font-family: monospace; }
-        
+        #clock { font-size: 10px; color: #8e8e93; font-family: monospace; }
         #msg { 
-            font-size: clamp(14px, 2.5vh, 18px); 
-            font-weight: bold; 
-            color: var(--accent); 
-            border: 2px solid var(--accent);
-            border-top: 4px solid var(--accent);
-            border-radius: 8px;
-            padding: 4px;
-            background: #fff;
+            font-size: clamp(12px, 2.2vh, 18px); 
+            font-weight: bold; color: var(--accent); 
+            border: 1.5px solid var(--accent); border-top: 3.5px solid var(--accent);
+            border-radius: 6px; padding: 2px;
         }
 
         .content-area {
-            flex: 1; /* 占据剩余所有高度 */
+            flex: 1;
             display: flex;
             flex-direction: column;
             gap: 6px;
-            min-height: 0; /* 允许内部元素收缩 */
+            min-height: 0;
         }
 
         .section-group {
-            flex: 1; /* 上下午表格平分剩余高度 */
+            flex: 1; 
             display: flex;
             flex-direction: column;
             background: #fff;
-            border-radius: 10px;
-            border: 2px solid var(--accent);
-            border-top: 4px solid var(--accent);
+            border-radius: 8px;
+            border: 1.5px solid var(--accent);
+            border-top: 3.5px solid var(--accent);
             overflow: hidden;
             min-height: 0;
         }
 
-        .section-title { 
-            flex: 0 0 auto; padding: 1px 0; 
-            font-size: clamp(12px, 2vh, 16px); 
-            color: var(--blue); background: rgba(0,122,255,0.03); 
-            font-weight: bold; text-align: center;
-        }
+        .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+        .grid-row { display: flex; flex: 1; border-bottom: 1px solid #f2f2f2; min-height: 0; }
+        .grid-row:last-child { border-bottom: none; }
+        .grid-header { background: #fafafa; flex: 0 0 auto; height: clamp(22px, 3.2vh, 34px); border-bottom: 1px solid #eee; }
 
-        .table-card { flex: 1; display: flex; min-height: 0; }
-        table { width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed; }
-        
-        th, td { 
-            border: 1px solid #f2f2f2; text-align: center; 
-            font-size: clamp(9px, 1.8vh, 15px); 
-            padding: 0;
-            line-height: 1.1;
+        .cell { 
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            border-right: 1px solid #f2f2f2; 
+            font-size: clamp(8px, 1.6vh, 15px);
+            text-align: center; 
+            line-height: 1.6; /* 进一步优化行高，确保藏文符号完整 */
+            padding: 2px 1px;
+            overflow: visible;
         }
-        th { background: #fafafa; color: #8e8e93; font-size: clamp(8px, 1.2vh, 11px); }
-        
-        .num-col { color: #8b0000; font-weight: bold; background: #fdfdfd; width: 14%; }
+        .cell:last-child { border-right: none; }
+        .num-col { flex: 0 0 14%; color: #8b0000; font-weight: bold; background: #fdfdfd; flex-direction: column; }
+
         .col-today { background-color: #fff5f5 !important; }
         .active-cell { background-color: var(--accent) !important; color: white !important; font-weight: bold; }
 
         @media (orientation: landscape) {
-            .wrapper { padding: env(safe-area-inset-top) 5vw 30px 5vw; }
+            .wrapper { padding: env(safe-area-inset-top) 40px 30px 40px; }
             .content-area { gap: 4px; }
-            th, td { font-size: clamp(10px, 4vh, 18px); }
+            .cell { font-size: clamp(10px, 4.5vh, 18px); padding: 4px 1px; }
         }
     </style>
 </head>
@@ -122,36 +113,26 @@
     <button class="btn" id="audioBtn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button>
     <div id="status-box">
         <div id="clock">00:00:00</div>
-        <div id="msg">སྒུག་བཞིན་པ།...</div>
+        <div id="msg">...</div>
     </div>
 
     <div class="content-area">
         <div class="section-group">
-            <div class="section-title">སྔ་དྲོ།</div>
-            <div class="table-card">
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="num-col">ཚོགས་ཐེངས།</th>
-                            <th>ཟླ་བ།</th><th>མིག་དམར།</th><th>ལྷག་པ།</th><th>ཕུར་བུ།</th><th>པ་སངས་།</th><th>སྤེན་པ།</th><th>ཉི་མ།</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tb-morning"></tbody>
-                </table>
+            <div class="grid-container">
+                <div class="grid-row grid-header">
+                    <div class="cell num-col" style="font-size:0.7em">ཚོགས་ཐེངས།</div>
+                    <div class="cell">ཟླ་བ།</div><div class="cell">མིག་དམར།</div><div class="cell">ལྷག་པ།</div><div class="cell">ཕུར་བུ།</div><div class="cell">པ་སངས་།</div><div class="cell">སྤེན་པ།</div><div class="cell">ཉི་མ།</div>
+                </div>
+                <div id="grid-morning" style="display:contents"></div>
             </div>
         </div>
         <div class="section-group">
-            <div class="section-title">ཕྱི་དྲོ།</div>
-            <div class="table-card">
-                <table>
-                    <thead>
-                        <tr>
-                            <th class="num-col">ཚོགས་ཐེངས།</th>
-                            <th>ཟླ་བ།</th><th>མིག་དམར།</th><th>ལྷག་པ།</th><th>ཕུར་བུ།</th><th>པ་སངས་།</th><th>སྤེན་པ།</th><th>ཉི་མ།</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tb-afternoon"></tbody>
-                </table>
+            <div class="grid-container">
+                <div class="grid-row grid-header">
+                    <div class="cell num-col" style="font-size:0.7em">ཚོགས་ཐེངས།</div>
+                    <div class="cell">ཟླ་བ།</div><div class="cell">མིག་དམར།</div><div class="cell">ལྷག་པ།</div><div class="cell">ཕུར་བུ།</div><div class="cell">པ་སངས་།</div><div class="cell">སྤེན་པ།</div><div class="cell">ཉི་མ།</div>
+                </div>
+                <div id="grid-afternoon" style="display:contents"></div>
             </div>
         </div>
     </div>
@@ -172,26 +153,26 @@
     let cm = cfg.mS; for(let i=0; i<4; i++) { let s = cm, e = timeAdd(s, cfg.dur); slots.push({s, e}); cm = timeAdd(e, i===1 ? 20 : 15); }
     let ca = cfg.aS; for(let i=0; i<3; i++) { let s = ca, e = timeAdd(s, cfg.dur); slots.push({s, e}); ca = timeAdd(e, 15); }
 
-    function renderTable(id, data, start) {
-        const body = document.getElementById(id);
+    function renderGrid(id, data, start) {
+        const container = document.getElementById(id);
         data.forEach((r, idx) => {
-            let tr = document.createElement('tr');
-            tr.innerHTML = `<td class="num-col">${r[0]}<br><span style="font-size:0.7em;opacity:0.6">${slots[start+idx].s}</span></td>`;
+            let row = document.createElement('div');
+            row.className = 'grid-row';
+            row.innerHTML = `<div class="cell num-col">${r[0]}<span style="font-size:0.7em;opacity:0.6">${slots[start+idx].s}</span></div>`;
             for(let i=1; i<=7; i++) {
-                let td = document.createElement('td');
-                td.innerText = r[i] || "";
-                td.id = `c-${start+idx}-${i}`;
-                if(r[i] && cfg.myKeys.some(k => r[i].includes(k))) {
-                    td.style.color = "var(--accent)";
-                }
-                tr.appendChild(td);
+                let cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.innerText = r[i] || "";
+                cell.id = `c-${start+idx}-${i}`;
+                if(r[i] && cfg.myKeys.some(k => r[i].includes(k))) cell.style.color = "var(--accent)";
+                row.appendChild(cell);
             }
-            body.appendChild(tr);
+            container.appendChild(row);
         });
     }
 
-    renderTable('tb-morning', morningData, 0);
-    renderTable('tb-afternoon', afternoonData, 4);
+    renderGrid('grid-morning', morningData, 0);
+    renderGrid('grid-afternoon', afternoonData, 4);
 
     function refresh() {
         const now = new Date();
@@ -215,18 +196,15 @@
         });
 
         if (realWk >= 6) {
-            msgEl.innerText = (realWk === 6) ? "དེ་རིང་གཟའ་སྤེན་པ་རེད། གཟའ་མཇུག་སྤྲོ།" : "དེ་རིང་གཟའ་ཉི་མ་རེད། གཟའ་མཇུག་སྤྲོ།";
+            msgEl.innerText = (realWk === 6) ? "གཟའ་སྤེན་པ་བདེ་ལེགས།" : "གཟའ་ཉི་མ་བདེ་ལེགས།";
         } else {
             const full = [...morningData, ...afternoonData];
-            let currentCourse = "";
-            slots.forEach((t, i) => {
-                if (nowS >= t.s && nowS < t.e) currentCourse = full[i][realWk] || "ནང་སྦྱོང་།";
-            });
-            msgEl.innerText = currentCourse ? `ད་ལྟ།: ${currentCourse}` : "ད་ལྟ་སློབ་ཚན་མེད།";
+            let cur = "";
+            slots.forEach((t, i) => { if (nowS >= t.s && nowS < t.e) cur = full[i][realWk] || "ནང་སྦྱོང་།"; });
+            msgEl.innerText = cur ? `ད་ལྟ།: ${cur}` : "སློབ་ཚན་མེད།";
         }
     }
-    setInterval(refresh, 1000); 
-    refresh();
+    setInterval(refresh, 1000); refresh();
 
     function activateAudio() { 
         const btn = document.getElementById('audioBtn');
@@ -235,21 +213,13 @@
             const ctx = new AudioContext();
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
-            osc.type = 'sine';
             osc.frequency.setValueAtTime(880, ctx.currentTime);
-            gain.gain.setValueAtTime(0, ctx.currentTime);
             gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.01);
             gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + 0.15);
-            btn.style.background = "#95a5a6";
-            btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་ཟིན།";
-            btn.disabled = true;
-        } catch (e) {
-            btn.innerText = "激活失败";
-        }
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + 0.15);
+            btn.style.background = "#95a5a6"; btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་ཟིན།"; btn.disabled = true;
+        } catch (e) { btn.innerText = "激活失败"; }
     }
 </script>
 </body>
