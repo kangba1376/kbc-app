@@ -3,96 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <meta name="apple-mobile-web-app-title" content="ཁམས་པ་ཚང་།">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>སློབ་ཚན་རེའུ་མིག</title>
-    
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    
     <style>
         @font-face {
             font-family: 'TibetWildYak';
             src: url('TibetWildYak.ttf') format('truetype');
-            font-weight: normal; font-style: normal;
         }
 
         :root {
-            --bg: #f8f9fa; 
-            --card: #ffffff; 
-            --accent: #c0392b; 
-            --deep-red: #8b0000; 
-            --blue: #007aff; 
-            --today-bg: #fff0f0; 
-            --text-sec: #8e8e93; 
-            --active-bg: #c0392b;
-            --other-class: #a0a0a0; 
+            --bg: #f8f9fa;
+            --accent: #c0392b;
+            --blue: #007aff;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { 
-            height: 100%; width: 100%; overflow: hidden; background: var(--bg); 
-            font-family: 'TibetWildYak', -apple-system, sans-serif; 
-        }
-        
-        .wrapper { 
-            display: flex; flex-direction: column; 
-            height: 100vh; width: 100vw; 
-            /* འོག་གི་བར་སྟོང་ 20px བཞག་ནས་ཁ་པར་གྱི་མཐའ་ལ་མི་ཐུག་པར་བཟོས། */
-            padding: 10px env(safe-area-inset-right) calc(env(safe-area-inset-bottom) + 20px) env(safe-area-inset-left); 
-            padding-top: env(safe-area-inset-top); 
-            background-image: linear-gradient(rgba(248,249,250,0.92), rgba(248,249,250,0.92)), url('apple-touch-icon.png');
-            background-size: 60%; background-repeat: no-repeat; background-position: center;
-        }
-        
-        header { flex: 0 0 auto; text-align: center; padding: 5px 0; }
-        .t-name { font-size: 1.6rem; font-weight: bold; color: var(--accent); }
-        
-        #status-box { flex: 0 0 auto; background: var(--card); border-radius: 12px; padding: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 8px; border: 1px solid #eee; }
-        #clock { font-size: 1rem; color: var(--text-sec); font-family: monospace; }
-        #msg { font-size: 1.1rem; font-weight: bold; color: var(--accent); margin-top: 4px; }
-        
-        .btn { flex: 0 0 auto; width: 100%; padding: 12px; background: #27ae60; color: #fff; border: none; border-radius: 10px; font-weight: bold; margin-bottom: 8px; cursor: pointer; font-size: 1.1rem; font-family: 'TibetWildYak'; }
 
-        .content-area { flex: 1 1 auto; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        .section-group { 
-            flex: 1; display: flex; flex-direction: column; min-height: 0; 
-            background: var(--card);
+        html, body { 
+            height: 100%; width: 100%; 
+            overflow: hidden; 
+            background: var(--bg);
+            font-family: 'TibetWildYak', -apple-system, sans-serif;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            padding: env(safe-area-inset-top) 12px calc(env(safe-area-inset-bottom) + 20px) 12px;
+            background: linear-gradient(rgba(248,249,250,0.92), rgba(248,249,250,0.92)), url('apple-touch-icon.png') no-repeat center;
+            background-size: 50%;
+        }
+
+        header { flex: 0 0 auto; padding: 5px 0; text-align: center; }
+        .t-name { font-size: 24px; font-weight: bold; color: var(--accent); }
+
+        .btn { 
+            flex: 0 0 auto; width: 100%; height: 44px; 
+            background: #27ae60; color: #fff; border: none; border-radius: 10px; 
+            font-size: 18px; margin: 5px 0; font-family: 'TibetWildYak';
+            cursor: pointer;
+        }
+
+        #status-box { 
+            flex: 0 0 auto; background: #fff; border-radius: 12px; border: 1px solid #eee; 
+            padding: 6px; text-align: center; margin-bottom: 8px;
+        }
+        #clock { font-size: 14px; color: #8e8e93; font-family: monospace; }
+        
+        #msg { 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: var(--accent); 
+            border: 2px solid var(--accent);
+            border-top: 5px solid var(--accent);
+            border-radius: 10px;
+            padding: 8px;
+            margin-top: 5px;
+            background: #fff;
+            display: block;
+        }
+
+        .content-area {
+            flex: 1; 
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 0; 
+        }
+
+        .section-group {
+            flex: 1; 
+            display: flex;
+            flex-direction: column;
+            background: #fff;
             border-radius: 12px;
-            border: 1px solid var(--accent);
-            border-top: 4px solid var(--accent);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            border: 2px solid var(--accent);
+            border-top: 5px solid var(--accent);
             overflow: hidden;
         }
 
         .section-title { 
-            flex: 0 0 auto; font-size: 1.2rem; font-weight: bold; padding: 5px 0; 
-            color: var(--blue);
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(0, 122, 255, 0.03);
+            flex: 0 0 auto; padding: 2px 0; 
+            font-size: clamp(14px, 2.2vh, 18px); 
+            display: flex; align-items: center; justify-content: center; 
+            color: var(--blue); background: rgba(0,122,255,0.03); 
+            font-weight: bold;
         }
 
-        .table-card { flex: 1; overflow: hidden; display: flex; }
+        .table-card { flex: 1; display: flex; overflow: hidden; }
         table { width: 100%; height: 100%; border-collapse: collapse; table-layout: fixed; }
         
-        th, td { border: 1px solid #f0f0f0; text-align: center; font-size: clamp(0.65rem, 2.5vw, 0.9rem); padding: 2px 0; }
-        th { background: #fcfcfc; color: var(--text-sec); height: 35px; }
+        th, td { 
+            border: 1px solid #f2f2f2; text-align: center; 
+            font-size: clamp(10px, 1.7vh, 16px); 
+            padding: 1px;
+        }
+        th { background: #fafafa; color: #8e8e93; font-size: clamp(8px, 1.3vh, 11px); height: 3vh; }
         
-        .num-col { color: var(--deep-red); font-weight: bold; background: #fafafa; width: 15%; }
-        .head-title { color: var(--deep-red) !important; font-weight: bold; font-size: 0.75rem; }
+        .num-col { color: #8b0000; font-weight: bold; background: #fdfdfd; width: 15%; }
+        .col-today { background-color: #fff5f5 !important; }
+        .active-cell { background-color: var(--accent) !important; color: white !important; font-weight: bold; }
 
-        .col-today { background-color: var(--today-bg) !important; }
-        .is-me { color: var(--accent); font-weight: bold; }
-        .is-other { color: var(--other-class); font-weight: normal; font-size: 0.75rem; }
-        .active-cell { background-color: var(--active-bg) !important; color: white !important; font-weight: bold; }
+        @media (orientation: landscape) {
+            .wrapper { padding-left: 10vw; padding-right: 10vw; }
+            th, td { font-size: clamp(12px, 3vh, 20px); }
+        }
     </style>
 </head>
 <body>
 
 <div class="wrapper">
     <header><div class="t-name">དགེན་ཁམས་པ་ཚང་།</div></header>
-    <button class="btn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button>
+    <button class="btn" id="audioBtn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button>
     <div id="status-box">
         <div id="clock">00:00:00</div>
         <div id="msg">སྒུག་བཞིན་པ།...</div>
@@ -105,23 +130,22 @@
                 <table>
                     <thead>
                         <tr>
-                            <th class="head-title" style="width: 15%;">ཚོགས་ཐེངས།</th>
-                            <th>ཟླ་བ།</th><th>མིག་དམར།</th><th>ལྷག་པ།</th><th>ཕུར་བུ།</th><th>པ་སངས།</th><th>སྤེན་པ།</th><th>ཉི་མ།</th>
+                            <th class="num-col">ཚོགས་ཐེངས།</th>
+                            <th>ཟླ་བ།</th><th>མིག་དམར།</th><th>ལྷག་པ།</th><th>ཕུར་བུ།</th><th>པ་སངས་།</th><th>སྤེན་པ།</th><th>ཉི་མ།</th>
                         </tr>
                     </thead>
                     <tbody id="tb-morning"></tbody>
                 </table>
             </div>
         </div>
-
         <div class="section-group">
             <div class="section-title">ཕྱི་དྲོ།</div>
             <div class="table-card">
                 <table>
                     <thead>
                         <tr>
-                            <th class="head-title" style="width: 15%;">ཚོགས་ཐེངས།</th>
-                            <th>ཟླ་བ།</th><th>མིག་དམར།</th><th>ལྷག་པ།</th><th>ཕུར་བུ།</th><th>པ་སངས།</th><th>སྤེན་པ།</th><th>ཉི་མ།</th>
+                            <th class="num-col">ཚོགས་ཐེངས།</th>
+                            <th>ཟླ་བ།</th><th>མིག་དམར།</th><th>ལྷག་པ།</th><th>ཕུར་བུ།</th><th>པ་སངས་།</th><th>སྤེན་པ།</th><th>ཉི་མ།</th>
                         </tr>
                     </thead>
                     <tbody id="tb-afternoon"></tbody>
@@ -131,102 +155,113 @@
     </div>
 </div>
 
-<audio id="beep" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YTdvT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19vT19v"></audio>
-
 <script>
-    // Service Worker རེའུ་འགོད།
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('SW Registered'))
-                .catch(err => console.log('SW Failed', err));
-        });
+    const cfg = { mS: "09:30", aS: "15:00", dur: 40, myKeys: ["རི་མོ།", "གླུ་གཞས།", "ཡིག་གཟུགས།"] };
+    const morningData = [["༡","","","","","","",""],["༢","","","","","","",""],["༣","རི་མོ།༡","","","རི་མོ།༢","","",""],["༤","ངལ་རྩོལ།","","","","ཡིག་གཟུགས།༡༢","",""]];
+    const afternoonData = [["༡","","རི་མོ།༢","","","","",""],["༢","","","གླུ་གཞས།༢","","སློབ་གསོ།","",""],["༣","","རི་མོ།༡","","","","",""]];
+
+    function timeAdd(t, m) { 
+        let [h, min] = t.split(':').map(Number); 
+        let d = new Date(); d.setHours(h, min + m); 
+        return d.toTimeString().slice(0, 5); 
     }
 
-    const cfg = { mS: "09:30", aS: "15:00", dur: 40, myKeys: ["རི་མོ།", "གླུ་གཞས།", "ཡིག་གཟུགས།"] };
-    
-    const morningData = [
-        ["༡", "", "", "", "", "", "", ""], ["༢", "", "", "", "", "", "", ""], 
-        ["༣", "རི་མོ། ༡", "", "", "རི་མོ། ༢", "", "", ""], 
-        ["༤", "ངལ་རྩོལ།", "", "", "", "ཡིག་གཟུགས། ༡ ༢", "", ""] 
-    ];
-    const afternoonData = [
-        ["༡", "", "རི་མོ། ༢", "", "", "", "", ""], 
-        ["༢", "", "", "གླུ་གཞས། ༢", "", "སློབ་གསོ།", "", ""], 
-        ["༣", "", "རི་མོ། ༡", "", "", "", "", ""]
-    ];
-
-    function timeAdd(t, m) { let [h, min] = t.split(':').map(Number); let d = new Date(); d.setHours(h, min + m); return d.toTimeString().slice(0, 5); }
     const slots = [];
     let cm = cfg.mS; for(let i=0; i<4; i++) { let s = cm, e = timeAdd(s, cfg.dur); slots.push({s, e}); cm = timeAdd(e, i===1 ? 20 : 15); }
     let ca = cfg.aS; for(let i=0; i<3; i++) { let s = ca, e = timeAdd(s, cfg.dur); slots.push({s, e}); ca = timeAdd(e, 15); }
 
-    const todayDay = new Date().getDay(); 
     function renderTable(id, data, start) {
         const body = document.getElementById(id);
         data.forEach((r, idx) => {
-            const gIdx = start + idx;
             let tr = document.createElement('tr');
-            tr.innerHTML = `<td class="num-col">${r[0]}<br><small style="font-weight:normal; font-size:0.5rem; color:#999">${slots[gIdx].s}</small></td>`;
+            tr.innerHTML = `<td class="num-col">${r[0]}<br><span style="font-size:0.75em;opacity:0.6">${slots[start+idx].s}</span></td>`;
             for(let i=1; i<=7; i++) {
                 let td = document.createElement('td');
-                let content = r[i] || "";
-                td.innerText = content;
-                let isToday = (i === todayDay) || (i === 7 && todayDay === 0);
-                if(isToday) td.classList.add('col-today');
-                td.id = `c-${gIdx}-${i}`;
-                if(content) {
-                    const isMe = cfg.myKeys.some(k => content.includes(k));
-                    if(isMe) td.classList.add('is-me'); else td.classList.add('is-other');
+                td.innerText = r[i] || "";
+                td.id = `c-${start+idx}-${i}`;
+                if(r[i] && cfg.myKeys.some(k => r[i].includes(k))) {
+                    td.style.color = "var(--accent)";
                 }
                 tr.appendChild(td);
             }
             body.appendChild(tr);
         });
     }
+
     renderTable('tb-morning', morningData, 0);
     renderTable('tb-afternoon', afternoonData, 4);
 
-    let a40 = new Set(), a5 = new Set();
-    function activateAudio() { document.getElementById('beep').play(); alert("དྲན་སྐུལ་ལམ་ལུགས་གྲ་སྒྲིག་ཨང་གསར་ཡིན།"); }
-
     function refresh() {
-        const now = new Date(); const nowS = now.toTimeString().slice(0, 5); const wk = now.getDay();
+        const now = new Date();
+        const nowS = now.toTimeString().slice(0, 5);
+        const wk = now.getDay(); 
+        const realWk = (wk === 0) ? 7 : wk; 
+        
         document.getElementById('clock').innerText = now.toLocaleTimeString('zh-CN', {hour12:false});
-        let msg = "";
-        if (wk === 0 || wk === 6) {
-            msg = `དེ་རིང་གཟའ་${wk===0?'ཉི་མ':'སྤེན་པ'}་རེད། གཟའ་མཇུག་སྤྲོ།`;
-        } else {
-            msg = "ད་ལྟ་སློབ་ཚན་མེད།"; 
-            let lastE = slots[slots.length-1].e;
-            if(nowS >= lastE) { msg = "དེ་རིང་གི་སློབ་ཚན་མཇུག་སྒྲིལ་ཟིན།"; } else {
-                let next = null; const full = [...morningData, ...afternoonData];
-                slots.forEach((t, i) => {
-                    let colIdx = wk === 0 ? 7 : wk;
-                    const cell = document.getElementById(`c-${i}-${colIdx}`);
-                    if(cell) {
-                        const name = full[i][colIdx]; 
-                        const isMe = name && cfg.myKeys.some(k => name.includes(k));
-                        if(nowS >= t.s && nowS < t.e) { 
-                            cell.classList.add('active-cell'); 
-                            if(isMe) msg = `སློབ་ཁྲིད་བྱེད་བཞིན་པ།：${name}`;
-                            else if(name) msg = `ད་ལྟ་ནི་：${name}`;
-                        } else { cell.classList.remove('active-cell'); }
-                        if(isMe && t.s > nowS && !next) next = { n: name, s: t.s, i: i };
+        const msgEl = document.getElementById('msg');
+        
+        // 清除旧的高亮
+        slots.forEach((_, i) => {
+            for(let j=1; j<=7; j++) {
+                const cell = document.getElementById(`c-${i}-${j}`);
+                if (cell) cell.classList.remove('col-today', 'active-cell');
+            }
+        });
+
+        // 无论周末还是平时，高亮显示当天列
+        slots.forEach((t, i) => {
+            for(let j=1; j<=7; j++) {
+                const cell = document.getElementById(`c-${i}-${j}`);
+                if (cell && j === realWk) {
+                    cell.classList.add('col-today');
+                    if (nowS >= t.s && nowS < t.e) {
+                        cell.classList.add('active-cell');
                     }
-                });
-                if(msg === "ད་ལྟ་སློབ་ཚན་མེད།" && next) {
-                    msg = `རྗེས་མའི་སློབ་ཚན།：${next.n} (${next.s})`;
-                    let diff = (new Date(now.toDateString() + " " + next.s) - now) / 60000;
-                    if(diff <= 40 && diff > 39 && !a40.has(next.i)) { notify(next.n + " སྐར་མ་ ༤༠ རྗེས་ནས་འགོ་ཚུགས།"); a40.add(next.i); }
-                    if(diff <= 5 && diff > 4 && !a5.has(next.i)) { notify(next.n + " སྐར་མ་ ༥ ལས་མེད། མགྱོགས་པོ་གནོངས་།"); a5.add(next.i); }
                 }
             }
+        });
+
+        // 状态栏文字显示
+        if (realWk >= 6) {
+            msgEl.innerText = (realWk === 6) ? "དེ་རིང་གཟའ་སྤེན་པ་རེད། གཟའ་མཇུག་སྤྲོ།" : "དེ་རིང་གཟའ་ཉི་མ་རེད། གཟའ་མཇུག་སྤྲོ།";
+        } else {
+            const full = [...morningData, ...afternoonData];
+            let currentCourse = "";
+            slots.forEach((t, i) => {
+                if (nowS >= t.s && nowS < t.e) {
+                    currentCourse = full[i][realWk] || "ནང་སྦྱོང་།";
+                }
+            });
+            msgEl.innerText = currentCourse ? `ད་ལྟ།: ${currentCourse}` : "ད་ལྟ་སློབ་ཚན་མེད།";
         }
-        document.getElementById('msg').innerText = msg;
     }
-    function notify(m) { document.getElementById('beep').play(); alert(m); }
-    setInterval(refresh, 1000); refresh();
+    
+    setInterval(refresh, 1000); 
+    refresh();
+
+    // 终极声音激活方案：使用 Web Audio API
+    function activateAudio() { 
+        const btn = document.getElementById('audioBtn');
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const ctx = new AudioContext();
+            
+            // 创建一个无声的瞬间震荡，激活 iOS/Android 声音上下文
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            gain.gain.value = 0.001; // 近乎无声
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(0);
+            osc.stop(0.1);
+
+            btn.style.background = "#95a5a6";
+            btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་ཟིན།";
+            btn.disabled = true;
+        } catch (e) {
+            btn.innerText = "激活失败, 重试";
+        }
+    }
 </script>
 </body>
 </html>
