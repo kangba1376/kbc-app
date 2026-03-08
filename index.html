@@ -21,7 +21,6 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        /* 核心修复：使用 svh 代替 vh，强制锁定可视高度 */
         html, body { 
             height: 100svh; width: 100vw; 
             overflow: hidden; 
@@ -35,43 +34,40 @@
         .wrapper {
             display: flex;
             flex-direction: column;
-            height: 100svh; /* 动态适配 iPad 实际可用高度 */
+            height: 100svh;
             width: 100vw;
-            /* 底部留出足够空间，避开 iPad 的 Home Bar */
-            padding: env(safe-area-inset-top) 8px calc(env(safe-area-inset-bottom) + 15px) 8px;
+            padding: env(safe-area-inset-top) 8px env(safe-area-inset-bottom) 8px;
             background: linear-gradient(rgba(248,249,250,0.96), rgba(248,249,250,0.96)), url('apple-touch-icon.png') no-repeat center;
             background-size: 160px auto;
         }
 
-        /* 顶部组件固定 */
-        .top-components { flex: 0 0 auto; }
-        header { padding: 2px 0; }
-        .t-name { font-size: clamp(16px, 2.5vh, 22px); font-weight: bold; color: var(--accent); text-align: center; }
+        .top-components { flex: 0 0 auto; margin-bottom: 2px; }
+        header { padding: 0; }
+        .t-name { font-size: clamp(16px, 2.5vh, 22px); font-weight: bold; color: var(--accent); text-align: center; line-height: 1.1; }
 
         .btn { 
-            width: 100%; height: clamp(26px, 3.8vh, 36px); 
-            background: #27ae60; color: #fff; border: none; border-radius: 8px; 
-            font-size: clamp(12px, 1.8vh, 16px); margin-bottom: 4px; font-family: 'TibetWildYak';
+            width: 100%; height: clamp(24px, 3.5vh, 34px); 
+            background: #27ae60; color: #fff; border: none; border-radius: 6px; 
+            font-size: clamp(12px, 1.8vh, 16px); margin: 1px 0; font-family: 'TibetWildYak';
         }
 
         #status-box { 
-            background: #fff; border-radius: 8px; border: 1px solid #ddd; 
-            padding: 3px; text-align: center; margin-bottom: 6px;
+            background: #fff; border-radius: 6px; border: 1px solid #ddd; 
+            padding: 2px; text-align: center; margin-bottom: 2px;
         }
         #clock { display: none; } 
         #msg { 
-            font-size: clamp(13px, 2vh, 18px); font-weight: bold; color: var(--accent); 
-            border: 2px solid var(--accent); border-top: 4px solid var(--accent);
-            border-radius: 6px; padding: 2px; min-height: 1.3em;
-            display: flex; align-items: center; justify-content: center;
+            font-size: clamp(12px, 2vh, 18px); font-weight: bold; color: var(--accent); 
+            /* 提示框同步调整：1px外框，3px顶部 */
+            border: 1px solid var(--accent); border-top: 3px solid var(--accent);
+            border-radius: 5px; padding: 1px; min-height: 1.3em;
         }
 
-        /* 严格比例控制：5:4 比例，禁止任何溢出 */
         .content-area {
             flex: 1;
             display: grid;
             grid-template-rows: 5fr 4fr; 
-            gap: 10px;
+            gap: 4px; 
             min-height: 0;
             overflow: hidden;
         }
@@ -81,22 +77,23 @@
             flex-direction: column;
             background: #fff;
             border-radius: 8px;
-            border: 2.5px solid var(--accent);
-            border-top: 6px solid var(--accent);
+            /* 【极致优化】主边框设为 1px，顶部设为 5px */
+            border: 1px solid var(--accent);
+            border-top: 5px solid var(--accent);
             overflow: hidden;
             min-height: 0;
         }
 
-        .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; width: 100%; }
-        .grid-row { display: flex; flex: 1; border-bottom: 1px solid #eee; min-height: 0; width: 100%; }
+        .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+        .grid-row { display: flex; flex: 1; border-bottom: 1px solid #eee; min-height: 0; }
         .grid-row:last-child { border-bottom: none; }
         
-        .grid-header { background: #fcfcfc; flex: 0 0 auto; height: clamp(24px, 3.5vh, 32px); border-bottom: 2px solid #eee; }
+        .grid-header { background: #fcfcfc; flex: 0 0 auto; height: clamp(20px, 3vh, 28px); border-bottom: 1px solid #eee; }
 
         .cell { 
             flex: 1; width: 0; display: flex; align-items: center; justify-content: center;
             border-right: 1px solid #eee; font-size: clamp(10px, 1.8vh, 17px);
-            text-align: center; line-height: 1.1; padding: 1px; overflow: hidden;
+            text-align: center; line-height: 1; padding: 1px; overflow: hidden;
         }
         
         .cell-inner { white-space: nowrap; display: inline-block; transform-origin: center; }
@@ -108,8 +105,8 @@
         .active-cell { background-color: var(--accent) !important; color: white !important; font-weight: bold; }
 
         @media (orientation: landscape) {
-            .wrapper { padding-left: 50px; padding-right: 50px; }
-            .content-area { gap: 8px; }
+            .wrapper { padding-left: 60px; padding-right: 60px; }
+            .content-area { gap: 4px; }
         }
     </style>
 </head>
