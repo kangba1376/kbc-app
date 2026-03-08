@@ -28,8 +28,8 @@
             display: flex;
             flex-direction: column;
             padding-top: env(safe-area-inset-top);
-            /* 底部精准留出 2px 间距，确保边框可见 */
-            padding-bottom: 2px; 
+            /* 精准留出 1px 间距，确保底边框可见 */
+            padding-bottom: 1px; 
             padding-left: 8px;
             padding-right: 8px;
             background: linear-gradient(rgba(248,249,250,0.96), rgba(248,249,250,0.96)), url('apple-touch-icon.png') no-repeat center;
@@ -59,6 +59,8 @@
             flex-direction: column;
             gap: 4px;
             min-height: 0;
+            /* 确保内部没有任何多余边距挤压这 1px */
+            margin-bottom: 0px; 
         }
 
         /* 维持 4:3 比例 */
@@ -151,6 +153,7 @@
 </div>
 
 <script>
+    // 脚本逻辑保持不变，确保 4/3 布局及提醒功能正常
     const cfg = { mS: "09:30", aS: "15:00", dur: 40, myKeys: ["རི་མོ།", "གླུ་གཞས།", "ཡིག་གཟུགས།"] };
     const morningData = [["༡","","","","","","",""],["༢","","","","","","",""],["༣","རི་མོ།༡","","","རི་མོ།༢","","",""],["༤","ངལ་རྩོལ།","","","","ཡིག་གཟུགས།","",""]];
     const afternoonData = [["༡","","རི་མོ།༢","","","","",""],["༢","","","གླུ་གཞས།","","སློབ་གསོ།","",""],["༣","","རི་མོ།༡","","","","",""]];
