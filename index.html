@@ -21,33 +21,35 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
+        /* 核心修复：使用 svh 代替 vh，强制锁定可视高度 */
         html, body { 
-            height: 100%; width: 100%; 
+            height: 100svh; width: 100vw; 
             overflow: hidden; 
             background: var(--bg);
             font-family: 'TibetWildYak', -apple-system, sans-serif;
             position: fixed;
+            left: 0; top: 0;
             touch-action: none;
         }
 
         .wrapper {
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            height: 100svh; /* 动态适配 iPad 实际可用高度 */
             width: 100vw;
-            /* 严格控制内边距，底部多预留一点避开系统条 */
-            padding: env(safe-area-inset-top) 8px 12px 8px;
+            /* 底部留出足够空间，避开 iPad 的 Home Bar */
+            padding: env(safe-area-inset-top) 8px calc(env(safe-area-inset-bottom) + 15px) 8px;
             background: linear-gradient(rgba(248,249,250,0.96), rgba(248,249,250,0.96)), url('apple-touch-icon.png') no-repeat center;
-            background-size: 180px auto;
+            background-size: 160px auto;
         }
 
-        /* 顶部区域固定高度 */
+        /* 顶部组件固定 */
         .top-components { flex: 0 0 auto; }
         header { padding: 2px 0; }
         .t-name { font-size: clamp(16px, 2.5vh, 22px); font-weight: bold; color: var(--accent); text-align: center; }
 
         .btn { 
-            width: 100%; height: clamp(28px, 4vh, 38px); 
+            width: 100%; height: clamp(26px, 3.8vh, 36px); 
             background: #27ae60; color: #fff; border: none; border-radius: 8px; 
             font-size: clamp(12px, 1.8vh, 16px); margin-bottom: 4px; font-family: 'TibetWildYak';
         }
@@ -60,15 +62,16 @@
         #msg { 
             font-size: clamp(13px, 2vh, 18px); font-weight: bold; color: var(--accent); 
             border: 2px solid var(--accent); border-top: 4px solid var(--accent);
-            border-radius: 6px; padding: 2px; min-height: 1.4em;
+            border-radius: 6px; padding: 2px; min-height: 1.3em;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        /* 核心修改：使用 Grid 锁定 5:4 的高度比例 */
+        /* 严格比例控制：5:4 比例，禁止任何溢出 */
         .content-area {
             flex: 1;
             display: grid;
-            grid-template-rows: 5fr 4fr; /* 上午5份(4课+1头), 下午4份(3课+1头) */
-            gap: 8px;
+            grid-template-rows: 5fr 4fr; 
+            gap: 10px;
             min-height: 0;
             overflow: hidden;
         }
@@ -78,26 +81,26 @@
             flex-direction: column;
             background: #fff;
             border-radius: 8px;
-            border: 2px solid var(--accent);
-            border-top: 5px solid var(--accent);
+            border: 2.5px solid var(--accent);
+            border-top: 6px solid var(--accent);
             overflow: hidden;
-            min-height: 0; /* 强制不被内容撑开 */
+            min-height: 0;
         }
 
-        .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-        .grid-row { display: flex; flex: 1; border-bottom: 1px solid #eee; min-height: 0; }
+        .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; width: 100%; }
+        .grid-row { display: flex; flex: 1; border-bottom: 1px solid #eee; min-height: 0; width: 100%; }
         .grid-row:last-child { border-bottom: none; }
         
-        .grid-header { background: #fcfcfc; flex: 0 0 auto; height: clamp(22px, 3.5vh, 30px); border-bottom: 2px solid #eee; }
+        .grid-header { background: #fcfcfc; flex: 0 0 auto; height: clamp(24px, 3.5vh, 32px); border-bottom: 2px solid #eee; }
 
         .cell { 
             flex: 1; width: 0; display: flex; align-items: center; justify-content: center;
-            border-right: 1px solid #eee; font-size: clamp(10px, 1.6vh, 16px);
-            text-align: center; line-height: 1.1; padding: 1px;
+            border-right: 1px solid #eee; font-size: clamp(10px, 1.8vh, 17px);
+            text-align: center; line-height: 1.1; padding: 1px; overflow: hidden;
         }
         
         .cell-inner { white-space: nowrap; display: inline-block; transform-origin: center; }
-        .grid-header .cell { font-size: clamp(9px, 1.3vh, 13px); color: var(--blue); font-weight: bold; }
+        .grid-header .cell { font-size: clamp(9px, 1.4vh, 14px); color: var(--blue); font-weight: bold; }
         .cell:last-child { border-right: none; }
         .num-col { flex: 0 0 12%; color: #8b0000; font-weight: bold; background: #fafafa; }
 
@@ -105,8 +108,8 @@
         .active-cell { background-color: var(--accent) !important; color: white !important; font-weight: bold; }
 
         @media (orientation: landscape) {
-            .wrapper { padding-left: 40px; padding-right: 40px; }
-            .content-area { gap: 6px; }
+            .wrapper { padding-left: 50px; padding-right: 50px; }
+            .content-area { gap: 8px; }
         }
     </style>
 </head>
@@ -278,7 +281,7 @@
             const inner = c.querySelector('.cell-inner');
             if(inner && inner.innerText !== "") {
                 inner.style.transform = "scale(1)";
-                const ratio = (c.offsetWidth - 4) / inner.offsetWidth;
+                const ratio = (c.offsetWidth - 6) / inner.offsetWidth;
                 if(ratio < 1) inner.style.transform = `scale(${ratio})`;
             }
         });
