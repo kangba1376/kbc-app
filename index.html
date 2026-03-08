@@ -35,7 +35,6 @@
             flex-direction: column;
             height: 100vh;
             width: 100vw;
-            /* 严格避让上下安全区 */
             padding: env(safe-area-inset-top) 6px env(safe-area-inset-bottom) 6px;
             background: linear-gradient(rgba(248,249,250,0.95), rgba(248,249,250,0.95)), url('apple-touch-icon.png') no-repeat center;
             background-size: contain;
@@ -52,9 +51,11 @@
 
         #status-box { 
             flex: 0 0 auto; background: #fff; border-radius: 6px; border: 1px solid #eee; 
-            padding: 1px; text-align: center; margin-bottom: 3px;
+            padding: 2px; text-align: center; margin-bottom: 3px;
         }
-        #clock { font-size: 8px; color: #8e8e93; font-family: monospace; line-height: 1; }
+        /* 隐藏时间显示 */
+        #clock { display: none; } 
+        
         #msg { 
             font-size: clamp(11px, 1.8vh, 15px); 
             font-weight: bold; color: var(--accent); 
@@ -66,8 +67,8 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 5px; /* 表格之间的间距 */
-            min-height: 0; /* 允许子元素收缩 */
+            gap: 5px;
+            min-height: 0;
             padding-bottom: 2px;
         }
 
@@ -80,7 +81,7 @@
             border: 1.5px solid var(--accent);
             border-top: 3px solid var(--accent);
             overflow: hidden;
-            min-height: 0; /* 关键：允许表格在空间不足时收缩 */
+            min-height: 0;
         }
 
         .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; width: 100%; table-layout: fixed; }
