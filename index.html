@@ -33,17 +33,17 @@
             flex-direction: column;
             height: 100vh;
             width: 100vw;
-            /* 彻底移除底部安全区域限制，强制铺满 */
-            padding: env(safe-area-inset-top) 6px 0px 6px;
+            /* 顶部保留避让，底部彻底冲破安全区限制 */
+            padding: env(safe-area-inset-top) 6px 2px 6px;
             background: linear-gradient(rgba(248,249,250,0.95), rgba(248,249,250,0.95)), url('apple-touch-icon.png') no-repeat center;
             background-size: contain;
         }
 
         header { flex: 0 0 auto; padding: 0px 0 1px 0; }
-        .t-name { font-size: clamp(14px, 3.2vh, 18px); font-weight: bold; color: var(--accent); text-align: center; }
+        .t-name { font-size: clamp(14px, 3vh, 18px); font-weight: bold; color: var(--accent); text-align: center; }
 
         .btn { 
-            flex: 0 0 auto; width: 100%; height: clamp(24px, 3.8vh, 34px); 
+            flex: 0 0 auto; width: 100%; height: clamp(24px, 3.5vh, 32px); 
             background: #27ae60; color: #fff; border: none; border-radius: 6px; 
             font-size: clamp(12px, 1.8vh, 15px); margin-bottom: 2px; font-family: 'TibetWildYak';
         }
@@ -56,7 +56,7 @@
         #msg { 
             font-size: clamp(11px, 2vh, 16px); 
             font-weight: bold; color: var(--accent); 
-            border: 1.5px solid var(--accent); border-top: 3px solid var(--accent);
+            border: 1.2px solid var(--accent); border-top: 3px solid var(--accent);
             border-radius: 5px; padding: 1px; min-height: 1.2em;
         }
 
@@ -66,7 +66,7 @@
             flex-direction: column;
             gap: 3px;
             min-height: 0;
-            padding-bottom: 2px; /* 留出极小的物理边缘 */
+            margin-bottom: 5px; /* 留出极小空隙防止贴死 */
         }
 
         .section-group {
@@ -84,43 +84,25 @@
         .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; width: 100%; table-layout: fixed; }
         .grid-row { display: flex; flex: 1; border-bottom: 1px solid #f2f2f2; min-height: 0; width: 100%; }
         .grid-row:last-child { border-bottom: none; }
-        .grid-header { background: #fafafa; flex: 0 0 auto; height: clamp(18px, 2.8vh, 28px); border-bottom: 1px solid #eee; }
+        .grid-header { background: #fafafa; flex: 0 0 auto; height: clamp(18px, 2.8vh, 26px); border-bottom: 1px solid #eee; }
 
         .cell { 
-            flex: 1; 
-            width: 0; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            border-right: 1px solid #f2f2f2; 
-            font-size: clamp(8px, 1.3vh, 12px);
-            text-align: center; 
-            line-height: 1.2; 
-            padding: 0px 1px;
-            overflow: hidden; 
+            flex: 1; width: 0; display: flex; align-items: center; justify-content: center;
+            border-right: 1px solid #f2f2f2; font-size: clamp(8px, 1.3vh, 12px);
+            text-align: center; line-height: 1.2; padding: 0px 1px; overflow: hidden; 
         }
         
-        .cell-inner {
-            white-space: nowrap;
-            display: inline-block;
-            transform-origin: center;
-        }
-
-        .grid-header .cell {
-            font-size: clamp(7px, 1.2vh, 11px);
-            color: var(--blue);
-        }
-
+        .cell-inner { white-space: nowrap; display: inline-block; transform-origin: center; }
+        .grid-header .cell { font-size: clamp(7px, 1.2vh, 11px); color: var(--blue); }
         .cell:last-child { border-right: none; }
-        .num-col { flex: 0 0 14%; color: #8b0000; font-weight: bold; background: #fdfdfd; flex-direction: column; width: 14% !important; }
+        .num-col { flex: 0 0 14%; color: #8b0000; font-weight: bold; background: #fdfdfd; width: 14% !important; }
 
         .col-today { background-color: #fff5f5 !important; }
         .active-cell { background-color: var(--accent) !important; color: white !important; font-weight: bold; }
 
         @media (orientation: landscape) {
             .wrapper { padding: env(safe-area-inset-top) 40px 5px 40px; }
-            .content-area { gap: 4px; }
-            .cell { font-size: clamp(10px, 4.2vh, 16px); padding: 3px 1px; line-height: 1.5; }
+            .cell { font-size: clamp(10px, 4.2vh, 16px); padding: 2px 1px; line-height: 1.5; }
             .grid-header .cell { font-size: clamp(9px, 3.8vh, 15px); }
             .t-name { font-size: clamp(14px, 5vh, 20px); }
             .btn { height: clamp(24px, 6vh, 36px); font-size: clamp(12px, 3vh, 16px); }
@@ -141,7 +123,7 @@
         <div class="section-group">
             <div class="grid-container">
                 <div class="grid-row grid-header">
-                    <div class="cell num-col" style="font-size:0.7em; color: #8b0000;"><span class="cell-inner">ཚོགས་ཐེངས།</span></div>
+                    <div class="cell num-col"><span class="cell-inner" style="font-size:0.7em">ཚོགས་ཐེངས།</span></div>
                     <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div>
                     <div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
                     <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div>
@@ -156,7 +138,7 @@
         <div class="section-group">
             <div class="grid-container">
                 <div class="grid-row grid-header">
-                    <div class="cell num-col" style="font-size:0.7em; color: #8b0000;"><span class="cell-inner">ཚོགས་ཐེངས།</span></div>
+                    <div class="cell num-col"><span class="cell-inner" style="font-size:0.7em">ཚོགས་ཐེངས།</span></div>
                     <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div>
                     <div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
                     <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div>
@@ -179,7 +161,6 @@
     let audioCtx = null;
     let isAudioMuted = false;
     let currentReminderKey = ""; 
-    let reminderCount = 0;
     let reminderStartTime = 0;
 
     function timeAdd(t, m) { 
@@ -242,7 +223,6 @@
         document.getElementById('clock').innerText = now.toLocaleTimeString('zh-CN', {hour12:false});
         const msgEl = document.getElementById('msg');
         
-        let activeClassFound = false;
         slots.forEach((t, i) => {
             for(let j=1; j<=7; j++) {
                 const cell = document.getElementById(`c-${i}-${j}`);
@@ -250,30 +230,20 @@
                     cell.classList.remove('col-today', 'active-cell');
                     if (j === realWk) {
                         cell.classList.add('col-today');
-                        if (nowS >= t.s && nowS < t.e) {
-                            cell.classList.add('active-cell');
-                            activeClassFound = true;
-                        }
+                        if (nowS >= t.s && nowS < t.e) cell.classList.add('active-cell');
                     }
                 }
             }
 
             if (realWk < 6) {
-                const checkTimes = [40, 5];
-                checkTimes.forEach(offset => {
+                [40, 5].forEach(offset => {
                     const triggerTime = timeAdd(t.s, -offset);
                     const key = `slot-${i}-${offset}`;
-                    if (nowS === triggerTime) {
-                        if (currentReminderKey !== key) {
-                            currentReminderKey = key;
-                            isAudioMuted = false;
-                            reminderCount = 0;
-                            reminderStartTime = Date.now();
-                            const btn = document.getElementById('audioBtn');
-                            btn.style.background = "#e67e22";
-                            btn.innerText = "🔔 སྒྲ་མཚམས་འཇོག་པ།";
-                            btn.disabled = false;
-                        }
+                    if (nowS === triggerTime && currentReminderKey !== key) {
+                        currentReminderKey = key; isAudioMuted = false;
+                        reminderStartTime = Date.now();
+                        const btn = document.getElementById('audioBtn');
+                        btn.style.background = "#e67e22"; btn.innerText = "🔔 སྒྲ་མཚམས་འཇོག་པ།";
                     }
                 });
             }
@@ -281,16 +251,9 @@
 
         if (currentReminderKey !== "" && !isAudioMuted) {
             const elapsed = Math.floor((Date.now() - reminderStartTime) / 60000);
-            const cycleIndex = Math.floor(elapsed / 2);
-            const isPlayingPhase = elapsed % 2 === 0;
-
-            if (cycleIndex < 3) {
-                if (isPlayingPhase) {
-                    if (now.getMilliseconds() < 1000 && now.getSeconds() % 2 === 0) playBeep(); 
-                }
-            } else {
-                stopAudioRemind();
-            }
+            if (elapsed < 6) {
+                if (elapsed % 2 === 0 && now.getMilliseconds() < 1000 && now.getSeconds() % 2 === 0) playBeep();
+            } else { stopAudioRemind(); }
         }
 
         if (realWk >= 6) {
@@ -298,28 +261,13 @@
         } else {
             const full = [...morningData, ...afternoonData];
             let currentSlotIndex = -1;
-            let lastSlotIndex = -1;
-
-            slots.forEach((t, i) => {
-                if (nowS >= t.s && nowS < t.e) currentSlotIndex = i;
-                if (full[i][realWk]) lastSlotIndex = i;
-            });
+            slots.forEach((t, i) => { if (nowS >= t.s && nowS < t.e) currentSlotIndex = i; });
 
             if (currentSlotIndex !== -1) {
                 const curTask = full[currentSlotIndex][realWk];
-                if (curTask) {
-                    const period = currentSlotIndex < 4 ? "སྔ་དྲོ།" : "ཕྱི་དྲོ།";
-                    msgEl.innerText = `དེ་རིང་${period}སློབ་ཚན་ཡོད།: ${curTask}`;
-                } else {
-                    msgEl.innerText = "";
-                }
+                msgEl.innerText = curTask ? `དེ་རིང་སློབ་ཚན་ཡོད།: ${curTask}` : "";
             } else {
-                const lastEndTime = lastSlotIndex !== -1 ? slots[lastSlotIndex].e : "00:00";
-                if (nowS > lastEndTime && lastSlotIndex !== -1) {
-                    msgEl.innerText = "དེ་རིང་གི་སློབ་ཚན་མཇུག་སྒྲིལ་ཟིན།";
-                } else {
-                    msgEl.innerText = "";
-                }
+                msgEl.innerText = "";
             }
         }
         
@@ -327,28 +275,20 @@
             const inner = c.querySelector('.cell-inner');
             if(inner && inner.innerText !== "") {
                 inner.style.transform = "scale(1)";
-                const ratio = (c.offsetWidth - 4) / inner.offsetWidth;
+                const ratio = (c.offsetWidth - 2) / inner.offsetWidth;
                 if(ratio < 1) inner.style.transform = `scale(${ratio})`;
             }
         });
     }
 
     function activateAudio() { 
-        if (currentReminderKey !== "" && !isAudioMuted) {
-            stopAudioRemind();
-            return;
-        }
+        if (currentReminderKey !== "" && !isAudioMuted) { stopAudioRemind(); return; }
         const btn = document.getElementById('audioBtn');
         try {
             const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
-            playBeep(); 
-            btn.style.background = "#27ae60"; 
-            btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; 
-        } catch (e) { 
-            btn.style.background = "#c0392b";
-            btn.innerText = "སྒྲ་གཏོང་ལམ་བོ་མ་ཐུབ།"; 
-        }
+            audioCtx = new AudioContext(); playBeep(); 
+            btn.style.background = "#27ae60"; btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; 
+        } catch (e) { btn.innerText = "སྒྲ་གཏོང་ལམ་བོ་མ་ཐུབ།"; }
     }
 
     setInterval(refresh, 1000); refresh();
