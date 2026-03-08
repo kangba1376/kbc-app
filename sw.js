@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kbc-v6.3'; // 提升版本号以强制手机拉取最新的 index.html
+const CACHE_NAME = 'kbc-v6.5'; // 提升版本号以强制手机拉取最新的 index.html
 const ASSETS = [
   './',
   './index.html',

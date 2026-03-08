@@ -40,7 +40,6 @@
             background-size: 160px auto;
         }
 
-        /* 核心修正：优化顶部布局，实现自动收缩平衡 */
         .nav-bar {
             display: flex;
             justify-content: space-between;
@@ -57,14 +56,12 @@
             font-size: clamp(14px, 3vh, 22px); font-weight: bold; 
             color: var(--indigo); 
             line-height: 1.8; text-align: center; white-space: nowrap;
-            overflow: hidden; text-overflow: ellipsis;
         }
 
         .btn-mini { 
             background: var(--green); color: #fff; border: none; border-radius: 4px; 
             padding: 4px 8px; font-size: clamp(10px, 1.8vh, 13px); 
             font-family: 'TibetWildYak'; cursor: pointer; white-space: nowrap;
-            max-width: 140px; overflow: hidden; text-overflow: ellipsis;
         }
 
         .time-display {
@@ -108,14 +105,34 @@
             text-align: center; line-height: 1.5; padding: 2px;
             position: relative;
         }
+
+        /* 核心修复：使用 SVG 确保实线、藏红色、1px */
+        .diagonal-cell {
+            padding: 0 !important;
+            flex: 0 0 12% !important;
+            background: #fcfcfc;
+            position: relative;
+        }
+        .diag-svg {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+        }
+        .diag-top {
+            position: absolute; top: 2px; right: 2px;
+            font-size: 9px; color: var(--teal); z-index: 3;
+        }
+        .diag-bottom {
+            position: absolute; bottom: 2px; left: 2px;
+            font-size: 9px; color: var(--blue); z-index: 3;
+        }
+
         .cell-inner { white-space: nowrap; display: inline-block; transform-origin: center; position: relative; z-index: 2; }
-        
         .grid-header .cell { font-size: clamp(10px, 1.8vh, 14px); color: var(--teal); font-weight: bold; }
         .cell:last-child { border-right: none; }
         
         .num-col { flex: 0 0 12%; color: var(--blue); font-weight: bold; background: #fafafa; }
 
-        /* 核心修正：加入透明度，使颜色更通透 */
         .active-cell { 
             background-color: rgba(178, 34, 34, 0.8) !important; 
             color: #ffffff !important;
@@ -153,7 +170,13 @@
         <div class="section-box">
             <div class="grid-container">
                 <div class="grid-row grid-header">
-                    <div class="cell num-col"><span class="cell-inner">ཚོགས་ཐེངས།</span></div>
+                    <div class="cell diagonal-cell">
+                        <svg class="diag-svg" preserveAspectRatio="none" viewBox="0 0 100 100">
+                            <line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1" />
+                        </svg>
+                        <span class="diag-top">རེས་གཟའ།</span>
+                        <span class="diag-bottom">ཚོགས་ཐེངས།</span>
+                    </div>
                     <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div><div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
                     <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div><div class="cell"><span class="cell-inner">ཕུར་བུ།</span></div>
                     <div class="cell"><span class="cell-inner">པ་སངས་།</span></div><div class="cell"><span class="cell-inner">སྤེན་པ།</span></div>
@@ -165,7 +188,13 @@
         <div class="section-box">
             <div class="grid-container">
                 <div class="grid-row grid-header">
-                    <div class="cell num-col"><span class="cell-inner">ཚོགས་ཐེངས།</span></div>
+                    <div class="cell diagonal-cell">
+                        <svg class="diag-svg" preserveAspectRatio="none" viewBox="0 0 100 100">
+                            <line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1" />
+                        </svg>
+                        <span class="diag-top">རེས་གཟའ།</span>
+                        <span class="diag-bottom">ཚོགས་ཐེངས།</span>
+                    </div>
                     <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div><div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
                     <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div><div class="cell"><span class="cell-inner">ཕུར་བུ།</span></div>
                     <div class="cell"><span class="cell-inner">པ་སངས་།</span></div><div class="cell"><span class="cell-inner">སྤེན་པ།</span></div>
