@@ -26,20 +26,26 @@
             overflow: hidden; 
             background: var(--bg);
             font-family: 'TibetWildYak', -apple-system, sans-serif;
+            /* 强制定位，锁定视口防止滚动 */
+            position: fixed;
+            left: 0; top: 0; right: 0; bottom: 0;
         }
 
         .wrapper {
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            /* 强制高度穿透底部安全区限制 */
+            height: calc(100vh + env(safe-area-inset-bottom));
             width: 100vw;
-            /* 顶部保留避让，底部彻底冲破安全区限制 */
-            padding: env(safe-area-inset-top) 6px 2px 6px;
+            /* 顶部保留避让，底部移除默认限制 */
+            padding: env(safe-area-inset-top) 6px 0 6px;
+            /* 通过负边距抵消底部安全区的视觉占位 */
+            margin-bottom: calc(-1 * env(safe-area-inset-bottom));
             background: linear-gradient(rgba(248,249,250,0.95), rgba(248,249,250,0.95)), url('apple-touch-icon.png') no-repeat center;
             background-size: contain;
         }
 
-        header { flex: 0 0 auto; padding: 0px 0 1px 0; }
+        header { flex: 0 0 auto; padding: 4px 0 2px 0; }
         .t-name { font-size: clamp(14px, 3vh, 18px); font-weight: bold; color: var(--accent); text-align: center; }
 
         .btn { 
@@ -66,7 +72,8 @@
             flex-direction: column;
             gap: 3px;
             min-height: 0;
-            margin-bottom: 5px; /* 留出极小空隙防止贴死 */
+            /* 底部内容区稍微补一点边距，使文字不贴死屏幕边缘 */
+            padding-bottom: calc(env(safe-area-inset-bottom) + 5px);
         }
 
         .section-group {
@@ -101,7 +108,12 @@
         .active-cell { background-color: var(--accent) !important; color: white !important; font-weight: bold; }
 
         @media (orientation: landscape) {
-            .wrapper { padding: env(safe-area-inset-top) 40px 5px 40px; }
+            .wrapper { 
+                height: 100vh;
+                margin-bottom: 0;
+                padding: env(safe-area-inset-top) 40px 5px 40px; 
+            }
+            .content-area { padding-bottom: 0; }
             .cell { font-size: clamp(10px, 4.2vh, 16px); padding: 2px 1px; line-height: 1.5; }
             .grid-header .cell { font-size: clamp(9px, 3.8vh, 15px); }
             .t-name { font-size: clamp(14px, 5vh, 20px); }
