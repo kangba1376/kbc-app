@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+、<!DOCTYPE html>
 <html lang="bo">
 <head>
     <meta charset="UTF-8">
@@ -56,7 +56,7 @@
             font-size: clamp(12px, 2.2vh, 18px); 
             font-weight: bold; color: var(--accent); 
             border: 1.5px solid var(--accent); border-top: 3.5px solid var(--accent);
-            border-radius: 6px; padding: 2px;
+            border-radius: 6px; padding: 2px; min-height: 1.5em;
         }
 
         .content-area {
@@ -180,7 +180,7 @@
 
     let audioCtx = null;
     let isAudioMuted = false;
-    let currentReminderKey = ""; // 记录当前提醒的时间节点
+    let currentReminderKey = ""; 
     let reminderCount = 0;
     let reminderStartTime = 0;
 
@@ -229,6 +229,13 @@
         osc.start(); osc.stop(audioCtx.currentTime + 0.5);
     }
 
+    function stopAudioRemind() {
+        isAudioMuted = true;
+        const btn = document.getElementById('audioBtn');
+        btn.style.background = "#27ae60";
+        btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།";
+    }
+
     function refresh() {
         const now = new Date();
         const nowS = now.toTimeString().slice(0, 5);
@@ -253,7 +260,6 @@
                 }
             }
 
-            // 声音逻辑：检查开课前40分钟和5分钟
             if (realWk < 6) {
                 const checkTimes = [40, 5];
                 checkTimes.forEach(offset => {
@@ -267,7 +273,7 @@
                             reminderStartTime = Date.now();
                             const btn = document.getElementById('audioBtn');
                             btn.style.background = "#e67e22";
-                            btn.innerText = "🔔 སྒྲ་མཚམས་འཇོག་པ། (关闭当前提醒)";
+                            btn.innerText = "🔔 སྒྲ་མཚམས་འཇོག་པ།";
                             btn.disabled = false;
                         }
                     }
@@ -275,28 +281,48 @@
             }
         });
 
-        // 提醒循环控制：响1分钟停1分钟，循环3次
         if (currentReminderKey !== "" && !isAudioMuted) {
-            const elapsed = Math.floor((Date.now() - reminderStartTime) / 60000); // 经过了几分钟
-            const cycleIndex = Math.floor(elapsed / 2); // 第几次循环 (0, 1, 2)
-            const isPlayingPhase = elapsed % 2 === 0; // 偶数分钟响，奇数分钟停
+            const elapsed = Math.floor((Date.now() - reminderStartTime) / 60000);
+            const cycleIndex = Math.floor(elapsed / 2);
+            const isPlayingPhase = elapsed % 2 === 0;
 
             if (cycleIndex < 3) {
                 if (isPlayingPhase) {
                     if (now.getMilliseconds() < 1000 && now.getSeconds() % 2 === 0) playBeep(); 
                 }
             } else {
-                stopAudioRemind(); // 三次结束
+                stopAudioRemind();
             }
         }
 
         if (realWk >= 6) {
-            msgEl.innerText = (realWk === 6) ? "དེ་རིང་གཟའ་སྤེན་པ་རེད། གཟའ་མཇུག་སྤྲོ།" : "དེ་རིང་གཟའ་ཉི་མ་རེད། གཟའ་མཇུག་སྤྲོ།";
+            msgEl.innerText = (realWk === 6) ? "དེ་རིང་གཟའ་སྤེན་པ་རེད། དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།" : "དེ་རིང་གཟའ་ཉི་མ་རེད། དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།";
         } else {
             const full = [...morningData, ...afternoonData];
-            let cur = "";
-            slots.forEach((t, i) => { if (nowS >= t.s && nowS < t.e) cur = full[i][realWk] || "ནང་སྦྱོང་།"; });
-            msgEl.innerText = cur ? `ད་ལྟ།: ${cur}` : "སློབ་ཚན་མེད།";
+            let currentSlotIndex = -1;
+            let lastSlotIndex = -1;
+
+            slots.forEach((t, i) => {
+                if (nowS >= t.s && nowS < t.e) currentSlotIndex = i;
+                if (full[i][realWk]) lastSlotIndex = i;
+            });
+
+            if (currentSlotIndex !== -1) {
+                const curTask = full[currentSlotIndex][realWk];
+                if (curTask) {
+                    const period = currentSlotIndex < 4 ? "སྔ་དྲོ།" : "ཕྱི་དྲོ།";
+                    msgEl.innerText = `དེ་རིང་${period}སློབ་ཚན་ཡོད།: ${curTask}`;
+                } else {
+                    msgEl.innerText = "";
+                }
+            } else {
+                const lastEndTime = lastSlotIndex !== -1 ? slots[lastSlotIndex].e : "00:00";
+                if (nowS > lastEndTime && lastSlotIndex !== -1) {
+                    msgEl.innerText = "དེ་རིང་གི་སློབ་ཚན་མཇུག་སྒྲིལ་ཟིན།";
+                } else {
+                    msgEl.innerText = "";
+                }
+            }
         }
         
         document.querySelectorAll('.cell').forEach(c => {
@@ -319,11 +345,9 @@
             const AudioContext = window.AudioContext || window.webkitAudioContext;
             audioCtx = new AudioContext();
             playBeep(); 
-            // 成功逻辑：背景变绿，文字提示成功
             btn.style.background = "#27ae60"; 
             btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; 
         } catch (e) { 
-            // 失败逻辑：背景变红，文字换成藏文提示失败
             btn.style.background = "#c0392b";
             btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་མ་ཐུབ།"; 
         }
