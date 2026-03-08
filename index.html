@@ -20,6 +20,7 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         html, body { 
             height: 100%; width: 100%; 
             overflow: hidden; 
@@ -34,82 +35,69 @@
             flex-direction: column;
             height: 100vh;
             width: 100vw;
-            padding: env(safe-area-inset-top) 10px env(safe-area-inset-bottom) 10px;
+            /* 严格控制内边距，底部多预留一点避开系统条 */
+            padding: env(safe-area-inset-top) 8px 12px 8px;
             background: linear-gradient(rgba(248,249,250,0.96), rgba(248,249,250,0.96)), url('apple-touch-icon.png') no-repeat center;
-            background-size: 200px auto;
+            background-size: 180px auto;
         }
 
-        header { flex: 0 0 auto; padding: 4px 0; }
-        .t-name { font-size: clamp(18px, 3vh, 24px); font-weight: bold; color: var(--accent); text-align: center; }
+        /* 顶部区域固定高度 */
+        .top-components { flex: 0 0 auto; }
+        header { padding: 2px 0; }
+        .t-name { font-size: clamp(16px, 2.5vh, 22px); font-weight: bold; color: var(--accent); text-align: center; }
 
         .btn { 
-            flex: 0 0 auto; width: 100%; height: clamp(30px, 4.5vh, 45px); 
+            width: 100%; height: clamp(28px, 4vh, 38px); 
             background: #27ae60; color: #fff; border: none; border-radius: 8px; 
-            font-size: clamp(14px, 2vh, 18px); margin-bottom: 5px; font-family: 'TibetWildYak';
+            font-size: clamp(12px, 1.8vh, 16px); margin-bottom: 4px; font-family: 'TibetWildYak';
         }
 
         #status-box { 
-            flex: 0 0 auto; background: #fff; border-radius: 8px; border: 1px solid #ddd; 
-            padding: 4px; text-align: center; margin-bottom: 8px;
+            background: #fff; border-radius: 8px; border: 1px solid #ddd; 
+            padding: 3px; text-align: center; margin-bottom: 6px;
         }
         #clock { display: none; } 
         #msg { 
-            font-size: clamp(14px, 2.2vh, 20px); font-weight: bold; color: var(--accent); 
-            border: 2px solid var(--accent); border-top: 5px solid var(--accent);
-            border-radius: 6px; padding: 4px; min-height: 1.5em;
-            display: flex; align-items: center; justify-content: center;
+            font-size: clamp(13px, 2vh, 18px); font-weight: bold; color: var(--accent); 
+            border: 2px solid var(--accent); border-top: 4px solid var(--accent);
+            border-radius: 6px; padding: 2px; min-height: 1.4em;
         }
 
+        /* 核心修改：使用 Grid 锁定 5:4 的高度比例 */
         .content-area {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 10px; 
+            display: grid;
+            grid-template-rows: 5fr 4fr; /* 上午5份(4课+1头), 下午4份(3课+1头) */
+            gap: 8px;
             min-height: 0;
-            padding-bottom: 5px;
+            overflow: hidden;
         }
 
-        /* 关键修改：按课节数分配比例 */
-        /* 上午4节课 + 1行表头 = 5份空间 */
-        .section-morning {
-            flex: 5; 
+        .section-box {
             display: flex;
             flex-direction: column;
             background: #fff;
-            border-radius: 10px;
-            border: 2.5px solid var(--accent);
-            border-top: 6px solid var(--accent);
+            border-radius: 8px;
+            border: 2px solid var(--accent);
+            border-top: 5px solid var(--accent);
             overflow: hidden;
-            min-height: 0;
+            min-height: 0; /* 强制不被内容撑开 */
         }
 
-        /* 下午3节课 + 1行表头 = 4份空间 */
-        .section-afternoon {
-            flex: 4; 
-            display: flex;
-            flex-direction: column;
-            background: #fff;
-            border-radius: 10px;
-            border: 2.5px solid var(--accent);
-            border-top: 6px solid var(--accent);
-            overflow: hidden;
-            min-height: 0;
-        }
-
-        .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; width: 100%; }
+        .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; }
         .grid-row { display: flex; flex: 1; border-bottom: 1px solid #eee; min-height: 0; }
         .grid-row:last-child { border-bottom: none; }
         
-        .grid-header { background: #fcfcfc; flex: 0 0 auto; height: clamp(26px, 4vh, 36px); border-bottom: 2px solid #eee; }
+        .grid-header { background: #fcfcfc; flex: 0 0 auto; height: clamp(22px, 3.5vh, 30px); border-bottom: 2px solid #eee; }
 
         .cell { 
             flex: 1; width: 0; display: flex; align-items: center; justify-content: center;
-            border-right: 1px solid #eee; font-size: clamp(11px, 1.8vh, 18px);
-            text-align: center; line-height: 1.2; padding: 2px; overflow: hidden; 
+            border-right: 1px solid #eee; font-size: clamp(10px, 1.6vh, 16px);
+            text-align: center; line-height: 1.1; padding: 1px;
         }
         
         .cell-inner { white-space: nowrap; display: inline-block; transform-origin: center; }
-        .grid-header .cell { font-size: clamp(10px, 1.5vh, 15px); color: var(--blue); font-weight: bold; }
+        .grid-header .cell { font-size: clamp(9px, 1.3vh, 13px); color: var(--blue); font-weight: bold; }
         .cell:last-child { border-right: none; }
         .num-col { flex: 0 0 12%; color: #8b0000; font-weight: bold; background: #fafafa; }
 
@@ -117,23 +105,25 @@
         .active-cell { background-color: var(--accent) !important; color: white !important; font-weight: bold; }
 
         @media (orientation: landscape) {
-            .wrapper { padding-left: 50px; padding-right: 50px; }
-            .content-area { gap: 10px; }
+            .wrapper { padding-left: 40px; padding-right: 40px; }
+            .content-area { gap: 6px; }
         }
     </style>
 </head>
 <body>
 
 <div class="wrapper">
-    <header><div class="t-name">དགེན་ཁམས་པ་ཚང་།</div></header>
-    <button class="btn" id="audioBtn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button>
-    <div id="status-box">
-        <div id="clock">00:00:00</div>
-        <div id="msg">...</div>
+    <div class="top-components">
+        <header><div class="t-name">དགེན་ཁམས་པ་ཚང་།</div></header>
+        <button class="btn" id="audioBtn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button>
+        <div id="status-box">
+            <div id="clock">00:00:00</div>
+            <div id="msg">...</div>
+        </div>
     </div>
 
     <div class="content-area">
-        <div class="section-morning">
+        <div class="section-box">
             <div class="grid-container">
                 <div class="grid-row grid-header">
                     <div class="cell num-col"><span class="cell-inner">ཚོགས་ཐེངས།</span></div>
@@ -148,7 +138,7 @@
                 <div id="grid-morning" style="display:contents"></div>
             </div>
         </div>
-        <div class="section-afternoon">
+        <div class="section-box">
             <div class="grid-container">
                 <div class="grid-row grid-header">
                     <div class="cell num-col"><span class="cell-inner">ཚོགས་ཐེངས།</span></div>
@@ -288,7 +278,7 @@
             const inner = c.querySelector('.cell-inner');
             if(inner && inner.innerText !== "") {
                 inner.style.transform = "scale(1)";
-                const ratio = (c.offsetWidth - 6) / inner.offsetWidth;
+                const ratio = (c.offsetWidth - 4) / inner.offsetWidth;
                 if(ratio < 1) inner.style.transform = `scale(${ratio})`;
             }
         });
