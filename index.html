@@ -8,80 +8,72 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <title>སློབ་ཚན་རེའུ་མིག</title>
     <style>
-        @font-face {
-            font-family: 'TibetWildYak';
-            src: url('TibetWildYak.ttf') format('truetype');
-        }
+        @font-face { font-family: 'TibetWildYak'; src: url('TibetWildYak.ttf') format('truetype'); }
 
-        :root {
-            --bg: #f8f9fa;
-            --accent: #c0392b;
-            --blue: #007aff;
-        }
+        :root { --bg: #f8f9fa; --accent: #c0392b; --blue: #007aff; }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
         html, body { 
             height: 100svh; width: 100vw; 
-            overflow: hidden; 
-            background: var(--bg);
+            background: var(--bg); 
             font-family: 'TibetWildYak', -apple-system, sans-serif;
-            position: fixed;
-            left: 0; top: 0;
-            touch-action: none;
+            overflow: hidden;
+            position: fixed; 
+            top: 0; left: 0;
         }
 
         .wrapper {
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
             display: flex;
             flex-direction: column;
-            height: 100svh;
-            width: 100vw;
-            /* 底部边距完全归零，依靠 padding-bottom 确保底边框顶到最下 */
-            padding: env(safe-area-inset-top) 8px env(safe-area-inset-bottom) 8px;
+            /* 顶部强制保留灵动岛位置，底部强制设为0 */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: 0px; 
+            padding-left: 8px;
+            padding-right: 8px;
             background: linear-gradient(rgba(248,249,250,0.96), rgba(248,249,250,0.96)), url('apple-touch-icon.png') no-repeat center;
             background-size: 160px auto;
         }
 
-        .top-components { flex: 0 0 auto; margin-bottom: 2px; }
-        header { padding: 0; }
+        .top-components { flex: 0 0 auto; margin-bottom: 4px; }
         .t-name { font-size: clamp(16px, 2.5vh, 22px); font-weight: bold; color: var(--accent); text-align: center; line-height: 1.1; }
 
         .btn { 
-            width: 100%; height: clamp(24px, 3.5vh, 34px); 
+            width: 100%; height: clamp(26px, 3.8vh, 36px); 
             background: #27ae60; color: #fff; border: none; border-radius: 6px; 
-            font-size: clamp(12px, 1.8vh, 16px); margin: 1px 0; font-family: 'TibetWildYak';
+            font-size: clamp(12px, 1.8vh, 16px); margin: 2px 0; font-family: 'TibetWildYak';
         }
 
-        #status-box { 
-            background: #fff; border-radius: 6px; border: 1px solid #ddd; 
-            padding: 2px; text-align: center; margin-bottom: 2px;
-        }
-        #clock { display: none; } 
+        #status-box { background: #fff; border-radius: 6px; border: 1px solid #ddd; padding: 2px; text-align: center; margin-bottom: 2px; }
         #msg { 
-            font-size: clamp(12px, 2vh, 18px); font-weight: bold; color: var(--accent); 
+            font-size: clamp(14px, 2.2vh, 20px); font-weight: bold; color: var(--accent); 
             border: 1px solid var(--accent); border-top: 3px solid var(--accent);
-            border-radius: 5px; padding: 1px; min-height: 1.4em;
+            border-radius: 5px; padding: 3px; min-height: 1.5em;
             display: flex; align-items: center; justify-content: center;
         }
 
         .content-area {
             flex: 1;
-            display: flex; /* 改用 flex 纵向平分空间 */
+            display: flex;
             flex-direction: column;
-            gap: 6px; 
+            gap: 8px; /* 稍微拉大间距更美观 */
             min-height: 0;
-            margin-bottom: 0; /* 确保不留白 */
+            margin-bottom: 0px; /* 强制底部无缝隙 */
         }
 
-        /* 专门针对 iPhone 的窄长屏幕调整，通过拉伸表格高度填满底部 */
-        @media screen and (max-aspect-ratio: 1/2) {
-            .content-area { gap: 12px; } 
-            .top-components { margin-bottom: 8px; }
-            #msg { padding: 6px 1px; }
+        /* 强制 4:3 比例 */
+        .section-box:nth-child(1) { flex: 4; }
+        .section-box:nth-child(2) { 
+            flex: 3; 
+            /* 底部表格的特殊处理：去掉圆角并让边框撞底 */
+            border-bottom-left-radius: 0; 
+            border-bottom-right-radius: 0;
+            border-bottom: none; 
         }
 
         .section-box {
-            flex: 1; /* 每个表格平分剩下的所有高度 */
             display: flex;
             flex-direction: column;
             background: #fff;
@@ -89,32 +81,31 @@
             border: 1px solid var(--accent);
             border-top: 5px solid var(--accent);
             overflow: hidden;
+            min-height: 0;
         }
 
         .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-        /* 强制每一行平分表格高度，确保最后一行能顶到底部 */
         .grid-row { display: flex; flex: 1; border-bottom: 1px solid #eee; min-height: 0; }
         .grid-row:last-child { border-bottom: none; }
         
-        .grid-header { background: #fcfcfc; flex: 0 0 auto; height: clamp(22px, 3vh, 32px); border-bottom: 1px solid #eee; }
+        .grid-header { background: #fcfcfc; flex: 0 0 auto; height: clamp(24px, 3.2vh, 34px); border-bottom: 1px solid #eee; }
 
         .cell { 
             flex: 1; width: 0; display: flex; align-items: center; justify-content: center;
-            border-right: 1px solid #eee; font-size: clamp(10px, 1.8vh, 17px);
-            text-align: center; line-height: 1; padding: 1px; overflow: hidden;
+            border-right: 1px solid #eee; font-size: clamp(11px, 2vh, 18px);
+            text-align: center; line-height: 1; padding: 2px; overflow: hidden;
         }
         
         .cell-inner { white-space: nowrap; display: inline-block; transform-origin: center; }
-        .grid-header .cell { font-size: clamp(9px, 1.4vh, 14px); color: var(--blue); font-weight: bold; }
+        .grid-header .cell { font-size: clamp(10px, 1.6vh, 15px); color: var(--blue); font-weight: bold; }
         .cell:last-child { border-right: none; }
         .num-col { flex: 0 0 12%; color: #8b0000; font-weight: bold; background: #fafafa; }
 
-        .col-today { background-color: #fffafa !important; }
         .active-cell { background-color: var(--accent) !important; color: white !important; font-weight: bold; }
+        .col-today { background-color: #fffafa !important; }
 
         @media (orientation: landscape) {
-            .wrapper { padding-left: 60px; padding-right: 60px; }
-            .content-area { gap: 4px; flex-direction: row; } /* 横屏并排显示 */
+            .wrapper { padding-left: clamp(40px, 10vw, 80px); padding-right: clamp(40px, 10vw, 80px); }
         }
     </style>
 </head>
@@ -125,7 +116,6 @@
         <header><div class="t-name">དགེན་ཁམས་པ་ཚང་།</div></header>
         <button class="btn" id="audioBtn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button>
         <div id="status-box">
-            <div id="clock">00:00:00</div>
             <div id="msg">...</div>
         </div>
     </div>
@@ -231,7 +221,6 @@
         const nowS = now.toTimeString().slice(0, 5);
         const wk = now.getDay(); 
         const realWk = (wk === 0) ? 7 : wk; 
-        document.getElementById('clock').innerText = now.toLocaleTimeString('zh-CN', {hour12:false});
         const msgEl = document.getElementById('msg');
         
         slots.forEach((t, i) => {
@@ -245,7 +234,6 @@
                     }
                 }
             }
-
             if (realWk < 6) {
                 [40, 5].forEach(offset => {
                     const triggerTime = timeAdd(t.s, -offset);
@@ -273,13 +261,10 @@
             const full = [...morningData, ...afternoonData];
             let currentSlotIndex = -1;
             slots.forEach((t, i) => { if (nowS >= t.s && nowS < t.e) currentSlotIndex = i; });
-
             if (currentSlotIndex !== -1) {
                 const curTask = full[currentSlotIndex][realWk];
-                msgEl.innerText = curTask ? `དེ་རིང་སློབ་ཚན་ཡོད།: ${curTask}` : "";
-            } else {
-                msgEl.innerText = "";
-            }
+                msgEl.innerText = curTask ? `དེ་རིང་སློབ་ཚན་ཡོད།: ${curTask}` : "སློབ་ཚན་མི་འདུག";
+            } else { msgEl.innerText = "སློབ་ཚན་མི་འདུག"; }
         }
         
         document.querySelectorAll('.cell').forEach(c => {
