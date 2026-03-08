@@ -20,14 +20,13 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
         html, body { 
             height: 100%; width: 100%; 
             overflow: hidden; 
             background: var(--bg);
             font-family: 'TibetWildYak', -apple-system, sans-serif;
             position: fixed;
-            left: 0; top: 0; right: 0; bottom: 0;
+            touch-action: none;
         }
 
         .wrapper {
@@ -35,80 +34,91 @@
             flex-direction: column;
             height: 100vh;
             width: 100vw;
-            padding: env(safe-area-inset-top) 6px env(safe-area-inset-bottom) 6px;
-            background: linear-gradient(rgba(248,249,250,0.95), rgba(248,249,250,0.95)), url('apple-touch-icon.png') no-repeat center;
-            background-size: contain;
+            padding: env(safe-area-inset-top) 10px env(safe-area-inset-bottom) 10px;
+            background: linear-gradient(rgba(248,249,250,0.96), rgba(248,249,250,0.96)), url('apple-touch-icon.png') no-repeat center;
+            background-size: 200px auto;
         }
 
-        header { flex: 0 0 auto; padding: 2px 0; }
-        .t-name { font-size: clamp(14px, 2.5vh, 18px); font-weight: bold; color: var(--accent); text-align: center; }
+        header { flex: 0 0 auto; padding: 4px 0; }
+        .t-name { font-size: clamp(18px, 3vh, 24px); font-weight: bold; color: var(--accent); text-align: center; }
 
         .btn { 
-            flex: 0 0 auto; width: 100%; height: clamp(22px, 3vh, 30px); 
-            background: #27ae60; color: #fff; border: none; border-radius: 6px; 
-            font-size: clamp(11px, 1.8vh, 14px); margin-bottom: 2px; font-family: 'TibetWildYak';
+            flex: 0 0 auto; width: 100%; height: clamp(30px, 4.5vh, 45px); 
+            background: #27ae60; color: #fff; border: none; border-radius: 8px; 
+            font-size: clamp(14px, 2vh, 18px); margin-bottom: 5px; font-family: 'TibetWildYak';
         }
 
         #status-box { 
-            flex: 0 0 auto; background: #fff; border-radius: 6px; border: 1px solid #eee; 
-            padding: 2px; text-align: center; margin-bottom: 3px;
+            flex: 0 0 auto; background: #fff; border-radius: 8px; border: 1px solid #ddd; 
+            padding: 4px; text-align: center; margin-bottom: 8px;
         }
-        /* 隐藏时间显示 */
         #clock { display: none; } 
-        
         #msg { 
-            font-size: clamp(11px, 1.8vh, 15px); 
-            font-weight: bold; color: var(--accent); 
-            border: 1.2px solid var(--accent); border-top: 3px solid var(--accent);
-            border-radius: 5px; padding: 1px; min-height: 1.2em;
+            font-size: clamp(14px, 2.2vh, 20px); font-weight: bold; color: var(--accent); 
+            border: 2px solid var(--accent); border-top: 5px solid var(--accent);
+            border-radius: 6px; padding: 4px; min-height: 1.5em;
+            display: flex; align-items: center; justify-content: center;
         }
 
         .content-area {
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 10px; 
             min-height: 0;
-            padding-bottom: 2px;
+            padding-bottom: 5px;
         }
 
-        .section-group {
-            flex: 1; 
+        /* 关键修改：按课节数分配比例 */
+        /* 上午4节课 + 1行表头 = 5份空间 */
+        .section-morning {
+            flex: 5; 
             display: flex;
             flex-direction: column;
             background: #fff;
-            border-radius: 6px;
-            border: 1.5px solid var(--accent);
-            border-top: 3px solid var(--accent);
+            border-radius: 10px;
+            border: 2.5px solid var(--accent);
+            border-top: 6px solid var(--accent);
             overflow: hidden;
             min-height: 0;
         }
 
-        .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; width: 100%; table-layout: fixed; }
-        .grid-row { display: flex; flex: 1; border-bottom: 1px solid #f2f2f2; min-height: 0; width: 100%; }
+        /* 下午3节课 + 1行表头 = 4份空间 */
+        .section-afternoon {
+            flex: 4; 
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border-radius: 10px;
+            border: 2.5px solid var(--accent);
+            border-top: 6px solid var(--accent);
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; width: 100%; }
+        .grid-row { display: flex; flex: 1; border-bottom: 1px solid #eee; min-height: 0; }
         .grid-row:last-child { border-bottom: none; }
-        .grid-header { background: #fafafa; flex: 0 0 auto; height: clamp(18px, 2.5vh, 24px); border-bottom: 1px solid #eee; }
+        
+        .grid-header { background: #fcfcfc; flex: 0 0 auto; height: clamp(26px, 4vh, 36px); border-bottom: 2px solid #eee; }
 
         .cell { 
             flex: 1; width: 0; display: flex; align-items: center; justify-content: center;
-            border-right: 1px solid #f2f2f2; font-size: clamp(8px, 1.2vh, 11px);
-            text-align: center; line-height: 1.1; padding: 0px 1px; overflow: hidden; 
+            border-right: 1px solid #eee; font-size: clamp(11px, 1.8vh, 18px);
+            text-align: center; line-height: 1.2; padding: 2px; overflow: hidden; 
         }
         
         .cell-inner { white-space: nowrap; display: inline-block; transform-origin: center; }
-        .grid-header .cell { font-size: clamp(7px, 1.1vh, 10px); color: var(--blue); }
+        .grid-header .cell { font-size: clamp(10px, 1.5vh, 15px); color: var(--blue); font-weight: bold; }
         .cell:last-child { border-right: none; }
-        .num-col { flex: 0 0 14%; color: #8b0000; font-weight: bold; background: #fdfdfd; width: 14% !important; }
+        .num-col { flex: 0 0 12%; color: #8b0000; font-weight: bold; background: #fafafa; }
 
-        .col-today { background-color: #fff5f5 !important; }
+        .col-today { background-color: #fffafa !important; }
         .active-cell { background-color: var(--accent) !important; color: white !important; font-weight: bold; }
 
         @media (orientation: landscape) {
-            .wrapper { padding: env(safe-area-inset-top) 40px env(safe-area-inset-bottom) 40px; }
-            .cell { font-size: clamp(10px, 4.2vh, 16px); padding: 2px 1px; line-height: 1.5; }
-            .grid-header .cell { font-size: clamp(9px, 3.8vh, 15px); }
-            .t-name { font-size: clamp(14px, 5vh, 20px); }
-            .btn { height: clamp(24px, 6vh, 36px); font-size: clamp(12px, 3vh, 16px); }
+            .wrapper { padding-left: 50px; padding-right: 50px; }
+            .content-area { gap: 10px; }
         }
     </style>
 </head>
@@ -123,10 +133,10 @@
     </div>
 
     <div class="content-area">
-        <div class="section-group">
+        <div class="section-morning">
             <div class="grid-container">
                 <div class="grid-row grid-header">
-                    <div class="cell num-col"><span class="cell-inner" style="font-size:0.7em">ཚོགས་ཐེངས།</span></div>
+                    <div class="cell num-col"><span class="cell-inner">ཚོགས་ཐེངས།</span></div>
                     <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div>
                     <div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
                     <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div>
@@ -138,10 +148,10 @@
                 <div id="grid-morning" style="display:contents"></div>
             </div>
         </div>
-        <div class="section-group">
+        <div class="section-afternoon">
             <div class="grid-container">
                 <div class="grid-row grid-header">
-                    <div class="cell num-col"><span class="cell-inner" style="font-size:0.7em">ཚོགས་ཐེངས།</span></div>
+                    <div class="cell num-col"><span class="cell-inner">ཚོགས་ཐེངས།</span></div>
                     <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div>
                     <div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
                     <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div>
@@ -278,7 +288,7 @@
             const inner = c.querySelector('.cell-inner');
             if(inner && inner.innerText !== "") {
                 inner.style.transform = "scale(1)";
-                const ratio = (c.offsetWidth - 2) / inner.offsetWidth;
+                const ratio = (c.offsetWidth - 6) / inner.offsetWidth;
                 if(ratio < 1) inner.style.transform = `scale(${ratio})`;
             }
         });
@@ -295,6 +305,7 @@
     }
 
     setInterval(refresh, 1000); refresh();
+    window.addEventListener('resize', refresh);
 </script>
 </body>
 </html>
