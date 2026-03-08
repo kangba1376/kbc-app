@@ -58,9 +58,9 @@
         #clock { display: none; } 
         #msg { 
             font-size: clamp(12px, 2vh, 18px); font-weight: bold; color: var(--accent); 
-            /* 提示框同步调整：1px外框，3px顶部 */
             border: 1px solid var(--accent); border-top: 3px solid var(--accent);
-            border-radius: 5px; padding: 1px; min-height: 1.3em;
+            border-radius: 5px; padding: 1px; min-height: 1.4em;
+            display: flex; align-items: center; justify-content: center;
         }
 
         .content-area {
@@ -72,12 +72,18 @@
             overflow: hidden;
         }
 
+        /* 针对 iPhone 这种长比例屏幕的特别优化 */
+        @media screen and (max-aspect-ratio: 1/2), (max-width: 500px) and (orientation: portrait) {
+            .content-area { gap: 15px; } /* 拉大上下两个表格的间距 */
+            #msg { padding: 8px 1px; }    /* 拉高提示框高度 */
+            .top-components { margin-bottom: 10px; } /* 增加顶部间距 */
+        }
+
         .section-box {
             display: flex;
             flex-direction: column;
             background: #fff;
             border-radius: 8px;
-            /* 【极致优化】主边框设为 1px，顶部设为 5px */
             border: 1px solid var(--accent);
             border-top: 5px solid var(--accent);
             overflow: hidden;
