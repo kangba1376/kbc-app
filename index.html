@@ -36,6 +36,7 @@
             flex-direction: column;
             height: 100svh;
             width: 100vw;
+            /* 底部边距完全归零，依靠 padding-bottom 确保底边框顶到最下 */
             padding: env(safe-area-inset-top) 8px env(safe-area-inset-bottom) 8px;
             background: linear-gradient(rgba(248,249,250,0.96), rgba(248,249,250,0.96)), url('apple-touch-icon.png') no-repeat center;
             background-size: 160px auto;
@@ -65,21 +66,22 @@
 
         .content-area {
             flex: 1;
-            display: grid;
-            grid-template-rows: 5fr 4fr; 
-            gap: 4px; 
+            display: flex; /* 改用 flex 纵向平分空间 */
+            flex-direction: column;
+            gap: 6px; 
             min-height: 0;
-            overflow: hidden;
+            margin-bottom: 0; /* 确保不留白 */
         }
 
-        /* 针对 iPhone 这种长比例屏幕的特别优化 */
-        @media screen and (max-aspect-ratio: 1/2), (max-width: 500px) and (orientation: portrait) {
-            .content-area { gap: 15px; } /* 拉大上下两个表格的间距 */
-            #msg { padding: 8px 1px; }    /* 拉高提示框高度 */
-            .top-components { margin-bottom: 10px; } /* 增加顶部间距 */
+        /* 专门针对 iPhone 的窄长屏幕调整，通过拉伸表格高度填满底部 */
+        @media screen and (max-aspect-ratio: 1/2) {
+            .content-area { gap: 12px; } 
+            .top-components { margin-bottom: 8px; }
+            #msg { padding: 6px 1px; }
         }
 
         .section-box {
+            flex: 1; /* 每个表格平分剩下的所有高度 */
             display: flex;
             flex-direction: column;
             background: #fff;
@@ -87,14 +89,14 @@
             border: 1px solid var(--accent);
             border-top: 5px solid var(--accent);
             overflow: hidden;
-            min-height: 0;
         }
 
         .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+        /* 强制每一行平分表格高度，确保最后一行能顶到底部 */
         .grid-row { display: flex; flex: 1; border-bottom: 1px solid #eee; min-height: 0; }
         .grid-row:last-child { border-bottom: none; }
         
-        .grid-header { background: #fcfcfc; flex: 0 0 auto; height: clamp(20px, 3vh, 28px); border-bottom: 1px solid #eee; }
+        .grid-header { background: #fcfcfc; flex: 0 0 auto; height: clamp(22px, 3vh, 32px); border-bottom: 1px solid #eee; }
 
         .cell { 
             flex: 1; width: 0; display: flex; align-items: center; justify-content: center;
@@ -112,7 +114,7 @@
 
         @media (orientation: landscape) {
             .wrapper { padding-left: 60px; padding-right: 60px; }
-            .content-area { gap: 4px; }
+            .content-area { gap: 4px; flex-direction: row; } /* 横屏并排显示 */
         }
     </style>
 </head>
