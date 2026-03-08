@@ -33,31 +33,30 @@
         .wrapper {
             display: flex;
             flex-direction: column;
-            /* 严格限制在可视安全区域内 */
             height: 100vh;
             width: 100vw;
-            /* 顶部避让刘海，底部避让横条 */
+            /* 严格避让上下安全区 */
             padding: env(safe-area-inset-top) 6px env(safe-area-inset-bottom) 6px;
             background: linear-gradient(rgba(248,249,250,0.95), rgba(248,249,250,0.95)), url('apple-touch-icon.png') no-repeat center;
             background-size: contain;
         }
 
-        header { flex: 0 0 auto; padding: 4px 0 2px 0; }
-        .t-name { font-size: clamp(14px, 3vh, 18px); font-weight: bold; color: var(--accent); text-align: center; }
+        header { flex: 0 0 auto; padding: 2px 0; }
+        .t-name { font-size: clamp(14px, 2.5vh, 18px); font-weight: bold; color: var(--accent); text-align: center; }
 
         .btn { 
-            flex: 0 0 auto; width: 100%; height: clamp(24px, 3.5vh, 32px); 
+            flex: 0 0 auto; width: 100%; height: clamp(22px, 3vh, 30px); 
             background: #27ae60; color: #fff; border: none; border-radius: 6px; 
-            font-size: clamp(12px, 1.8vh, 15px); margin-bottom: 2px; font-family: 'TibetWildYak';
+            font-size: clamp(11px, 1.8vh, 14px); margin-bottom: 2px; font-family: 'TibetWildYak';
         }
 
         #status-box { 
             flex: 0 0 auto; background: #fff; border-radius: 6px; border: 1px solid #eee; 
-            padding: 1px; text-align: center; margin-bottom: 2px;
+            padding: 1px; text-align: center; margin-bottom: 3px;
         }
         #clock { font-size: 8px; color: #8e8e93; font-family: monospace; line-height: 1; }
         #msg { 
-            font-size: clamp(11px, 2vh, 16px); 
+            font-size: clamp(11px, 1.8vh, 15px); 
             font-weight: bold; color: var(--accent); 
             border: 1.2px solid var(--accent); border-top: 3px solid var(--accent);
             border-radius: 5px; padding: 1px; min-height: 1.2em;
@@ -67,9 +66,9 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            min-height: 0;
-            padding-bottom: 5px; /* 与底部安全区留出微小呼吸感 */
+            gap: 5px; /* 表格之间的间距 */
+            min-height: 0; /* 允许子元素收缩 */
+            padding-bottom: 2px;
         }
 
         .section-group {
@@ -81,22 +80,22 @@
             border: 1.5px solid var(--accent);
             border-top: 3px solid var(--accent);
             overflow: hidden;
-            min-height: 0;
+            min-height: 0; /* 关键：允许表格在空间不足时收缩 */
         }
 
         .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; width: 100%; table-layout: fixed; }
         .grid-row { display: flex; flex: 1; border-bottom: 1px solid #f2f2f2; min-height: 0; width: 100%; }
         .grid-row:last-child { border-bottom: none; }
-        .grid-header { background: #fafafa; flex: 0 0 auto; height: clamp(18px, 2.8vh, 26px); border-bottom: 1px solid #eee; }
+        .grid-header { background: #fafafa; flex: 0 0 auto; height: clamp(18px, 2.5vh, 24px); border-bottom: 1px solid #eee; }
 
         .cell { 
             flex: 1; width: 0; display: flex; align-items: center; justify-content: center;
-            border-right: 1px solid #f2f2f2; font-size: clamp(8px, 1.3vh, 12px);
-            text-align: center; line-height: 1.2; padding: 0px 1px; overflow: hidden; 
+            border-right: 1px solid #f2f2f2; font-size: clamp(8px, 1.2vh, 11px);
+            text-align: center; line-height: 1.1; padding: 0px 1px; overflow: hidden; 
         }
         
         .cell-inner { white-space: nowrap; display: inline-block; transform-origin: center; }
-        .grid-header .cell { font-size: clamp(7px, 1.2vh, 11px); color: var(--blue); }
+        .grid-header .cell { font-size: clamp(7px, 1.1vh, 10px); color: var(--blue); }
         .cell:last-child { border-right: none; }
         .num-col { flex: 0 0 14%; color: #8b0000; font-weight: bold; background: #fdfdfd; width: 14% !important; }
 
@@ -104,9 +103,7 @@
         .active-cell { background-color: var(--accent) !important; color: white !important; font-weight: bold; }
 
         @media (orientation: landscape) {
-            .wrapper { 
-                padding: env(safe-area-inset-top) 40px env(safe-area-inset-bottom) 40px; 
-            }
+            .wrapper { padding: env(safe-area-inset-top) 40px env(safe-area-inset-bottom) 40px; }
             .cell { font-size: clamp(10px, 4.2vh, 16px); padding: 2px 1px; line-height: 1.5; }
             .grid-header .cell { font-size: clamp(9px, 3.8vh, 15px); }
             .t-name { font-size: clamp(14px, 5vh, 20px); }
