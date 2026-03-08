@@ -27,30 +27,40 @@
             top: 0; left: 0; bottom: 0; right: 0;
             display: flex;
             flex-direction: column;
+            /* 恢复正常安全区感应，侧边灵动岛会自动避开 */
             padding-top: env(safe-area-inset-top);
-            /* 精准留出 1px 间距，确保底边框可见 */
-            padding-bottom: 1px; 
-            padding-left: 8px;
-            padding-right: 8px;
+            padding-bottom: 1px; /* 康巴仓要求的 1px 底部间距 */
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
             background: linear-gradient(rgba(248,249,250,0.96), rgba(248,249,250,0.96)), url('apple-touch-icon.png') no-repeat center;
             background-size: 160px auto;
         }
 
-        .top-components { flex: 0 0 auto; margin-bottom: 2px; }
-        .t-name { font-size: clamp(16px, 2.2vh, 20px); font-weight: bold; color: var(--accent); text-align: center; line-height: 1.1; }
-
-        .btn { 
-            width: 100%; height: clamp(24px, 3.5vh, 32px); 
-            background: #27ae60; color: #fff; border: none; border-radius: 6px; 
-            font-size: clamp(12px, 1.8vh, 16px); margin: 1px 0; font-family: 'TibetWildYak';
+        .top-components { flex: 0 0 auto; margin-bottom: 4px; padding: 0 8px; }
+        
+        /* 极致修正：为名字增加顶空，并加大行高防止削头 */
+        .t-name { 
+            font-size: clamp(16px, 4vh, 22px); 
+            font-weight: bold; 
+            color: var(--accent); 
+            text-align: center; 
+            line-height: 1.8; /* 极大行高，保护上加字 */
+            padding-top: 8px; /* 强制下压 */
         }
 
-        #status-box { background: #fff; border-radius: 6px; border: 1px solid #ddd; padding: 1px; text-align: center; margin-bottom: 1px; }
+        .btn { 
+            width: 100%; height: clamp(26px, 5vh, 36px); 
+            background: #27ae60; color: #fff; border: none; border-radius: 6px; 
+            font-size: clamp(12px, 2.5vh, 16px); margin: 2px 0; font-family: 'TibetWildYak';
+        }
+
+        #status-box { background: #fff; border-radius: 6px; border: 1px solid #ddd; padding: 2px; text-align: center; margin-bottom: 2px; }
         #msg { 
-            font-size: clamp(13px, 2.1vh, 18px); font-weight: bold; color: var(--accent); 
+            font-size: clamp(14px, 3vh, 18px); font-weight: bold; color: var(--accent); 
             border: 1px solid var(--accent); border-top: 3px solid var(--accent);
-            border-radius: 5px; padding: 2px; min-height: 1.3em;
+            border-radius: 5px; padding: 4px; min-height: 1.6em;
             display: flex; align-items: center; justify-content: center;
+            line-height: 1.5;
         }
 
         .content-area {
@@ -59,11 +69,9 @@
             flex-direction: column;
             gap: 4px;
             min-height: 0;
-            /* 确保内部没有任何多余边距挤压这 1px */
-            margin-bottom: 0px; 
+            padding: 0 8px;
         }
 
-        /* 维持 4:3 比例 */
         .section-box:nth-child(1) { flex: 4; }
         .section-box:nth-child(2) { flex: 3; }
 
@@ -73,8 +81,8 @@
             background: #fff;
             border-radius: 8px;
             border: 1px solid var(--accent);
-            border-top: 4px solid var(--accent);
-            overflow: hidden;
+            border-top: 5px solid var(--accent);
+            overflow: visible; /* 允许文字辅音稍微溢出边框，不切断 */
             min-height: 0;
         }
 
@@ -82,16 +90,22 @@
         .grid-row { display: flex; flex: 1; border-bottom: 1px solid #eee; min-height: 0; }
         .grid-row:last-child { border-bottom: none; }
         
-        .grid-header { background: #fcfcfc; flex: 0 0 auto; height: clamp(22px, 3vh, 30px); border-bottom: 1px solid #eee; }
+        /* 修正：表头行高 */
+        .grid-header { 
+            background: #fcfcfc; 
+            flex: 0 0 auto; 
+            height: clamp(28px, 6vh, 38px); 
+            border-bottom: 1px solid #eee; 
+        }
 
         .cell { 
             flex: 1; width: 0; display: flex; align-items: center; justify-content: center;
-            border-right: 1px solid #eee; font-size: clamp(10px, 1.9vh, 17px);
-            text-align: center; line-height: 1; padding: 1px; overflow: hidden;
+            border-right: 1px solid #eee; font-size: clamp(11px, 2.8vh, 18px);
+            text-align: center; line-height: 1.6; padding: 2px;
         }
         
         .cell-inner { white-space: nowrap; display: inline-block; transform-origin: center; }
-        .grid-header .cell { font-size: clamp(9px, 1.5vh, 14px); color: var(--blue); font-weight: bold; }
+        .grid-header .cell { font-size: clamp(10px, 2.2vh, 15px); color: var(--blue); font-weight: bold; }
         .cell:last-child { border-right: none; }
         .num-col { flex: 0 0 12%; color: #8b0000; font-weight: bold; background: #fafafa; }
 
@@ -99,16 +113,12 @@
         .col-today { background-color: #fffafa !important; }
 
         @media (orientation: landscape) {
-            .wrapper { 
-                padding-left: env(safe-area-inset-left); 
-                padding-right: env(safe-area-inset-right); 
-            }
-            .content-area { flex-direction: column; gap: 2px; }
+            .content-area { gap: 2px; }
+            .t-name { padding-top: 4px; line-height: 1.5; }
         }
     </style>
 </head>
 <body>
-
 <div class="wrapper">
     <div class="top-components">
         <header><div class="t-name">དགེན་ཁམས་པ་ཚང་།</div></header>
@@ -117,45 +127,16 @@
             <div id="msg">...</div>
         </div>
     </div>
-
     <div class="content-area">
-        <div class="section-box">
-            <div class="grid-container">
-                <div class="grid-row grid-header">
-                    <div class="cell num-col"><span class="cell-inner">ཚོགས་ཐེངས།</span></div>
-                    <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div>
-                    <div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
-                    <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div>
-                    <div class="cell"><span class="cell-inner">ཕུར་བུ།</span></div>
-                    <div class="cell"><span class="cell-inner">པ་སངས་།</span></div>
-                    <div class="cell"><span class="cell-inner">སྤེན་པ།</span></div>
-                    <div class="cell"><span class="cell-inner">ཉི་མ།</span></div>
-                </div>
-                <div id="grid-morning" style="display:contents"></div>
-            </div>
-        </div>
-        <div class="section-box">
-            <div class="grid-container">
-                <div class="grid-row grid-header">
-                    <div class="cell num-col"><span class="cell-inner">ཚོགས་ཐེངས།</span></div>
-                    <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div>
-                    <div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
-                    <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div>
-                    <div class="cell"><span class="cell-inner">ཕུར་བུ།</span></div>
-                    <div class="cell"><span class="cell-inner">པ་སངས་།</span></div>
-                    <div class="cell"><span class="cell-inner">སྤེན་པ།</span></div>
-                    <div class="cell"><span class="cell-inner">ཉི་མ།</span></div>
-                </div>
-                <div id="grid-afternoon" style="display:contents"></div>
-            </div>
-        </div>
+        <div class="section-box"><div class="grid-container"><div class="grid-row grid-header"><div class="cell num-col"><span class="cell-inner">ཚོགས་ཐེངས།</span></div><div class="cell"><span class="cell-inner">ཟླ་བ།</span></div><div class="cell"><span class="cell-inner">མིག་དམར།</span></div><div class="cell"><span class="cell-inner">ལྷག་པ།</span></div><div class="cell"><span class="cell-inner">ཕུར་བུ།</span></div><div class="cell"><span class="cell-inner">པ་སངས་།</span></div><div class="cell"><span class="cell-inner">སྤེན་པ།</span></div><div class="cell"><span class="cell-inner">ཉི་མ།</span></div></div><div id="grid-morning" style="display:contents"></div></div></div>
+        <div class="section-box"><div class="grid-container"><div class="grid-row grid-header"><div class="cell num-col"><span class="cell-inner">ཚོགས་ཐེངས།</span></div><div class="cell"><span class="cell-inner">ཟླ་བ།</span></div><div class="cell"><span class="cell-inner">མིག་དམར།</span></div><div class="cell"><span class="cell-inner">ལྷག་པ།</span></div><div class="cell"><span class="cell-inner">ཕུར་བུ།</span></div><div class="cell"><span class="cell-inner">པ་སངས་།</span></div><div class="cell"><span class="cell-inner">སྤེན་པ།</span></div><div class="cell"><span class="cell-inner">ཉི་མ།</span></div></div><div id="grid-afternoon" style="display:contents"></div></div></div>
     </div>
 </div>
 
 <script>
-    // 脚本逻辑保持不变，确保 4/3 布局及提醒功能正常
-    const cfg = { mS: "09:30", aS: "15:00", dur: 40, myKeys: ["རི་མོ།", "གླུ་གཞས།", "ཡིགཟུགས།"] };
-    const morningData = [["༡","","","","","","",""],["༢","","","","","","",""],["༣","རི་མོ།༡","","","རི་མོ།༢","","",""],["༤","ངལ་རྩོལ།","","","","ཡིགཟུགས།","",""]];
+    // 逻辑部分无需改动，维持 4:3 比例及自动提醒
+    const cfg = { mS: "09:30", aS: "15:00", dur: 40, myKeys: ["རི་མོ།", "གླུ་གཞས།", "ཡིག་གཟུགས།"] };
+    const morningData = [["༡","","","","","","",""],["༢","","","","","","",""],["༣","རི་མོ།༡","","","རི་མོ།༢","","",""],["༤","ངལ་རྩོལ།","","","","ཡིག་གཟུགས།","",""]];
     const afternoonData = [["༡","","རི་མོ།༢","","","","",""],["༢","","","གླུ་གཞས།","","སློབ་གསོ།","",""],["༣","","རི་མོ།༡","","","","",""]];
     let audioCtx = null, isAudioMuted = false, currentReminderKey = "", reminderStartTime = 0;
     function timeAdd(t, m) { let [h, min] = t.split(':').map(Number); let d = new Date(); d.setHours(h, min + m); return d.toTimeString().slice(0, 5); }
