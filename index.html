@@ -70,12 +70,10 @@
         }
 
         .status-area { padding: 0 10px; margin-bottom: 4px; }
-        
-        /* 核心修正：删除了背景颜色，使其与界面背景一致 */
         #msg { 
             font-size: clamp(14px, 2.5vh, 18px); font-weight: bold; 
             color: var(--tibetan-red); 
-            background: transparent; /* 背景透明，保持与整体一致 */
+            background: transparent; 
             border: 2px solid var(--tibetan-red); 
             border-top: 4px solid var(--tibetan-red);
             border-radius: 8px; 
@@ -105,18 +103,24 @@
             flex: 1; width: 0; display: flex; align-items: center; justify-content: center;
             border-right: 1px solid #eee; font-size: clamp(11px, 2.5vh, 17px);
             text-align: center; line-height: 1.5; padding: 2px;
+            position: relative;
         }
-        .cell-inner { white-space: nowrap; display: inline-block; transform-origin: center; }
+        .cell-inner { white-space: nowrap; display: inline-block; transform-origin: center; position: relative; z-index: 2; }
         
         .grid-header .cell { font-size: clamp(10px, 1.8vh, 14px); color: var(--teal); font-weight: bold; }
         .cell:last-child { border-right: none; }
         
         .num-col { flex: 0 0 12%; color: var(--blue); font-weight: bold; background: #fafafa; }
 
-        .active-cell { background-color: var(--tibetan-red) !important; font-weight: bold; }
-        .active-cell .cell-inner { color: white !important; }
+        /* 重点强化：当前课程单元格的高亮样式 */
+        .active-cell { 
+            background-color: var(--tibetan-red) !important; 
+            color: #ffffff !important;
+            font-weight: bold; 
+        }
+        .active-cell .cell-inner { color: #ffffff !important; }
         
-        .col-today { background-color: #fffafa !important; }
+        .col-today { background-color: #fffafa; }
 
         @media (orientation: landscape) {
             .nav-bar { padding: 2px 20px; }
@@ -227,9 +231,12 @@
                 const cell = document.getElementById(`c-${i}-${j}`);
                 if (cell) {
                     cell.classList.remove('col-today', 'active-cell');
+                    // 逻辑：如果是今天，添加今天背景；如果是当前时间段，添加高亮色
                     if (j === realWk) {
                         cell.classList.add('col-today');
-                        if (nowS >= t.s && nowS < t.e) cell.classList.add('active-cell');
+                        if (nowS >= t.s && nowS < t.e) {
+                            cell.classList.add('active-cell');
+                        }
                     }
                 }
             }
