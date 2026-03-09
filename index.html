@@ -10,232 +10,98 @@
     <style>
         @font-face { font-family: 'TibetWildYak'; src: url('TibetWildYak.ttf') format('truetype'); }
         :root { 
-            --bg: #f8f9fa; 
-            --blue: #007aff; 
-            --green: #27ae60; 
-            --orange: #e67e22; 
-            --white: #ffffff; 
-            --tibetan-red: #B22222; 
-            --gray: #999999;
-            --teal: #008080; 
-            --butter-yellow: #FFFAFA;
-            --indigo: #004080; 
+            --bg: #f8f9fa; --blue: #007aff; --green: #27ae60; --orange: #e67e22; 
+            --white: #ffffff; --tibetan-red: #B22222; --gray: #999999;
+            --teal: #008080; --indigo: #004080; 
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { 
             height: 100svh; width: 100vw; background: var(--bg); 
             font-family: 'TibetWildYak', -apple-system, sans-serif;
-            overflow: hidden; position: fixed; top: 0; left: 0;
+            overflow: hidden; position: fixed;
         }
-
         .wrapper {
             position: absolute; top: 0; left: 0; bottom: 0; right: 0;
             display: flex; flex-direction: column;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: 1px; 
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
+            padding-top: env(safe-area-inset-top); padding-bottom: 2px;
             background: linear-gradient(rgba(248,249,250,0.96), rgba(248,249,250,0.96)), url('apple-touch-icon.png') no-repeat center;
             background-size: 160px auto;
         }
-
-        .nav-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding: 4px 10px;
-            gap: 8px;
-        }
-
-        .nav-left { flex: 0 1 auto; display: flex; }
-        .nav-right { flex: 0 0 auto; display: flex; justify-content: flex-end; }
-        .t-name { 
-            flex: 1 1 auto;
-            font-size: clamp(14px, 3vh, 22px); font-weight: bold; 
-            color: var(--indigo); 
-            line-height: 1.8; text-align: center; white-space: nowrap;
-        }
-
-        .btn-mini { 
-            background: var(--green); color: #fff; border: none; border-radius: 4px; 
-            padding: 4px 8px; font-size: clamp(10px, 1.8vh, 13px); 
-            font-family: 'TibetWildYak'; cursor: pointer; white-space: nowrap;
-        }
-
-        .time-display {
-            font-size: clamp(10px, 1.8vh, 13px); color: var(--blue); font-weight: bold;
-            font-family: 'TibetWildYak', -apple-system, sans-serif; white-space: nowrap;
-        }
-
+        .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 4px 10px; }
+        .t-name { font-size: 20px; font-weight: bold; color: var(--indigo); flex: 1; text-align: center; }
+        .time-display { font-size: 13px; color: var(--blue); font-weight: bold; }
+        .btn-mini { background: var(--green); color: #fff; border: none; border-radius: 4px; padding: 4px 8px; font-family: 'TibetWildYak'; cursor: pointer; }
         .status-area { padding: 0 10px; margin-bottom: 4px; }
         #msg { 
-            font-size: clamp(14px, 2.5vh, 18px); font-weight: bold; 
-            color: var(--tibetan-red); 
-            background: transparent; 
-            border: 2px solid var(--tibetan-red); 
-            border-top: 4px solid var(--tibetan-red);
-            border-radius: 8px; 
-            padding: 6px; 
-            min-height: 1.6em;
-            display: flex; align-items: center; justify-content: center; 
-            line-height: 1.4;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            font-size: 18px; font-weight: bold; color: var(--tibetan-red); 
+            border: 2px solid var(--tibetan-red); border-top: 4px solid var(--tibetan-red);
+            border-radius: 8px; padding: 6px; text-align: center; min-height: 40px;
         }
-
-        .content-area { flex: 1; display: flex; flex-direction: column; gap: 4px; min-height: 0; padding: 0 8px; }
-        .section-box:nth-child(1) { flex: 4; }
-        .section-box:nth-child(2) { flex: 3; }
-        .section-box {
+        .content-area { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 0 8px; min-height: 0; }
+        .section-box { 
             display: flex; flex-direction: column; background: #fff; border-radius: 8px;
-            border: 1px solid var(--tibetan-red); 
-            border-top: 5px solid var(--tibetan-red); 
-            overflow: visible; min-height: 0;
+            border: 1px solid var(--tibetan-red); border-top: 5px solid var(--tibetan-red);
+            flex: 1; min-height: 0;
         }
-
-        .grid-container { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-        .grid-row { display: flex; flex: 1; border-bottom: 1px solid #eee; min-height: 0; }
-        .grid-row:last-child { border-bottom: none; }
-        .grid-header { background: #fcfcfc; flex: 0 0 auto; height: clamp(28px, 5.5vh, 36px); border-bottom: 1px solid #eee; }
-
+        .grid-row { display: flex; flex: 1; border-bottom: 1px solid #eee; }
+        .grid-header { background: #fcfcfc; flex: 0 0 32px; font-weight: bold; color: var(--teal); }
         .cell { 
-            flex: 1; width: 0; display: flex; align-items: center; justify-content: center;
-            border-right: 1px solid #eee; font-size: clamp(11px, 2.5vh, 17px);
-            text-align: center; line-height: 1.5; padding: 2px;
-            position: relative;
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            border-right: 1px solid #eee; font-size: 15px; text-align: center; position: relative;
         }
-
-        .diagonal-cell {
-            padding: 0 !important;
-            flex: 0 0 12% !important;
-            background: #fcfcfc;
-            position: relative;
-        }
-        .diag-svg {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-        }
-        .diag-top {
-            position: absolute; top: 2px; right: 2px;
-            font-size: 9px; color: var(--teal); z-index: 3;
-        }
-        .diag-bottom {
-            position: absolute; bottom: 2px; left: 2px;
-            font-size: 9px; color: var(--blue); z-index: 3;
-        }
-
-        .cell-inner { white-space: nowrap; display: inline-block; transform-origin: center; position: relative; z-index: 2; }
-        .grid-header .cell { font-size: clamp(10px, 1.8vh, 14px); color: var(--teal); font-weight: bold; }
-        .cell:last-child { border-right: none; }
-        
-        .num-col { flex: 0 0 12%; color: var(--blue); font-weight: bold; background: #fafafa; }
-
-        .active-cell { 
-            background-color: rgba(178, 34, 34, 0.8) !important; 
-            color: #ffffff !important;
-            font-weight: bold; 
-        }
+        .num-col { flex: 0 0 12%; color: var(--blue); background: #fafafa; font-weight: bold; }
+        .active-cell { background-color: var(--tibetan-red) !important; color: #ffffff !important; font-weight: bold; }
         .active-cell .cell-inner { color: #ffffff !important; }
-        
         .col-today { background-color: #fffafa; }
-
-        @media (orientation: landscape) {
-            .nav-bar { padding: 2px 20px; }
-            .content-area { gap: 2px; }
-        }
+        .diagonal-cell { flex: 0 0 12%; position: relative; }
+        .diag-svg { position: absolute; width: 100%; height: 100%; top:0; left:0; }
     </style>
 </head>
 <body>
-
 <div class="wrapper">
-    <div class="top-components">
-        <div class="nav-bar">
-            <div class="nav-left">
-                <button class="btn-mini" id="audioBtn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button>
-            </div>
-            <div class="t-name">དགེན་ཁམས་པ་ཚང་།</div>
-            <div class="nav-right">
-                <div class="time-display" id="real-time">--:--:--</div>
-            </div>
-        </div>
-        <div class="status-area">
-            <div id="msg">...</div>
-        </div>
+    <div class="nav-bar">
+        <button class="btn-mini" id="audioBtn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button>
+        <div class="t-name">དགེན་ཁམས་པ་ཚང་།</div>
+        <div class="time-display" id="real-time">--:--:--</div>
     </div>
-
+    <div class="status-area"><div id="msg">...</div></div>
     <div class="content-area">
-        <div class="section-box">
-            <div class="grid-container">
-                <div class="grid-row grid-header">
-                    <div class="cell diagonal-cell">
-                        <svg class="diag-svg" preserveAspectRatio="none" viewBox="0 0 100 100">
-                            <line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1" />
-                        </svg>
-                        <span class="diag-top">རེས་གཟའ།</span>
-                        <span class="diag-bottom">ཚོགས་ཐེངས།</span>
-                    </div>
-                    <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div><div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
-                    <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div><div class="cell"><span class="cell-inner">ཕུར་བུ།</span></div>
-                    <div class="cell"><span class="cell-inner">པ་སངས་།</span></div><div class="cell"><span class="cell-inner">སྤེན་པ།</span></div>
-                    <div class="cell"><span class="cell-inner">ཉི་མ།</span></div>
-                </div>
-                <div id="grid-morning" style="display:contents"></div>
-            </div>
-        </div>
-        <div class="section-box">
-            <div class="grid-container">
-                <div class="grid-row grid-header">
-                    <div class="cell diagonal-cell">
-                        <svg class="diag-svg" preserveAspectRatio="none" viewBox="0 0 100 100">
-                            <line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1" />
-                        </svg>
-                        <span class="diag-top">རེས་གཟའ།</span>
-                        <span class="diag-bottom">ཚོགས་ཐེངས།</span>
-                    </div>
-                    <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div><div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
-                    <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div><div class="cell"><span class="cell-inner">ཕུར་བུ།</span></div>
-                    <div class="cell"><span class="cell-inner">པ་སངས་།</span></div><div class="cell"><span class="cell-inner">སྤེན་པ།</span></div>
-                    <div class="cell"><span class="cell-inner">ཉི་མ།</span></div>
-                </div>
-                <div id="grid-afternoon" style="display:contents"></div>
-            </div>
-        </div>
+        <div class="section-box"><div id="grid-morning" style="display:contents"></div></div>
+        <div class="section-box"><div id="grid-afternoon" style="display:contents"></div></div>
     </div>
 </div>
 
 <script>
-    const cfg = { mS: "09:30", aS: "15:00", dur: 40, myKeys: ["རི་མོ།", "གླུ་གཞས།", "ཡིགཟུགས།"], otherKeys: ["ངལ་རྩོལ།", "སློབ་གསོ།"] };
+    let audioCtx = null, isAudioMuted = false, currentReminderKey = "", reminderStartTime = 0;
+    
+    function toM(t) { const [h, m] = t.split(':').map(Number); return h * 60 + m; }
+    function minToTime(m) { return String(Math.floor(m/60)).padStart(2,'0') + ":" + String(m%60).padStart(2,'0'); }
+
+    // 精确时间表
+    const exactSlots = [
+        { s: "09:30", e: "10:10" }, { s: "10:25", e: "11:05" }, 
+        { s: "11:30", e: "12:10" }, { s: "12:25", e: "13:05" }, 
+        { s: "15:00", e: "15:40" }, { s: "15:55", e: "16:35" }, 
+        { s: "16:50", e: "17:30" }
+    ];
+
     const morningData = [["༡","","","","","","",""],["༢","","","","","","",""],["༣","རི་མོ།༡","","","རི་མོ།༢","","",""],["༤","ངལ་རྩོལ།","","","","ཡིགཟུགས།","",""]];
     const afternoonData = [["༡","","རི་མོ།༢","","","","",""],["༢","","","གླུ་གཞས།","","སློབ་གསོ།","",""],["༣","","རི་མོ།༡","","","","",""]];
     
-    let audioCtx = null, isAudioMuted = true, currentReminderKey = "", reminderStartTime = 0;
-    function timeAdd(t, m) { let [h, min] = t.split(':').map(Number); let d = new Date(); d.setHours(h, min + m); return d.toTimeString().slice(0, 5); }
-
-    const slots = [];
-    let cm = cfg.mS; for(let i=0; i<4; i++) { let s = cm, e = timeAdd(s, cfg.dur); slots.push({s, e}); cm = timeAdd(e, i===1 ? 20 : 15); }
-    let ca = cfg.aS; for(let i=0; i<3; i++) { let s = ca, e = timeAdd(s, cfg.dur); slots.push({s, e}); ca = timeAdd(e, 15); }
-
-    function renderGrid(id, data, start) {
-        const container = document.getElementById(id);
-        data.forEach((r, idx) => {
-            let row = document.createElement('div'); row.className = 'grid-row';
-            row.innerHTML = `<div class="cell num-col"><span class="cell-inner">${r[0]}</span></div>`;
-            for(let i=1; i<=7; i++) {
-                let cell = document.createElement('div'); cell.className = 'cell';
-                let inner = document.createElement('span'); inner.className = 'cell-inner'; inner.innerText = r[i] || "";
-                cell.id = `c-${start+idx}-${i}`;
-                if(r[i]) {
-                    if(cfg.myKeys.some(k => r[i].includes(k))) cell.style.color = "var(--blue)";
-                    else if(cfg.otherKeys.some(k => r[i].includes(k))) cell.style.color = "var(--gray)";
-                }
-                cell.appendChild(inner); row.appendChild(cell);
+    function render(id, data, startIdx) {
+        const el = document.getElementById(id);
+        let head = `<div class="grid-row grid-header"><div class="cell diagonal-cell"><svg class="diag-svg" preserveAspectRatio="none" viewBox="0 0 100 100"><line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1"/></svg></div>`;
+        ["ཟླ་བ།","མིག་དམར།","ལྷག་པ།","ཕུར་བུ།","པ་སངས་།","སྤེན་པ།","ཉི་མ།"].forEach(d => head += `<div class="cell">${d}</div>`);
+        el.innerHTML = head + `</div>`;
+        data.forEach((r, rowIdx) => {
+            let rowHtml = `<div class="grid-row"><div class="cell num-col">${r[0]}</div>`;
+            for(let col=1; col<=7; col++) {
+                rowHtml += `<div class="cell" id="c-${startIdx + rowIdx}-${col}"><span class="cell-inner">${r[col]||''}</span></div>`;
             }
-            container.appendChild(row);
+            el.innerHTML += rowHtml + `</div>`;
         });
     }
-    renderGrid('grid-morning', morningData, 0); renderGrid('grid-afternoon', afternoonData, 4);
+    render('grid-morning', morningData, 0); render('grid-afternoon', afternoonData, 4);
 
     function playBeep() {
         if (!audioCtx || isAudioMuted) return;
@@ -249,40 +115,41 @@
 
     function stopAudioRemind() { isAudioMuted = true; const btn = document.getElementById('audioBtn'); btn.style.background = "var(--green)"; btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; }
 
+    function activateAudio() { 
+        if (currentReminderKey !== "" && !isAudioMuted) { stopAudioRemind(); return; }
+        const btn = document.getElementById('audioBtn');
+        try { 
+            const AudioContext = window.AudioContext || window.webkitAudioContext; 
+            audioCtx = new AudioContext(); playBeep(); 
+            btn.style.background = "var(--green)"; btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; 
+        } catch (e) { btn.innerText = "ERROR"; }
+    }
+
     function refresh() {
-        const now = new Date(); const nowS = now.toTimeString().slice(0, 5);
-        const h = String(now.getHours()).padStart(2, '0'), m = String(now.getMinutes()).padStart(2, '0'), s = String(now.getSeconds()).padStart(2, '0');
-        document.getElementById('real-time').innerText = `དུས་ཚོད། ${h}:${m}:${s}`;
+        const now = new Date();
+        const currentM = now.getHours() * 60 + now.getMinutes();
+        const nowStr = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
+        const day = now.getDay() === 0 ? 7 : now.getDay();
+        document.getElementById('real-time').innerText = now.toTimeString().slice(0, 8);
 
-        const wk = now.getDay(), realWk = (wk === 0) ? 7 : wk; 
-        const msgEl = document.getElementById('msg');
-        const fullData = [...morningData, ...afternoonData];
+        document.querySelectorAll('.cell').forEach(c => c.classList.remove('active-cell', 'col-today'));
+        document.querySelectorAll(`[id$="-${day}"]`).forEach(c => c.classList.add('col-today'));
 
-        let currentSlotIdx = -1;
-        let myLessonsToday = []; 
-        fullData.forEach((row, idx) => { if(cfg.myKeys.some(k => (row[realWk]||"").includes(k))) myLessonsToday.push(idx); });
-
-        slots.forEach((t, i) => {
-            for(let j=1; j<=7; j++) {
-                const cell = document.getElementById(`c-${i}-${j}`);
-                if (cell) {
-                    cell.classList.remove('col-today', 'active-cell');
-                    if (j === realWk) {
-                        cell.classList.add('col-today');
-                        if (nowS >= t.s && nowS < t.e) {
-                            cell.classList.add('active-cell');
-                            currentSlotIdx = i;
-                        }
-                    }
-                }
+        let currentLessonIdx = -1;
+        exactSlots.forEach((slot, idx) => {
+            const startM = toM(slot.s), endM = toM(slot.e);
+            if (currentM >= startM && currentM < endM) {
+                currentLessonIdx = idx;
+                const cell = document.getElementById(`c-${idx}-${day}`);
+                if (cell) cell.classList.add('active-cell');
             }
-            
-            // 声音提醒触发逻辑
-            if (realWk < 6 && myLessonsToday.includes(i)) {
+
+            // 闹钟触发逻辑：提前 40 分钟和提前 5 分钟
+            if (day < 6) {
                 [40, 5].forEach(offset => {
-                    const triggerTime = timeAdd(t.s, -offset);
-                    const key = `slot-${i}-${offset}`;
-                    if (nowS === triggerTime && currentReminderKey !== key) {
+                    const triggerM = startM - offset;
+                    const key = `slot-${idx}-${offset}`;
+                    if (currentM === triggerM && currentReminderKey !== key) {
                         currentReminderKey = key; isAudioMuted = false; reminderStartTime = Date.now();
                         const btn = document.getElementById('audioBtn'); btn.style.background = "var(--orange)"; btn.innerText = "🔔 སྒྲ་མཚམས་འཇོག་པ།";
                     }
@@ -290,62 +157,31 @@
             }
         });
 
-        // 状态栏逻辑修复
-        if (realWk >= 6) { 
-            msgEl.innerText = (realWk === 6) ? "དེ་རིང་གཟའ་སྤེན་པ་རེད། དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།" : "དེ་རིང་གཟའ་ཉི་མ་རེད། དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།"; 
-        } else {
-            if (myLessonsToday.length === 0) {
-                msgEl.innerText = "དེ་རིང་སློབ་ཚན་མི་འདུག";
-            } else {
-                const firstLessonIdx = myLessonsToday[0];
-                const lastLessonIdx = myLessonsToday[myLessonsToday.length - 1];
-                const firstStartTime = slots[firstLessonIdx].s;
-                const lastEndTime = slots[lastLessonIdx].e;
-
-                if (nowS < firstStartTime) {
-                    msgEl.innerText = "དགེན་ལགས་དེ་རིང་སློབ་ཚན་ཡོད།";
-                } else if (nowS >= firstStartTime && nowS < lastEndTime) {
-                    // 判断当前是否正在上自己的课
-                    if (currentSlotIdx !== -1 && myLessonsToday.includes(currentSlotIdx)) {
-                        msgEl.innerText = "ད་ལྟ་སློབ་ཚན་ཚོགས་བཞིན་པ་ཡིན།";
-                    } else {
-                        msgEl.innerText = "དགེན་ལགས་དེ་རིང་སློབ་ཚན་ཡོད།";
-                    }
-                } else {
-                    msgEl.innerText = "དེ་རིང་གི་སློབ་ཚན་མཇུག་སྒྲིལ་ཟིན།";
-                }
-            }
-        }
-
-        // 蜂鸣声处理
+        // 持续响铃逻辑
         if (currentReminderKey !== "" && !isAudioMuted) {
             const elapsed = Math.floor((Date.now() - reminderStartTime) / 60000);
-            if (elapsed < 6) { if (now.getMilliseconds() < 500 && now.getSeconds() % 2 === 0) playBeep(); } else { stopAudioRemind(); }
+            if (elapsed < 6) { 
+                if (elapsed % 2 === 0 && now.getMilliseconds() < 1000 && now.getSeconds() % 2 === 0) playBeep(); 
+            } else { stopAudioRemind(); }
         }
 
-        document.querySelectorAll('.cell').forEach(c => {
-            const inner = c.querySelector('.cell-inner');
-            if(inner && inner.innerText !== "") {
-                inner.style.transform = "scale(1)";
-                const ratio = (c.offsetWidth - 6) / inner.offsetWidth;
-                if(ratio < 1) inner.style.transform = `scale(${ratio})`;
-            }
-        });
+        const msgEl = document.getElementById('msg');
+        const myKeys = ["རི་མོ།", "གླུ་གཞས།", "ཡིགཟུགས།"];
+        const fullData = [...morningData, ...afternoonData];
+        const myTodayLessons = fullData.map((r, i) => myKeys.some(k => r[day].includes(k)) ? i : -1).filter(i => i !== -1);
+
+        if (day >= 6) {
+            msgEl.innerText = "གཟའ་མཇུག་ངལ་གསོ།";
+        } else if (currentLessonIdx !== -1 && myTodayLessons.includes(currentLessonIdx)) {
+            msgEl.innerText = "ད་ལྟ་སློབ་ཚན་ཚོགས་བཞིན་པ་ཡིན།";
+        } else if (myTodayLessons.length > 0 && currentM >= toM(exactSlots[myTodayLessons[myTodayLessons.length-1]].e)) {
+            msgEl.innerText = "དེ་རིང་གི་སློབ་ཚན་མཇུག་སྒྲིལ་ཟིན།";
+        } else {
+            msgEl.innerText = "དགེན་ལགས་དེ་རིང་སློབ་ཚན་ཡོད།";
+        }
     }
 
-    function activateAudio() { 
-        if (currentReminderKey !== "" && !isAudioMuted) { stopAudioRemind(); return; }
-        const btn = document.getElementById('audioBtn');
-        try { 
-            const AudioContext = window.AudioContext || window.webkitAudioContext; 
-            audioCtx = new AudioContext(); 
-            isAudioMuted = false;
-            playBeep(); 
-            btn.style.background = "var(--green)"; 
-            btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; 
-        } catch (e) { btn.innerText = "ERROR"; }
-    }
-    setInterval(refresh, 1000); refresh(); window.addEventListener('resize', refresh);
+    setInterval(refresh, 1000); refresh();
 </script>
 </body>
 </html>
