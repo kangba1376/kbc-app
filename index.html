@@ -10,7 +10,12 @@
         @font-face { font-family: 'TibetWildYak'; src: url('TibetWildYak.ttf') format('truetype'); }
         :root { 
             --bg: #f8f9fa; --blue: #007aff; --green: #27ae60; --orange: #e67e22; 
-            --white: #ffffff; --tibetan-red: #B22222; --indigo: #004080; 
+            --white: #ffffff; --tibetan-red: #B22222; --indigo: #004080;
+            /* 课程专用色 */
+            --art-red: #FF0000;
+            --music-blue: #0000FF;
+            --calligraphy-navy: #000080;
+            --other-gray: #A9A9A9;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { 
@@ -46,31 +51,40 @@
         }
         .grid-row { display: flex; flex: 1; border-bottom: 1px solid #eee; min-height: 0; }
         .grid-header { background: #fcfcfc; flex: 0 0 32px; font-weight: bold; color: #008080; }
+        
         .cell { 
             flex: 1; display: flex; align-items: center; justify-content: center;
             border-right: 1px solid #eee; font-size: 14px; position: relative; overflow: hidden;
-            padding: 0 1px;
+            padding: 0 2px;
         }
         
         .cell-inner { 
             display: inline-block; 
-            white-space: nowrap; 
+            white-space: nowrap !important;
+            word-break: keep-all !important;
             transform-origin: center center;
             flex-shrink: 0;
+            font-weight: bold;
         }
 
         .num-col { flex: 0 0 12%; color: var(--blue); background: #fafafa; font-weight: bold; }
         .active-cell { background-color: var(--tibetan-red) !important; color: #fff !important; }
-        .active-cell .cell-inner { color: #fff !important; }
+        .active-cell .cell-inner { color: #fff !important; } /* 高亮时文字强制白色 */
         .col-today { background-color: #fffafa; }
         .diag-svg { position: absolute; width: 100%; height: 100%; top:0; left:0; }
+
+        /* 课程颜色定义 */
+        .art { color: var(--art-red); }
+        .music { color: var(--music-blue); }
+        .calligraphy { color: var(--calligraphy-navy); }
+        .other { color: var(--other-gray); }
     </style>
 </head>
 <body>
 <div class="wrapper">
     <div class="nav-bar">
         <div class="nav-left"><button class="btn-mini" id="audioBtn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button></div>
-        <div class="t-name">དགེན་ཁམས་པ་ཚང་།</div>
+        <div class="t-name">༢༠༢༦ - ཁམས་པ་ཚང་།</div>
         <div class="nav-right"><div class="time-display" id="real-time">--:--:--</div></div>
     </div>
     <div class="status-area"><div id="msg">...</div></div>
@@ -91,16 +105,28 @@
         {s: "16:50", e: "17:30"}
     ];
     
-    const mData = [["༡","","","","","","",""],["༢","","","","","","",""],["༣","རི་མོ།༡","","","རི་མོ།༢","","",""],["༤","ངལ་རྩོལ།","","","","ཡིགཟུགས།","",""]];
+    const mData = [["༡","","","","","","",""],["༢","","","","","","",""],["༣","རི་མོ།༢","","","རི་མོ།༢","","",""],["༤","ངལ་རྩོལ།","","","","ཡིགཟུགས།","",""]];
     const aData = [["༡","","རི་མོ།༢","","","","",""],["༢","","","གླུ་གཞས།","","སློབ་གསོ།","",""],["༣","","རི་མོ།༡","","","","",""]];
+
+    // 颜色匹配逻辑
+    function getLessonClass(name) {
+        if (!name) return "";
+        if (name.includes("རི་མོ།")) return "art";
+        if (name.includes("གླུ་གཞས།")) return "music";
+        if (name.includes("ཡིགཟུགས།")) return "calligraphy";
+        return "other";
+    }
 
     function render(id, data, startIdx) {
         const el = document.getElementById(id);
         let h = `<div class="grid-row grid-header"><div class="cell num-col" style="position:relative"><svg class="diag-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1"/></svg></div>`;
-        ["ཟླ་བ།","མིག་དམར།","ལྷག་པ།","ཕུར་བུ།","པ་སངས་།","སྤེན་པ།","ཉི་མ།"].forEach(d => h += `<div class="cell">${d}</div>`);
+        ["ཟླ་བ།","མིག་དམར།","ལྷག་པ།","ཕུར་བུ།","པ་སངས་།","སྤེན་པ།","ཉི་མ།"].forEach(d => h += `<div class="cell"><span class="cell-inner">${d}</span></div>`);
         el.innerHTML = h + `</div>` + data.map((r, i) => 
-            `<div class="grid-row"><div class="cell num-col">${r[0]}</div>` + 
-            r.slice(1).map((c, j) => `<div class="cell" id="c-${startIdx+i}-${j+1}"><span class="cell-inner">${c}</span></div>`).join('') + `</div>`
+            `<div class="grid-row"><div class="cell num-col"><span class="cell-inner">${r[0]}</span></div>` + 
+            r.slice(1).map((c, j) => {
+                const cls = c ? getLessonClass(c) : "";
+                return `<div class="cell" id="c-${startIdx+i}-${j+1}"><span class="cell-inner ${cls}">${c}</span></div>`;
+            }).join('') + `</div>`
         ).join('');
     }
     render('grid-morning', mData, 0); render('grid-afternoon', aData, 4);
@@ -120,14 +146,11 @@
         document.querySelectorAll('.cell').forEach(cell => {
             const inner = cell.querySelector('.cell-inner');
             if (!inner || inner.innerText.trim() === "") return;
-            
-            inner.style.transform = 'scale(1)'; // 先重置缩放
-            const containerWidth = cell.clientWidth - 2; // 获取容器实际可用宽度
-            const contentWidth = inner.offsetWidth; // 获取文字实际宽度
-            
+            inner.style.transform = 'scale(1)'; 
+            const containerWidth = cell.clientWidth - 4; 
+            const contentWidth = inner.offsetWidth; 
             if (contentWidth > containerWidth && containerWidth > 0) {
-                const ratio = containerWidth / contentWidth;
-                inner.style.transform = `scale(${ratio})`;
+                inner.style.transform = `scale(${containerWidth / contentWidth})`;
             }
         });
     }
@@ -135,7 +158,6 @@
     function refresh() {
         const now = new Date(), currentM = now.getHours() * 60 + now.getMinutes(), day = now.getDay() || 7;
         document.getElementById('real-time').innerText = now.toTimeString().slice(0, 8);
-        
         document.querySelectorAll('.cell').forEach(c => c.classList.remove('active-cell', 'col-today'));
         document.querySelectorAll(`[id$="-${day}"]`).forEach(c => c.classList.add('col-today'));
 
@@ -147,9 +169,9 @@
                 document.getElementById(`c-${i}-${day}`)?.classList.add('active-cell');
             }
             if (day < 6) {
-                [40, 5].forEach(off => {
-                    if (currentM === startM - off && currentReminderKey !== `r-${i}-${off}`) {
-                        currentReminderKey = `r-${i}-${off}`; isAudioMuted = false;
+                [40, 5].forEach(offset => {
+                    if (currentM === startM - offset && currentReminderKey !== `r-${i}-${offset}`) {
+                        currentReminderKey = `r-${i}-${offset}`; isAudioMuted = false;
                         document.getElementById('audioBtn').style.background = "var(--orange)";
                         if (now.getSeconds() % 2 === 0) playBeep();
                     }
@@ -157,7 +179,7 @@
             }
         });
 
-        doAutoScale(); // 在高亮处理完后再统一计算缩放
+        doAutoScale();
 
         const msgEl = document.getElementById('msg');
         const myKeys = ["རི་མོ།", "གླུ་གཞས།", "ཡིགཟུགས།"];
@@ -165,7 +187,7 @@
         const myTodayLessons = fullData.map((r, i) => myKeys.some(k => r[day].includes(k)) ? i : -1).filter(i => i !== -1);
 
         if (day >= 6) {
-            msgEl.innerText = "གཟའ་མཇུག་ངལ་གསོ།";
+            msgEl.innerText = "དགེན་ལསག་གཟའ་མཇུག་སྤྲོ། ངལ་གསོ་ལྷོད་ལྷོད་གནང་རོགས།";
         } else if (currentLessonIdx !== -1 && myTodayLessons.includes(currentLessonIdx)) {
             msgEl.innerText = "ད་ལྟ་སློབ་ཚན་ཚོགས་བཞིན་པ་ཡིན།";
         } else if (myTodayLessons.length > 0 && currentM >= toM(slots[myTodayLessons[myTodayLessons.length-1]].e)) {
@@ -177,7 +199,6 @@
 
     setInterval(refresh, 1000);
     window.addEventListener('resize', doAutoScale);
-    // 确保字体加载后执行一次
     document.fonts.ready.then(doAutoScale);
     refresh();
 </script>
