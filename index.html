@@ -106,7 +106,6 @@
             position: relative;
         }
 
-        /* 核心修复：使用 SVG 确保实线、藏红色、1px */
         .diagonal-cell {
             padding: 0 !important;
             flex: 0 0 12% !important;
@@ -257,8 +256,19 @@
 
         const wk = now.getDay(), realWk = (wk === 0) ? 7 : wk; 
         const msgEl = document.getElementById('msg');
+        const fullData = [...morningData, ...afternoonData];
+
+        let hasClassToday = false;
+        let isClassNow = false;
+        let lastClassEndTime = "00:00";
 
         slots.forEach((t, i) => {
+            const task = fullData[i][realWk];
+            if (task && task.trim() !== "") {
+                hasClassToday = true;
+                if (t.e > lastClassEndTime) lastClassEndTime = t.e;
+            }
+
             for(let j=1; j<=7; j++) {
                 const cell = document.getElementById(`c-${i}-${j}`);
                 if (cell) {
@@ -267,6 +277,7 @@
                         cell.classList.add('col-today');
                         if (nowS >= t.s && nowS < t.e) {
                             cell.classList.add('active-cell');
+                            if (task && task.trim() !== "") isClassNow = true;
                         }
                     }
                 }
@@ -283,20 +294,23 @@
             }
         });
 
-        if (currentReminderKey !== "" && !isAudioMuted) {
-            const elapsed = Math.floor((Date.now() - reminderStartTime) / 60000);
-            if (elapsed < 6) { if (elapsed % 2 === 0 && now.getMilliseconds() < 1000 && now.getSeconds() % 2 === 0) playBeep(); } else { stopAudioRemind(); }
-        }
-
         if (realWk >= 6) { 
             msgEl.innerText = (realWk === 6) ? "དེ་རིང་གཟའ་སྤེན་པ་རེད། དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།" : "དེ་རིང་གཟའ་ཉི་མ་རེད། དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།"; 
         } else {
-            const full = [...morningData, ...afternoonData];
-            let currentSlotIndex = -1; slots.forEach((t, i) => { if (nowS >= t.s && nowS < t.e) currentSlotIndex = i; });
-            if (currentSlotIndex !== -1) {
-                const curTask = full[currentSlotIndex][realWk];
-                msgEl.innerText = curTask ? `དེ་རིང་སློབ་ཚན་ཡོད།: ${curTask}` : "སློབ་ཚན་མི་འདུག";
-            } else { msgEl.innerText = "སློབ་ཚན་མི་འདུག"; }
+            if (!hasClassToday) {
+                msgEl.innerText = "དེ་རིང་སློབ་ཚན་མི་འདུག";
+            } else if (isClassNow) {
+                msgEl.innerText = "ད་ལྟ་སློབ་ཚན་ཚོགས་བཞིན་པ་ཡིན།";
+            } else if (nowS >= lastClassEndTime) {
+                msgEl.innerText = "དེ་རིང་གི་སློབ་ཚན་མཇུག་སྒྲིལ་ཟིན།";
+            } else {
+                msgEl.innerText = "དེ་རིང་སློབ་ཚན་ཡོད།";
+            }
+        }
+
+        if (currentReminderKey !== "" && !isAudioMuted) {
+            const elapsed = Math.floor((Date.now() - reminderStartTime) / 60000);
+            if (elapsed < 6) { if (elapsed % 2 === 0 && now.getMilliseconds() < 1000 && now.getSeconds() % 2 === 0) playBeep(); } else { stopAudioRemind(); }
         }
 
         document.querySelectorAll('.cell').forEach(c => {
