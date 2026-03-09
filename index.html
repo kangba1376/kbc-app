@@ -133,7 +133,7 @@
         .num-col { flex: 0 0 12%; color: var(--blue); font-weight: bold; background: #fafafa; }
 
         .active-cell { 
-            background-color: var(--tibetan-red) !important; 
+            background-color: rgba(178, 34, 34, 0.8) !important; 
             color: #ffffff !important;
             font-weight: bold; 
         }
@@ -168,40 +168,38 @@
     <div class="content-area">
         <div class="section-box">
             <div class="grid-container">
-                <div id="grid-morning" style="display:contents">
-                    <div class="grid-row grid-header">
-                        <div class="cell diagonal-cell">
-                            <svg class="diag-svg" preserveAspectRatio="none" viewBox="0 0 100 100">
-                                <line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1" />
-                            </svg>
-                            <span class="diag-top">རེས་གཟའ།</span>
-                            <span class="diag-bottom">ཚོགས་ཐེངས།</span>
-                        </div>
-                        <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div><div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
-                        <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div><div class="cell"><span class="cell-inner">ཕུར་བུ།</span></div>
-                        <div class="cell"><span class="cell-inner">པ་སངས་།</span></div><div class="cell"><span class="cell-inner">སྤེན་པ།</span></div>
-                        <div class="cell"><span class="cell-inner">ཉི་མ།</span></div>
+                <div class="grid-row grid-header">
+                    <div class="cell diagonal-cell">
+                        <svg class="diag-svg" preserveAspectRatio="none" viewBox="0 0 100 100">
+                            <line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1" />
+                        </svg>
+                        <span class="diag-top">རེས་གཟའ།</span>
+                        <span class="diag-bottom">ཚོགས་ཐེངས།</span>
                     </div>
+                    <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div><div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
+                    <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div><div class="cell"><span class="cell-inner">ཕུར་བུ།</span></div>
+                    <div class="cell"><span class="cell-inner">པ་སངས་།</span></div><div class="cell"><span class="cell-inner">སྤེན་པ།</span></div>
+                    <div class="cell"><span class="cell-inner">ཉི་མ།</span></div>
                 </div>
+                <div id="grid-morning" style="display:contents"></div>
             </div>
         </div>
         <div class="section-box">
             <div class="grid-container">
-                <div id="grid-afternoon" style="display:contents">
-                    <div class="grid-row grid-header">
-                        <div class="cell diagonal-cell">
-                            <svg class="diag-svg" preserveAspectRatio="none" viewBox="0 0 100 100">
-                                <line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1" />
-                            </svg>
-                            <span class="diag-top">རེས་གཟའ།</span>
-                            <span class="diag-bottom">ཚོགས་ཐེངས།</span>
-                        </div>
-                        <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div><div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
-                        <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div><div class="cell"><span class="cell-inner">ཕུར་བུ།</span></div>
-                        <div class="cell"><span class="cell-inner">པ་སངས་།</span></div><div class="cell"><span class="cell-inner">སྤེན་པ།</span></div>
-                        <div class="cell"><span class="cell-inner">ཉི་མ།</span></div>
+                <div class="grid-row grid-header">
+                    <div class="cell diagonal-cell">
+                        <svg class="diag-svg" preserveAspectRatio="none" viewBox="0 0 100 100">
+                            <line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1" />
+                        </svg>
+                        <span class="diag-top">རེས་གཟའ།</span>
+                        <span class="diag-bottom">ཚོགས་ཐེངས།</span>
                     </div>
+                    <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div><div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
+                    <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div><div class="cell"><span class="cell-inner">ཕུར་བུ།</span></div>
+                    <div class="cell"><span class="cell-inner">པ་སངས་།</span></div><div class="cell"><span class="cell-inner">སྤེན་པ།</span></div>
+                    <div class="cell"><span class="cell-inner">ཉི་མ།</span></div>
                 </div>
+                <div id="grid-afternoon" style="display:contents"></div>
             </div>
         </div>
     </div>
@@ -212,7 +210,7 @@
     const morningData = [["༡","","","","","","",""],["༢","","","","","","",""],["༣","རི་མོ།༡","","","རི་མོ།༢","","",""],["༤","ངལ་རྩོལ།","","","","ཡིགཟུགས།","",""]];
     const afternoonData = [["༡","","རི་མོ།༢","","","","",""],["༢","","","གླུ་གཞས།","","སློབ་གསོ།","",""],["༣","","རི་མོ།༡","","","","",""]];
     
-    let audioCtx = null, isAudioMuted = false, currentReminderKey = "", reminderStartTime = 0;
+    let audioCtx = null, isAudioMuted = true, currentReminderKey = "", reminderStartTime = 0;
     function timeAdd(t, m) { let [h, min] = t.split(':').map(Number); let d = new Date(); d.setHours(h, min + m); return d.toTimeString().slice(0, 5); }
 
     const slots = [];
@@ -260,12 +258,9 @@
         const msgEl = document.getElementById('msg');
         const fullData = [...morningData, ...afternoonData];
 
-        let myTodaySlots = [];
-        fullData.forEach((row, index) => {
-            if (row[realWk] && row[realWk] !== "") myTodaySlots.push(index);
-        });
-
-        let isDuringMyClass = false;
+        let currentSlotIdx = -1;
+        let myLessonsToday = []; 
+        fullData.forEach((row, idx) => { if(cfg.myKeys.some(k => (row[realWk]||"").includes(k))) myLessonsToday.push(idx); });
 
         slots.forEach((t, i) => {
             for(let j=1; j<=7; j++) {
@@ -274,15 +269,16 @@
                     cell.classList.remove('col-today', 'active-cell');
                     if (j === realWk) {
                         cell.classList.add('col-today');
-                        // 强制修正逻辑：只要到了这一节课的上课时间，红背景直接亮起
                         if (nowS >= t.s && nowS < t.e) {
                             cell.classList.add('active-cell');
-                            if (myTodaySlots.includes(i)) isDuringMyClass = true;
+                            currentSlotIdx = i;
                         }
                     }
                 }
             }
-            if (realWk < 6) {
+            
+            // 声音提醒触发逻辑
+            if (realWk < 6 && myLessonsToday.includes(i)) {
                 [40, 5].forEach(offset => {
                     const triggerTime = timeAdd(t.s, -offset);
                     const key = `slot-${i}-${offset}`;
@@ -294,25 +290,37 @@
             }
         });
 
-        if (currentReminderKey !== "" && !isAudioMuted) {
-            const elapsed = Math.floor((Date.now() - reminderStartTime) / 60000);
-            if (elapsed < 6) { if (elapsed % 2 === 0 && now.getMilliseconds() < 1000 && now.getSeconds() % 2 === 0) playBeep(); } else { stopAudioRemind(); }
-        }
-
+        // 状态栏逻辑修复
         if (realWk >= 6) { 
             msgEl.innerText = (realWk === 6) ? "དེ་རིང་གཟའ་སྤེན་པ་རེད། དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།" : "དེ་རིང་གཟའ་ཉི་མ་རེད། དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།"; 
-        } else if (myTodaySlots.length === 0) {
-            msgEl.innerText = "དེ་རིང་སློབ་ཚན་མི་འདུག";
         } else {
-            const lastSlotIndex = myTodaySlots[myTodaySlots.length - 1];
-            const myEndTime = slots[lastSlotIndex].e;
-            if (isDuringMyClass) {
-                msgEl.innerText = "ད་ལྟ་སློབ་ཚན་ཚོགས་བཞིན་པ་ཡིན།";
-            } else if (nowS >= myEndTime) {
-                msgEl.innerText = "དེ་རིང་གི་སློབ་ཚན་མཇུག་སྒྲིལ་ཟིན།";
+            if (myLessonsToday.length === 0) {
+                msgEl.innerText = "དེ་རིང་སློབ་ཚན་མི་འདུག";
             } else {
-                msgEl.innerText = "དགེན་ལགས་དེ་རིང་སློབ་ཚན་ཡོད།";
+                const firstLessonIdx = myLessonsToday[0];
+                const lastLessonIdx = myLessonsToday[myLessonsToday.length - 1];
+                const firstStartTime = slots[firstLessonIdx].s;
+                const lastEndTime = slots[lastLessonIdx].e;
+
+                if (nowS < firstStartTime) {
+                    msgEl.innerText = "དགེན་ལགས་དེ་རིང་སློབ་ཚན་ཡོད།";
+                } else if (nowS >= firstStartTime && nowS < lastEndTime) {
+                    // 判断当前是否正在上自己的课
+                    if (currentSlotIdx !== -1 && myLessonsToday.includes(currentSlotIdx)) {
+                        msgEl.innerText = "ད་ལྟ་སློབ་ཚན་ཚོགས་བཞིན་པ་ཡིན།";
+                    } else {
+                        msgEl.innerText = "དགེན་ལགས་དེ་རིང་སློབ་ཚན་ཡོད།";
+                    }
+                } else {
+                    msgEl.innerText = "དེ་རིང་གི་སློབ་ཚན་མཇུག་སྒྲིལ་ཟིན།";
+                }
             }
+        }
+
+        // 蜂鸣声处理
+        if (currentReminderKey !== "" && !isAudioMuted) {
+            const elapsed = Math.floor((Date.now() - reminderStartTime) / 60000);
+            if (elapsed < 6) { if (now.getMilliseconds() < 500 && now.getSeconds() % 2 === 0) playBeep(); } else { stopAudioRemind(); }
         }
 
         document.querySelectorAll('.cell').forEach(c => {
@@ -328,7 +336,14 @@
     function activateAudio() { 
         if (currentReminderKey !== "" && !isAudioMuted) { stopAudioRemind(); return; }
         const btn = document.getElementById('audioBtn');
-        try { const AudioContext = window.AudioContext || window.webkitAudioContext; audioCtx = new AudioContext(); playBeep(); btn.style.background = "var(--green)"; btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; } catch (e) { btn.innerText = "ERROR"; }
+        try { 
+            const AudioContext = window.AudioContext || window.webkitAudioContext; 
+            audioCtx = new AudioContext(); 
+            isAudioMuted = false;
+            playBeep(); 
+            btn.style.background = "var(--green)"; 
+            btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; 
+        } catch (e) { btn.innerText = "ERROR"; }
     }
     setInterval(refresh, 1000); refresh(); window.addEventListener('resize', refresh);
 </script>
