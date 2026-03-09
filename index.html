@@ -48,9 +48,17 @@
         .grid-header { background: #fcfcfc; flex: 0 0 32px; font-weight: bold; color: #008080; }
         .cell { 
             flex: 1; display: flex; align-items: center; justify-content: center;
-            border-right: 1px solid #eee; font-size: 15px; position: relative; overflow: hidden;
+            border-right: 1px solid #eee; font-size: 14px; position: relative; overflow: hidden;
+            padding: 0 1px;
         }
-        .cell-inner { white-space: nowrap; transition: transform 0.1s; transform-origin: center; display: inline-block; }
+        
+        .cell-inner { 
+            display: inline-block; 
+            white-space: nowrap; 
+            transform-origin: center center;
+            flex-shrink: 0;
+        }
+
         .num-col { flex: 0 0 12%; color: var(--blue); background: #fafafa; font-weight: bold; }
         .active-cell { background-color: var(--tibetan-red) !important; color: #fff !important; }
         .active-cell .cell-inner { color: #fff !important; }
@@ -74,8 +82,6 @@
 
 <script>
     let audioCtx = null, isAudioMuted = false, currentReminderKey = "";
-    
-    // 转换为分钟数
     const toM = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 
     const slots = [
@@ -85,7 +91,7 @@
         {s: "16:50", e: "17:30"}
     ];
     
-    const mData = [["༡","","","","","","",""],["༢","","","","","","",""],["༣","རི་མོ།༢","","","རི་མོ།༢","","",""],["༤","ངལ་རྩོལ།","","","","ཡིགཟུགས།","",""]];
+    const mData = [["༡","","","","","","",""],["༢","","","","","","",""],["༣","རི་མོ།༡","","","རི་མོ།༢","","",""],["༤","ངལ་རྩོལ།","","","","ཡིགཟུགས།","",""]];
     const aData = [["༡","","རི་མོ།༢","","","","",""],["༢","","","གླུ་གཞས།","","སློབ་གསོ།","",""],["༣","","རི་མོ།༡","","","","",""]];
 
     function render(id, data, startIdx) {
@@ -110,6 +116,22 @@
         try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); playBeep(); document.getElementById('audioBtn').innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; } catch(e){}
     }
 
+    function doAutoScale() {
+        document.querySelectorAll('.cell').forEach(cell => {
+            const inner = cell.querySelector('.cell-inner');
+            if (!inner || inner.innerText.trim() === "") return;
+            
+            inner.style.transform = 'scale(1)'; // 先重置缩放
+            const containerWidth = cell.clientWidth - 2; // 获取容器实际可用宽度
+            const contentWidth = inner.offsetWidth; // 获取文字实际宽度
+            
+            if (contentWidth > containerWidth && containerWidth > 0) {
+                const ratio = containerWidth / contentWidth;
+                inner.style.transform = `scale(${ratio})`;
+            }
+        });
+    }
+
     function refresh() {
         const now = new Date(), currentM = now.getHours() * 60 + now.getMinutes(), day = now.getDay() || 7;
         document.getElementById('real-time').innerText = now.toTimeString().slice(0, 8);
@@ -124,29 +146,26 @@
                 currentLessonIdx = i;
                 document.getElementById(`c-${i}-${day}`)?.classList.add('active-cell');
             }
-            [40, 5].forEach(off => {
-                if (currentM === startM - off && currentReminderKey !== `r-${i}-${off}`) {
-                    currentReminderKey = `r-${i}-${off}`; isAudioMuted = false;
-                    document.getElementById('audioBtn').style.background = "var(--orange)";
-                    if (now.getSeconds() % 2 === 0) playBeep();
-                }
-            });
+            if (day < 6) {
+                [40, 5].forEach(off => {
+                    if (currentM === startM - off && currentReminderKey !== `r-${i}-${off}`) {
+                        currentReminderKey = `r-${i}-${off}`; isAudioMuted = false;
+                        document.getElementById('audioBtn').style.background = "var(--orange)";
+                        if (now.getSeconds() % 2 === 0) playBeep();
+                    }
+                });
+            }
         });
 
-        // 文字自适应
-        document.querySelectorAll('.cell-inner').forEach(inner => {
-            const pw = inner.parentElement.offsetWidth - 4;
-            inner.style.transform = inner.offsetWidth > pw ? `scale(${pw / inner.offsetWidth})` : 'scale(1)';
-        });
+        doAutoScale(); // 在高亮处理完后再统一计算缩放
 
-        // 状态提示文字核心逻辑
         const msgEl = document.getElementById('msg');
         const myKeys = ["རི་མོ།", "གླུ་གཞས།", "ཡིགཟུགས།"];
         const fullData = [...mData, ...aData];
         const myTodayLessons = fullData.map((r, i) => myKeys.some(k => r[day].includes(k)) ? i : -1).filter(i => i !== -1);
 
         if (day >= 6) {
-            msgEl.innerText = "དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།  ངལ་གསོ་ལྷོད་ལྷོད་གནང་།";
+            msgEl.innerText = "གཟའ་མཇུག་ངལ་གསོ།";
         } else if (currentLessonIdx !== -1 && myTodayLessons.includes(currentLessonIdx)) {
             msgEl.innerText = "ད་ལྟ་སློབ་ཚན་ཚོགས་བཞིན་པ་ཡིན།";
         } else if (myTodayLessons.length > 0 && currentM >= toM(slots[myTodayLessons[myTodayLessons.length-1]].e)) {
@@ -155,7 +174,12 @@
             msgEl.innerText = "དགེན་ལགས་དེ་རིང་སློབ་ཚན་ཡོད།";
         }
     }
-    setInterval(refresh, 1000); refresh();
+
+    setInterval(refresh, 1000);
+    window.addEventListener('resize', doAutoScale);
+    // 确保字体加载后执行一次
+    document.fonts.ready.then(doAutoScale);
+    refresh();
 </script>
 </body>
 </html>
