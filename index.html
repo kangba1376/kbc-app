@@ -5,14 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <title>སློབ་ཚན་རེའུ་མིག</title>
     <style>
         @font-face { font-family: 'TibetWildYak'; src: url('TibetWildYak.ttf') format('truetype'); }
         :root { 
             --bg: #f8f9fa; --blue: #007aff; --green: #27ae60; --orange: #e67e22; 
-            --white: #ffffff; --tibetan-red: #B22222; --gray: #999999;
-            --teal: #008080; --indigo: #004080; 
+            --white: #ffffff; --tibetan-red: #B22222; --indigo: #004080; 
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { 
@@ -23,164 +21,140 @@
         .wrapper {
             position: absolute; top: 0; left: 0; bottom: 0; right: 0;
             display: flex; flex-direction: column;
-            padding-top: env(safe-area-inset-top); padding-bottom: 2px;
+            padding-top: env(safe-area-inset-top);
             background: linear-gradient(rgba(248,249,250,0.96), rgba(248,249,250,0.96)), url('apple-touch-icon.png') no-repeat center;
             background-size: 160px auto;
         }
-        .nav-bar { display: flex; justify-content: space-between; align-items: center; padding: 4px 10px; }
-        .t-name { font-size: 20px; font-weight: bold; color: var(--indigo); flex: 1; text-align: center; }
+        .nav-bar { position: relative; height: 44px; display: flex; align-items: center; padding: 0 10px; }
+        .nav-left { position: absolute; left: 10px; z-index: 10; }
+        .nav-right { position: absolute; right: 10px; z-index: 10; }
+        .t-name { width: 100%; text-align: center; font-size: 20px; font-weight: bold; color: var(--indigo); }
         .time-display { font-size: 13px; color: var(--blue); font-weight: bold; }
-        .btn-mini { background: var(--green); color: #fff; border: none; border-radius: 4px; padding: 4px 8px; font-family: 'TibetWildYak'; cursor: pointer; }
+        .btn-mini { background: var(--green); color: #fff; border: none; border-radius: 4px; padding: 6px 10px; font-family: 'TibetWildYak'; cursor: pointer; }
+        
         .status-area { padding: 0 10px; margin-bottom: 4px; }
         #msg { 
             font-size: 18px; font-weight: bold; color: var(--tibetan-red); 
             border: 2px solid var(--tibetan-red); border-top: 4px solid var(--tibetan-red);
-            border-radius: 8px; padding: 6px; text-align: center; min-height: 40px;
+            border-radius: 8px; padding: 8px; text-align: center; min-height: 44px;
         }
-        .content-area { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 0 8px; min-height: 0; }
+
+        .content-area { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 0 8px; overflow: hidden; }
         .section-box { 
-            display: flex; flex-direction: column; background: #fff; border-radius: 8px;
-            border: 1px solid var(--tibetan-red); border-top: 5px solid var(--tibetan-red);
-            flex: 1; min-height: 0;
+            flex: 1; display: flex; flex-direction: column; background: #fff; border-radius: 8px;
+            border: 1px solid var(--tibetan-red); border-top: 5px solid var(--tibetan-red); min-height: 0;
         }
-        .grid-row { display: flex; flex: 1; border-bottom: 1px solid #eee; }
-        .grid-header { background: #fcfcfc; flex: 0 0 32px; font-weight: bold; color: var(--teal); }
+        .grid-row { display: flex; flex: 1; border-bottom: 1px solid #eee; min-height: 0; }
+        .grid-header { background: #fcfcfc; flex: 0 0 32px; font-weight: bold; color: #008080; }
         .cell { 
             flex: 1; display: flex; align-items: center; justify-content: center;
-            border-right: 1px solid #eee; font-size: 15px; text-align: center; position: relative;
+            border-right: 1px solid #eee; font-size: 15px; position: relative; overflow: hidden;
         }
+        .cell-inner { white-space: nowrap; transition: transform 0.1s; transform-origin: center; display: inline-block; }
         .num-col { flex: 0 0 12%; color: var(--blue); background: #fafafa; font-weight: bold; }
-        .active-cell { background-color: var(--tibetan-red) !important; color: #ffffff !important; font-weight: bold; }
-        .active-cell .cell-inner { color: #ffffff !important; }
+        .active-cell { background-color: var(--tibetan-red) !important; color: #fff !important; }
+        .active-cell .cell-inner { color: #fff !important; }
         .col-today { background-color: #fffafa; }
-        .diagonal-cell { flex: 0 0 12%; position: relative; }
         .diag-svg { position: absolute; width: 100%; height: 100%; top:0; left:0; }
     </style>
 </head>
 <body>
 <div class="wrapper">
     <div class="nav-bar">
-        <button class="btn-mini" id="audioBtn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button>
+        <div class="nav-left"><button class="btn-mini" id="audioBtn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button></div>
         <div class="t-name">དགེན་ཁམས་པ་ཚང་།</div>
-        <div class="time-display" id="real-time">--:--:--</div>
+        <div class="nav-right"><div class="time-display" id="real-time">--:--:--</div></div>
     </div>
     <div class="status-area"><div id="msg">...</div></div>
     <div class="content-area">
-        <div class="section-box"><div id="grid-morning" style="display:contents"></div></div>
-        <div class="section-box"><div id="grid-afternoon" style="display:contents"></div></div>
+        <div class="section-box" id="grid-morning"></div>
+        <div class="section-box" id="grid-afternoon"></div>
     </div>
 </div>
 
 <script>
-    let audioCtx = null, isAudioMuted = false, currentReminderKey = "", reminderStartTime = 0;
+    let audioCtx = null, isAudioMuted = false, currentReminderKey = "";
     
-    function toM(t) { const [h, m] = t.split(':').map(Number); return h * 60 + m; }
-    function minToTime(m) { return String(Math.floor(m/60)).padStart(2,'0') + ":" + String(m%60).padStart(2,'0'); }
+    // 转换为分钟数
+    const toM = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 
-    // 精确时间表
-    const exactSlots = [
-        { s: "09:30", e: "10:10" }, { s: "10:25", e: "11:05" }, 
-        { s: "11:30", e: "12:10" }, { s: "12:25", e: "13:05" }, 
-        { s: "15:00", e: "15:40" }, { s: "15:55", e: "16:35" }, 
-        { s: "16:50", e: "17:30" }
+    const slots = [
+        {s: "09:30", e: "10:10"}, {s: "10:25", e: "11:05"}, 
+        {s: "11:30", e: "12:10"}, {s: "12:25", e: "13:05"}, 
+        {s: "15:00", e: "15:40"}, {s: "15:55", e: "16:35"}, 
+        {s: "16:50", e: "17:30"}
     ];
-
-    const morningData = [["༡","","","","","","",""],["༢","","","","","","",""],["༣","རི་མོ།༡","","","རི་མོ།༢","","",""],["༤","ངལ་རྩོལ།","","","","ཡིགཟུགས།","",""]];
-    const afternoonData = [["༡","","རི་མོ།༢","","","","",""],["༢","","","གླུ་གཞས།","","སློབ་གསོ།","",""],["༣","","རི་མོ།༡","","","","",""]];
     
+    const mData = [["༡","","","","","","",""],["༢","","","","","","",""],["༣","རི་མོ།༢","","","རི་མོ།༢","","",""],["༤","ངལ་རྩོལ།","","","","ཡིགཟུགས།","",""]];
+    const aData = [["༡","","རི་མོ།༢","","","","",""],["༢","","","གླུ་གཞས།","","སློབ་གསོ།","",""],["༣","","རི་མོ།༡","","","","",""]];
+
     function render(id, data, startIdx) {
         const el = document.getElementById(id);
-        let head = `<div class="grid-row grid-header"><div class="cell diagonal-cell"><svg class="diag-svg" preserveAspectRatio="none" viewBox="0 0 100 100"><line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1"/></svg></div>`;
-        ["ཟླ་བ།","མིག་དམར།","ལྷག་པ།","ཕུར་བུ།","པ་སངས་།","སྤེན་པ།","ཉི་མ།"].forEach(d => head += `<div class="cell">${d}</div>`);
-        el.innerHTML = head + `</div>`;
-        data.forEach((r, rowIdx) => {
-            let rowHtml = `<div class="grid-row"><div class="cell num-col">${r[0]}</div>`;
-            for(let col=1; col<=7; col++) {
-                rowHtml += `<div class="cell" id="c-${startIdx + rowIdx}-${col}"><span class="cell-inner">${r[col]||''}</span></div>`;
-            }
-            el.innerHTML += rowHtml + `</div>`;
-        });
+        let h = `<div class="grid-row grid-header"><div class="cell num-col" style="position:relative"><svg class="diag-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1"/></svg></div>`;
+        ["ཟླ་བ།","མིག་དམར།","ལྷག་པ།","ཕུར་བུ།","པ་སངས་།","སྤེན་པ།","ཉི་མ།"].forEach(d => h += `<div class="cell">${d}</div>`);
+        el.innerHTML = h + `</div>` + data.map((r, i) => 
+            `<div class="grid-row"><div class="cell num-col">${r[0]}</div>` + 
+            r.slice(1).map((c, j) => `<div class="cell" id="c-${startIdx+i}-${j+1}"><span class="cell-inner">${c}</span></div>`).join('') + `</div>`
+        ).join('');
     }
-    render('grid-morning', morningData, 0); render('grid-afternoon', afternoonData, 4);
+    render('grid-morning', mData, 0); render('grid-afternoon', aData, 4);
 
     function playBeep() {
         if (!audioCtx || isAudioMuted) return;
-        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.5);
     }
 
-    function stopAudioRemind() { isAudioMuted = true; const btn = document.getElementById('audioBtn'); btn.style.background = "var(--green)"; btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; }
-
-    function activateAudio() { 
-        if (currentReminderKey !== "" && !isAudioMuted) { stopAudioRemind(); return; }
-        const btn = document.getElementById('audioBtn');
-        try { 
-            const AudioContext = window.AudioContext || window.webkitAudioContext; 
-            audioCtx = new AudioContext(); playBeep(); 
-            btn.style.background = "var(--green)"; btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; 
-        } catch (e) { btn.innerText = "ERROR"; }
+    function activateAudio() {
+        if (currentReminderKey !== "" && !isAudioMuted) { isAudioMuted = true; document.getElementById('audioBtn').style.background = "var(--green)"; return; }
+        try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); playBeep(); document.getElementById('audioBtn').innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; } catch(e){}
     }
 
     function refresh() {
-        const now = new Date();
-        const currentM = now.getHours() * 60 + now.getMinutes();
-        const nowStr = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
-        const day = now.getDay() === 0 ? 7 : now.getDay();
+        const now = new Date(), currentM = now.getHours() * 60 + now.getMinutes(), day = now.getDay() || 7;
         document.getElementById('real-time').innerText = now.toTimeString().slice(0, 8);
-
+        
         document.querySelectorAll('.cell').forEach(c => c.classList.remove('active-cell', 'col-today'));
         document.querySelectorAll(`[id$="-${day}"]`).forEach(c => c.classList.add('col-today'));
 
         let currentLessonIdx = -1;
-        exactSlots.forEach((slot, idx) => {
-            const startM = toM(slot.s), endM = toM(slot.e);
+        slots.forEach((s, i) => {
+            const startM = toM(s.s), endM = toM(s.e);
             if (currentM >= startM && currentM < endM) {
-                currentLessonIdx = idx;
-                const cell = document.getElementById(`c-${idx}-${day}`);
-                if (cell) cell.classList.add('active-cell');
+                currentLessonIdx = i;
+                document.getElementById(`c-${i}-${day}`)?.classList.add('active-cell');
             }
-
-            // 闹钟触发逻辑：提前 40 分钟和提前 5 分钟
-            if (day < 6) {
-                [40, 5].forEach(offset => {
-                    const triggerM = startM - offset;
-                    const key = `slot-${idx}-${offset}`;
-                    if (currentM === triggerM && currentReminderKey !== key) {
-                        currentReminderKey = key; isAudioMuted = false; reminderStartTime = Date.now();
-                        const btn = document.getElementById('audioBtn'); btn.style.background = "var(--orange)"; btn.innerText = "🔔 སྒྲ་མཚམས་འཇོག་པ།";
-                    }
-                });
-            }
+            [40, 5].forEach(off => {
+                if (currentM === startM - off && currentReminderKey !== `r-${i}-${off}`) {
+                    currentReminderKey = `r-${i}-${off}`; isAudioMuted = false;
+                    document.getElementById('audioBtn').style.background = "var(--orange)";
+                    if (now.getSeconds() % 2 === 0) playBeep();
+                }
+            });
         });
 
-        // 持续响铃逻辑
-        if (currentReminderKey !== "" && !isAudioMuted) {
-            const elapsed = Math.floor((Date.now() - reminderStartTime) / 60000);
-            if (elapsed < 6) { 
-                if (elapsed % 2 === 0 && now.getMilliseconds() < 1000 && now.getSeconds() % 2 === 0) playBeep(); 
-            } else { stopAudioRemind(); }
-        }
+        // 文字自适应
+        document.querySelectorAll('.cell-inner').forEach(inner => {
+            const pw = inner.parentElement.offsetWidth - 4;
+            inner.style.transform = inner.offsetWidth > pw ? `scale(${pw / inner.offsetWidth})` : 'scale(1)';
+        });
 
+        // 状态提示文字核心逻辑
         const msgEl = document.getElementById('msg');
         const myKeys = ["རི་མོ།", "གླུ་གཞས།", "ཡིགཟུགས།"];
-        const fullData = [...morningData, ...afternoonData];
+        const fullData = [...mData, ...aData];
         const myTodayLessons = fullData.map((r, i) => myKeys.some(k => r[day].includes(k)) ? i : -1).filter(i => i !== -1);
 
         if (day >= 6) {
-            msgEl.innerText = "གཟའ་མཇུག་ངལ་གསོ།";
+            msgEl.innerText = "དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།  ངལ་གསོ་ལྷོད་ལྷོད་གནང་།";
         } else if (currentLessonIdx !== -1 && myTodayLessons.includes(currentLessonIdx)) {
             msgEl.innerText = "ད་ལྟ་སློབ་ཚན་ཚོགས་བཞིན་པ་ཡིན།";
-        } else if (myTodayLessons.length > 0 && currentM >= toM(exactSlots[myTodayLessons[myTodayLessons.length-1]].e)) {
+        } else if (myTodayLessons.length > 0 && currentM >= toM(slots[myTodayLessons[myTodayLessons.length-1]].e)) {
             msgEl.innerText = "དེ་རིང་གི་སློབ་ཚན་མཇུག་སྒྲིལ་ཟིན།";
         } else {
             msgEl.innerText = "དགེན་ལགས་དེ་རིང་སློབ་ཚན་ཡོད།";
         }
     }
-
     setInterval(refresh, 1000); refresh();
 </script>
 </body>
