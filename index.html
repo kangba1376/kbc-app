@@ -18,7 +18,6 @@
             --tibetan-red: #B22222; 
             --gray: #999999;
             --teal: #008080; 
-            --butter-yellow: #FFFAFA;
             --indigo: #004080; 
         }
 
@@ -49,8 +48,6 @@
             gap: 8px;
         }
 
-        .nav-left { flex: 0 1 auto; display: flex; }
-        .nav-right { flex: 0 0 auto; display: flex; justify-content: flex-end; }
         .t-name { 
             flex: 1 1 auto;
             font-size: clamp(14px, 3vh, 22px); font-weight: bold; 
@@ -62,6 +59,7 @@
             background: var(--green); color: #fff; border: none; border-radius: 4px; 
             padding: 4px 8px; font-size: clamp(10px, 1.8vh, 13px); 
             font-family: 'TibetWildYak'; cursor: pointer; white-space: nowrap;
+            min-width: 85px; transition: background 0.3s;
         }
 
         .time-display {
@@ -73,15 +71,10 @@
         #msg { 
             font-size: clamp(14px, 2.5vh, 18px); font-weight: bold; 
             color: var(--tibetan-red); 
-            background: transparent; 
             border: 2px solid var(--tibetan-red); 
             border-top: 4px solid var(--tibetan-red);
-            border-radius: 8px; 
-            padding: 6px; 
-            min-height: 1.6em;
-            display: flex; align-items: center; justify-content: center; 
-            line-height: 1.4;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-radius: 8px; padding: 6px; 
+            min-height: 1.6em; display: flex; align-items: center; justify-content: center; 
         }
 
         .content-area { flex: 1; display: flex; flex-direction: column; gap: 4px; min-height: 0; padding: 0 8px; }
@@ -89,8 +82,7 @@
         .section-box:nth-child(2) { flex: 3; }
         .section-box {
             display: flex; flex-direction: column; background: #fff; border-radius: 8px;
-            border: 1px solid var(--tibetan-red); 
-            border-top: 5px solid var(--tibetan-red); 
+            border: 1px solid var(--tibetan-red); border-top: 5px solid var(--tibetan-red); 
             overflow: visible; min-height: 0;
         }
 
@@ -103,48 +95,18 @@
             flex: 1; width: 0; display: flex; align-items: center; justify-content: center;
             border-right: 1px solid #eee; font-size: clamp(11px, 2.5vh, 17px);
             text-align: center; line-height: 1.5; padding: 2px;
-            position: relative;
         }
 
-        .diagonal-cell {
-            padding: 0 !important;
-            flex: 0 0 12% !important;
-            background: #fcfcfc;
-            position: relative;
-        }
-        .diag-svg {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-        }
-        .diag-top {
-            position: absolute; top: 2px; right: 2px;
-            font-size: 9px; color: var(--teal); z-index: 3;
-        }
-        .diag-bottom {
-            position: absolute; bottom: 2px; left: 2px;
-            font-size: 9px; color: var(--blue); z-index: 3;
-        }
+        .diagonal-cell { padding: 0 !important; flex: 0 0 12% !important; background: #fcfcfc; position: relative; }
+        .diag-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .diag-top { position: absolute; top: 2px; right: 2px; font-size: 9px; color: var(--teal); }
+        .diag-bottom { position: absolute; bottom: 2px; left: 2px; font-size: 9px; color: var(--blue); }
 
-        .cell-inner { white-space: nowrap; display: inline-block; transform-origin: center; position: relative; z-index: 2; }
+        .cell-inner { white-space: nowrap; display: inline-block; transform-origin: center; }
         .grid-header .cell { font-size: clamp(10px, 1.8vh, 14px); color: var(--teal); font-weight: bold; }
-        .cell:last-child { border-right: none; }
-        
         .num-col { flex: 0 0 12%; color: var(--blue); font-weight: bold; background: #fafafa; }
-
-        .active-cell { 
-            background-color: rgba(178, 34, 34, 0.8) !important; 
-            color: #ffffff !important;
-            font-weight: bold; 
-        }
-        .active-cell .cell-inner { color: #ffffff !important; }
-        
+        .active-cell { background-color: rgba(178, 34, 34, 0.8) !important; color: #ffffff !important; }
         .col-today { background-color: #fffafa; }
-
-        @media (orientation: landscape) {
-            .nav-bar { padding: 2px 20px; }
-            .content-area { gap: 2px; }
-        }
     </style>
 </head>
 <body>
@@ -153,7 +115,7 @@
     <div class="top-components">
         <div class="nav-bar">
             <div class="nav-left">
-                <button class="btn-mini" id="audioBtn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button>
+                <button class="btn-mini" id="audioBtn" onclick="handleAudioClick()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button>
             </div>
             <div class="t-name">དགེན་ཁམས་པ་ཚང་།</div>
             <div class="nav-right">
@@ -166,42 +128,8 @@
     </div>
 
     <div class="content-area">
-        <div class="section-box">
-            <div class="grid-container">
-                <div class="grid-row grid-header">
-                    <div class="cell diagonal-cell">
-                        <svg class="diag-svg" preserveAspectRatio="none" viewBox="0 0 100 100">
-                            <line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1" />
-                        </svg>
-                        <span class="diag-top">རེས་གཟའ།</span>
-                        <span class="diag-bottom">ཚོགས་ཐེངས།</span>
-                    </div>
-                    <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div><div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
-                    <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div><div class="cell"><span class="cell-inner">ཕུར་བུ།</span></div>
-                    <div class="cell"><span class="cell-inner">པ་སངས་།</span></div><div class="cell"><span class="cell-inner">སྤེན་པ།</span></div>
-                    <div class="cell"><span class="cell-inner">ཉི་མ།</span></div>
-                </div>
-                <div id="grid-morning" style="display:contents"></div>
-            </div>
-        </div>
-        <div class="section-box">
-            <div class="grid-container">
-                <div class="grid-row grid-header">
-                    <div class="cell diagonal-cell">
-                        <svg class="diag-svg" preserveAspectRatio="none" viewBox="0 0 100 100">
-                            <line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1" />
-                        </svg>
-                        <span class="diag-top">རེས་གཟའ།</span>
-                        <span class="diag-bottom">ཚོགས་ཐེངས།</span>
-                    </div>
-                    <div class="cell"><span class="cell-inner">ཟླ་བ།</span></div><div class="cell"><span class="cell-inner">མིག་དམར།</span></div>
-                    <div class="cell"><span class="cell-inner">ལྷག་པ།</span></div><div class="cell"><span class="cell-inner">ཕུར་བུ།</span></div>
-                    <div class="cell"><span class="cell-inner">པ་སངས་།</span></div><div class="cell"><span class="cell-inner">སྤེན་པ།</span></div>
-                    <div class="cell"><span class="cell-inner">ཉི་མ།</span></div>
-                </div>
-                <div id="grid-afternoon" style="display:contents"></div>
-            </div>
-        </div>
+        <div class="section-box"><div class="grid-container" id="grid-morning-container"></div></div>
+        <div class="section-box"><div class="grid-container" id="grid-afternoon-container"></div></div>
     </div>
 </div>
 
@@ -210,65 +138,113 @@
     const morningData = [["༡","","","","","","",""],["༢","","","","","","",""],["༣","རི་མོ།༡","","","རི་མོ།༢","","",""],["༤","ངལ་རྩོལ།","","","","ཡིགཟུགས།","",""]];
     const afternoonData = [["༡","","རི་མོ།༢","","","","",""],["༢","","","གླུ་གཞས།","","སློབ་གསོ།","",""],["༣","","རི་མོ།༡","","","","",""]];
     
-    let audioCtx = null, isAudioMuted = false, currentReminderKey = "", reminderStartTime = 0;
-    function timeAdd(t, m) { let [h, min] = t.split(':').map(Number); let d = new Date(); d.setHours(h, min + m); return d.toTimeString().slice(0, 5); }
+    let audioCtx = null, isRinging = false, isActivated = false, currentReminderKey = "";
+    
+    function timeAdd(t, m) { 
+        let [h, min] = t.split(':').map(Number); 
+        let d = new Date(); d.setHours(h, min + m); 
+        return d.toTimeString().slice(0, 5); 
+    }
 
     const slots = [];
     let cm = cfg.mS; for(let i=0; i<4; i++) { let s = cm, e = timeAdd(s, cfg.dur); slots.push({s, e}); cm = timeAdd(e, i===1 ? 20 : 15); }
     let ca = cfg.aS; for(let i=0; i<3; i++) { let s = ca, e = timeAdd(s, cfg.dur); slots.push({s, e}); ca = timeAdd(e, 15); }
 
-    function renderGrid(id, data, start) {
-        const container = document.getElementById(id);
+    function buildHeader() {
+        return `<div class="grid-row grid-header">
+            <div class="cell diagonal-cell">
+                <svg class="diag-svg" preserveAspectRatio="none" viewBox="0 0 100 100"><line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1" /></svg>
+                <span class="diag-top">རེས་གཟའ།</span><span class="diag-bottom">ཚོགས་ཐེངས།</span>
+            </div>
+            <div class="cell">ཟླ་བ།</div><div class="cell">མིག་དམར།</div><div class="cell">ལྷག་པ།</div><div class="cell">ཕུར་བུ།</div><div class="cell">པ་སངས་།</div><div class="cell">སྤེན་པ།</div><div class="cell">ཉི་མ།</div>
+        </div>`;
+    }
+
+    function renderGrid(containerId, data, start) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = buildHeader();
         data.forEach((r, idx) => {
             let row = document.createElement('div'); row.className = 'grid-row';
-            row.innerHTML = `<div class="cell num-col"><span class="cell-inner">${r[0]}</span></div>`;
+            row.innerHTML = `<div class="cell num-col">${r[0]}</div>`;
             for(let i=1; i<=7; i++) {
-                let cell = document.createElement('div'); cell.className = 'cell';
-                let inner = document.createElement('span'); inner.className = 'cell-inner'; inner.innerText = r[i] || "";
-                cell.id = `c-${start+idx}-${i}`;
+                let cell = document.createElement('div'); cell.className = 'cell'; cell.id = `c-${start+idx}-${i}`;
                 if(r[i]) {
+                    cell.innerHTML = `<span class="cell-inner">${r[i]}</span>`;
                     if(cfg.myKeys.some(k => r[i].includes(k))) cell.style.color = "var(--blue)";
                     else if(cfg.otherKeys.some(k => r[i].includes(k))) cell.style.color = "var(--gray)";
                 }
-                cell.appendChild(inner); row.appendChild(cell);
+                row.appendChild(cell);
             }
             container.appendChild(row);
         });
     }
-    renderGrid('grid-morning', morningData, 0); renderGrid('grid-afternoon', afternoonData, 4);
+    renderGrid('grid-morning-container', morningData, 0); renderGrid('grid-afternoon-container', afternoonData, 4);
 
-    function playBeep() {
-        if (!audioCtx || isAudioMuted) return;
-        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-        osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+    // 核心发音函数
+    function playBeep(force = false) {
+        // 如果没有初始化 Context 或者 (既没响铃也不是强制测试)，则返回
+        if (!audioCtx || (!isRinging && !force)) return;
+        try {
+            const osc = audioCtx.createOscillator(); 
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+        } catch(e) { console.error(e); }
     }
 
-    function stopAudioRemind() { isAudioMuted = true; const btn = document.getElementById('audioBtn'); btn.style.background = "var(--green)"; btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; }
+    function handleAudioClick() {
+        const btn = document.getElementById('audioBtn');
+        
+        // 状态1：正在响铃时，点击是“关闭”
+        if (isRinging) {
+            isRinging = false;
+            btn.style.background = "var(--green)";
+            btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // 已激活
+            return;
+        }
+
+        // 状态2：未激活或需要重置音频上下文
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            
+            isActivated = true;
+            // 立即强制响一声，确保权限获取成功
+            playBeep(true); 
+            
+            btn.style.background = "var(--green)";
+            btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // 已激活
+        } catch (e) { 
+            btn.innerText = "Error"; 
+        }
+    }
 
     function refresh() {
-        const now = new Date(); const nowS = now.toTimeString().slice(0, 5);
+        const now = new Date(); 
+        const nowS = now.toTimeString().slice(0, 5);
         const h = String(now.getHours()).padStart(2, '0'), m = String(now.getMinutes()).padStart(2, '0'), s = String(now.getSeconds()).padStart(2, '0');
         document.getElementById('real-time').innerText = `དུས་ཚོད། ${h}:${m}:${s}`;
 
         const wk = now.getDay(), realWk = (wk === 0) ? 7 : wk; 
         const msgEl = document.getElementById('msg');
         const fullData = [...morningData, ...afternoonData];
+        const btn = document.getElementById('audioBtn');
 
-        let hasClassToday = false;
-        let isClassNow = false;
-        let lastClassEndTime = "00:00";
+        let hasClassToday = false, isClassNow = false, lastClassEndTime = "00:00";
 
         slots.forEach((t, i) => {
             const task = fullData[i][realWk];
-            if (task && task.trim() !== "") {
-                hasClassToday = true;
-                if (t.e > lastClassEndTime) lastClassEndTime = t.e;
-            }
-
+            if (task) { hasClassToday = true; if (t.e > lastClassEndTime) lastClassEndTime = t.e; }
             for(let j=1; j<=7; j++) {
                 const cell = document.getElementById(`c-${i}-${j}`);
                 if (cell) {
@@ -277,58 +253,48 @@
                         cell.classList.add('col-today');
                         if (nowS >= t.s && nowS < t.e) {
                             cell.classList.add('active-cell');
-                            if (task && task.trim() !== "") isClassNow = true;
+                            if (task) isClassNow = true;
                         }
                     }
                 }
             }
-            if (realWk < 6) {
+            // 只有在已激活状态下才触发闹钟
+            if (isActivated && realWk < 6) {
                 [40, 5].forEach(offset => {
-                    const triggerTime = timeAdd(t.s, -offset);
-                    const key = `slot-${i}-${offset}`;
-                    if (nowS === triggerTime && currentReminderKey !== key) {
-                        currentReminderKey = key; isAudioMuted = false; reminderStartTime = Date.now();
-                        const btn = document.getElementById('audioBtn'); btn.style.background = "var(--orange)"; btn.innerText = "🔔 སྒྲ་མཚམས་འཇོག་པ།";
+                    const trig = timeAdd(t.s, -offset);
+                    if (nowS === trig && currentReminderKey !== `slot-${i}-${offset}`) {
+                        currentReminderKey = `slot-${i}-${offset}`;
+                        isRinging = true;
+                        btn.style.background = "var(--orange)";
+                        btn.innerText = "🔔 སྒྲ་མཚམས་འཇོག་པ།"; // 关闭
                     }
                 });
             }
         });
 
-        if (realWk >= 6) { 
-            msgEl.innerText = (realWk === 6) ? "དེ་རིང་གཟའ་སྤེན་པ་རེད། དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།" : "དེ་རིང་གཟའ་ཉི་མ་རེད། དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།"; 
-        } else {
-            if (!hasClassToday) {
-                msgEl.innerText = "དེ་རིང་སློབ་ཚན་མི་འདུག";
-            } else if (isClassNow) {
-                msgEl.innerText = "ད་ལྟ་སློབ་ཚན་ཚོགས་བཞིན་པ་ཡིན།";
-            } else if (nowS >= lastClassEndTime) {
-                msgEl.innerText = "དེ་རིང་གི་སློབ་ཚན་མཇུག་སྒྲིལ་ཟིན།";
-            } else {
-                msgEl.innerText = "དེ་རིང་སློབ་ཚན་ཡོད།";
-            }
-        }
+        // 状态文字逻辑
+        if (realWk >= 6) { msgEl.innerText = (realWk === 6) ? "དེ་རིང་གཟའ་སྤེན་པ་རེད། དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།" : "དེ་རིང་གཟའ་ཉི་མ་རེད། དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།"; }
+        else if (!hasClassToday) msgEl.innerText = "དེ་རིང་སློབ་ཚན་མི་འདུག";
+        else if (isClassNow) msgEl.innerText = "ད་ལྟ་སློབ་ཚན་ཚོགས་བཞིན་པ་ཡིན།";
+        else if (nowS >= lastClassEndTime) msgEl.innerText = "དེ་རིང་གི་སློབ་ཚན་མཇུག་སྒྲིལ་ཟིན།";
+        else msgEl.innerText = "དེ་རིང་སློབ་ཚན་ཡོད།";
 
-        if (currentReminderKey !== "" && !isAudioMuted) {
-            const elapsed = Math.floor((Date.now() - reminderStartTime) / 60000);
-            if (elapsed < 6) { if (elapsed % 2 === 0 && now.getMilliseconds() < 1000 && now.getSeconds() % 2 === 0) playBeep(); } else { stopAudioRemind(); }
+        // 执行响铃：每2秒响一次，直到点击关闭
+        if (isRinging && now.getSeconds() % 2 === 0 && now.getMilliseconds() < 1000) {
+            playBeep();
         }
-
-        document.querySelectorAll('.cell').forEach(c => {
-            const inner = c.querySelector('.cell-inner');
-            if(inner && inner.innerText !== "") {
-                inner.style.transform = "scale(1)";
-                const ratio = (c.offsetWidth - 6) / inner.offsetWidth;
-                if(ratio < 1) inner.style.transform = `scale(${ratio})`;
-            }
+        
+        // 字体缩放自适应
+        document.querySelectorAll('.cell-inner').forEach(inner => {
+            const p = inner.parentElement;
+            inner.style.transform = "scale(1)";
+            const ratio = (p.offsetWidth - 4) / inner.offsetWidth;
+            if(ratio < 1) inner.style.transform = `scale(${ratio})`;
         });
     }
 
-    function activateAudio() { 
-        if (currentReminderKey !== "" && !isAudioMuted) { stopAudioRemind(); return; }
-        const btn = document.getElementById('audioBtn');
-        try { const AudioContext = window.AudioContext || window.webkitAudioContext; audioCtx = new AudioContext(); playBeep(); btn.style.background = "var(--green)"; btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; } catch (e) { btn.innerText = "ERROR"; }
-    }
-    setInterval(refresh, 1000); refresh(); window.addEventListener('resize', refresh);
+    setInterval(refresh, 500); 
+    refresh();
 </script>
 </body>
 </html>
