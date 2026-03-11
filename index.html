@@ -132,36 +132,36 @@
         u.lang = 'zh-CN';
         const voices = window.speechSynthesis.getVoices();
         
-        // 既然您手机上已经下载了“月”，我们就强制优先找“月”
-        // 注意：iOS 上下载的“月”有时名字叫 "Yue" (英文环境) 有时叫 "月" (中文环境)
-        // 也有可能叫 "Siri" (如果是 Siri 语音包里的月)
+        let targetVoice = null;
+
+        // 1. 尝试直接找 "月" (Yue)
+        targetVoice = voices.find(v => v.lang.includes('zh') && (v.name.includes('Yue') || v.name.includes('月')));
         
-        // 1. 绝对优先：名字里带 "Yue" 或 "月" 的
-        let targetVoice = voices.find(v => v.lang.includes('zh') && (v.name.includes('Yue') || v.name.includes('月')));
-        
-        // 2. 如果有多个 "月"，选 Enhanced/Premium 高级版
-        if (targetVoice) {
-             const bestYue = voices.find(v => v.lang.includes('zh') && (v.name.includes('Yue') || v.name.includes('月')) && (v.name.includes('Enhanced') || v.name.includes('Premium')));
-             if (bestYue) targetVoice = bestYue;
+        // 2. 如果没找到，尝试找 "系统默认" (Default) 的中文声音
+        // 既然您在系统设置里把“月”设为了默认，这一步应该能抓到它
+        if (!targetVoice) {
+            targetVoice = voices.find(v => v.lang.includes('zh') && v.default);
         }
 
-        // 3. 次选：Ting-Ting (婷婷)
-        if (!targetVoice) {
-            targetVoice = voices.find(v => v.lang.includes('zh') && (v.name.includes('Ting-Ting') || v.name.includes('婷婷')));
-        }
-        
-        // 4. 再次选：Siri
+        // 3. 如果还是没有，尝试找 "Siri"
         if (!targetVoice) {
             targetVoice = voices.find(v => v.lang.includes('zh') && v.name.includes('Siri'));
         }
 
-        // 5. 兜底
+        // 4. 尝试找 "Ting-Ting" (婷婷)
+        if (!targetVoice) {
+            targetVoice = voices.find(v => v.lang.includes('zh') && (v.name.includes('Ting-Ting') || v.name.includes('婷婷')));
+        }
+
+        // 5. 最后的兜底：随便给一个中文声音
         if (!targetVoice) targetVoice = voices.find(v => v.lang.includes('zh'));
 
         if (targetVoice) {
             u.voice = targetVoice;
             u.pitch = 1.0; 
             u.rate = 1.0; 
+            // 调试信息：把选中的声音名字打印到红条上，方便您确认
+            // console.log("Selected Voice:", targetVoice.name); 
         }
         u.volume = 1;
     }
