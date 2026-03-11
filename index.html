@@ -99,7 +99,7 @@
 <script>
     let audioCtx = null, currentReminderKey = "";
     let isSpeaking = false, stopSpeech = false;
-    let isAudioActivated = false;
+    // let isAudioActivated = false; // REMOVED
 
     const toM = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 
@@ -132,163 +132,125 @@
     function getCuteVoice(u) {
         u.lang = 'zh-CN';
         const voices = window.speechSynthesis.getVoices();
-        
         let targetVoice = null;
-
-        // 1. 尝试直接找 "月" (Yue)
         targetVoice = voices.find(v => v.lang.includes('zh') && (v.name.includes('Yue') || v.name.includes('月')));
-        
-        // 2. 如果没找到，尝试找 "系统默认" (Default) 的中文声音
-        // 既然您在系统设置里把“月”设为了默认，这一步应该能抓到它
-        if (!targetVoice) {
-            targetVoice = voices.find(v => v.lang.includes('zh') && v.default);
-        }
-
-        // 3. 如果还是没有，尝试找 "Siri"
-        if (!targetVoice) {
-            targetVoice = voices.find(v => v.lang.includes('zh') && v.name.includes('Siri'));
-        }
-
-        // 4. 尝试找 "Ting-Ting" (婷婷)
-        if (!targetVoice) {
-            targetVoice = voices.find(v => v.lang.includes('zh') && (v.name.includes('Ting-Ting') || v.name.includes('婷婷')));
-        }
-
-        // 5. 最后的兜底：随便给一个中文声音
+        if (!targetVoice) targetVoice = voices.find(v => v.lang.includes('zh') && v.default);
+        if (!targetVoice) targetVoice = voices.find(v => v.lang.includes('zh') && v.name.includes('Siri'));
+        if (!targetVoice) targetVoice = voices.find(v => v.lang.includes('zh') && (v.name.includes('Ting-Ting') || v.name.includes('婷婷')));
         if (!targetVoice) targetVoice = voices.find(v => v.lang.includes('zh'));
-
-        if (targetVoice) {
-            u.voice = targetVoice;
-            u.pitch = 1.0; 
-            u.rate = 1.0; 
-            // 调试信息：把选中的声音名字打印到红条上，方便您确认
-            // console.log("Selected Voice:", targetVoice.name); 
-        }
+        if (targetVoice) { u.voice = targetVoice; u.pitch = 1.0; u.rate = 1.0; }
         u.volume = 1;
     }
 
-    // 预加载音频
-    const audioFiles = {
-        success: new Audio('success.m4a'),
-        fail: new Audio('fail.m4a'),
-        reminder40: new Audio('reminder40.m4a'),
-        reminder5: new Audio('reminder5.m4a')
-    };
-    
-    // 允许后台播放
-    Object.values(audioFiles).forEach(a => {
-        a.load();
-        a.loop = false;
-    });
-
-    // 关键：在 iOS 上，Audio 对象必须在用户交互（点击）的瞬间被“激活”一次，否则后续无法播放。
-    // 我们修改 playAudio 函数，使其更稳健。
-    
-    function playAudio(key, onEnd) {
-        const audio = audioFiles[key];
-        if (!audio) {
-            console.error("Audio key not found:", key);
-            return;
-        }
-
-        // iOS Safari 限制：必须在用户交互中调用 play()
-        // 这里的 playAudio 是在 activateAudio() -> onclick 触发的，所以理论上是有效的。
-        
-        audio.currentTime = 0;
-        const playPromise = audio.play();
-        
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                if (onEnd) {
-                    // 使用 once 确保只执行一次
-                    audio.addEventListener('ended', onEnd, { once: true });
-                }
-            }).catch(error => {
-                console.error("Playback failed:", error);
-                // 可能是因为没有用户交互，或者文件不存在
-                // 尝试用 alert 提示，方便调试
-                if (error.name === 'NotAllowedError') {
-                    alert("请点击屏幕以允许播放声音");
-                } else {
-                    // alert("音频播放错误: " + error.message); 
-                }
-            });
-        }
-    }
-
-    function speakSequence(audioKey, count, intervalMs) {
+    function speakSequence(text, count, intervalMs) {
+        if (isSpeaking) window.speechSynthesis.cancel();
         stopSpeech = false;
         isSpeaking = true;
         
         const btn = document.getElementById('audioBtn');
-        btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; 
-        btn.style.background = "var(--orange)"; 
+        btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // Keep text
+        btn.style.background = "var(--orange)"; // Yellow for playing
 
         let remaining = count;
-        const playOne = () => {
+        const speakOne = () => {
             if (stopSpeech || remaining <= 0) {
                 isSpeaking = false;
-                btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; 
-                btn.style.background = "var(--blue)"; 
+                btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // Audio Activated
+                btn.style.background = "var(--blue)"; // Blue for active
                 return;
             }
             
-            playAudio(audioKey, () => {
+            const u = new SpeechSynthesisUtterance(text);
+            getCuteVoice(u);
+            
+            u.onend = () => {
                 remaining--;
                 if (remaining > 0 && !stopSpeech) {
-                    setTimeout(playOne, intervalMs);
+                    setTimeout(speakOne, intervalMs);
                 } else {
                     isSpeaking = false;
                     btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།";
-                    btn.style.background = "var(--blue)";
+                    btn.style.background = "var(--blue)"; // Blue for active
                 }
-            });
+            };
+            u.onerror = () => { 
+                isSpeaking = false; 
+                btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།";
+                btn.style.background = "var(--blue)";
+            };
+            
+            window.speechSynthesis.speak(u);
         };
-        playOne();
+        speakOne();
     }
 
-    // ... (Wake Lock and Silent Audio remain the same) ...
+    let wakeLock = null;
+
+    // Wake Lock
+    async function requestWakeLock() {
+        try {
+            if ('wakeLock' in navigator) {
+                wakeLock = await navigator.wakeLock.request('screen');
+            }
+        } catch (err) {}
+    }
+
+    // Silent Audio for Background
+    let silentAudio = null;
+    function initSilentAudio() {
+        if (!silentAudio) {
+            silentAudio = new Audio();
+            silentAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACAgQAZGF0YQAAAAA=';
+            silentAudio.loop = true;
+            silentAudio.volume = 0.01; 
+            silentAudio.play().catch(()=>{});
+        }
+    }
 
     function activateAudio() {
         const btn = document.getElementById('audioBtn');
-        if (isAudioActivated) {
-            // STOP
-            isAudioActivated = false;
+        if (isSpeaking) {
             stopSpeech = true;
-            Object.values(audioFiles).forEach(a => { a.pause(); a.currentTime = 0; });
+            window.speechSynthesis.cancel();
             isSpeaking = false;
-            
-            btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་བ།"; // Idle text
-            btn.style.background = "var(--green)";
-            
-            // Release wake lock? No need, let it expire.
+            btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; 
+            btn.style.background = "var(--green)"; 
             return;
         }
         
-        // START
-        isAudioActivated = true;
         requestWakeLock();
         initSilentAudio();
 
-        // 关键：在用户点击的这个瞬间，把所有音频都“预热”一下（播放0秒然后暂停）
-        // 这样 iOS 就认为这4个文件都获得了播放权限，后续自动播放才不会被拦截
-        Object.values(audioFiles).forEach(a => {
-            a.volume = 0; // 静音预热
-            a.play().then(() => {
-                a.pause();
-                a.currentTime = 0;
-                a.volume = 1; // 恢复音量
-            }).catch(e => console.error("Warmup failed", e));
-        });
+        try {
+            if (!window.speechSynthesis) return;
 
-        // Play success audio (真正要播的)
-        // 延迟一点点，确保预热完成
-        setTimeout(() => {
-             playAudio('success', () => {
-                 btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // Activated
-                 btn.style.background = "var(--blue)";
-             });
-        }, 100);
+            if (window.speechSynthesis.getVoices().length === 0) {
+                window.speechSynthesis.onvoiceschanged = () => activateAudio();
+                return;
+            }
+
+            const u = new SpeechSynthesisUtterance("老师，提醒声音激活成功");
+            getCuteVoice(u);
+            
+            u.onend = () => {
+                btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།";
+                btn.style.background = "var(--blue)";
+            };
+
+            u.onerror = () => {
+                const uFail = new SpeechSynthesisUtterance("老师，提醒声音激活失败了");
+                getCuteVoice(uFail);
+                window.speechSynthesis.speak(uFail);
+                btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་མ་ཐུབ།";
+                btn.style.background = "var(--art-red)";
+            };
+
+            window.speechSynthesis.speak(u);
+
+        } catch (e) {
+            btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་མ་ཐུབ།";
+            btn.style.background = "var(--art-red)";
+        }
     }
     
     // Update logic to use speakSequence with audioKey instead of text
@@ -345,16 +307,16 @@
                 currentLessonIdx = i;
                 document.getElementById(`c-${i}-${day}`)?.classList.add('active-cell');
             }
-            if (day < 6 && isAudioActivated) {
+            if (day < 6) {
                 // 40 min reminder
                 if (currentM === (startM - 40) && currentReminderKey !== `r-${i}-40`) {
                     currentReminderKey = `r-${i}-40`;
-                    speakSequence('reminder40', 16, 5000);
+                    speakSequence("康老师，离开课只有40分钟，请您准备前往学校，路上注意安全。", 16, 5000);
                 }
                 // 5 min reminder
                 if (currentM === (startM - 5) && currentReminderKey !== `r-${i}-5`) {
                     currentReminderKey = `r-${i}-5`;
-                    speakSequence('reminder5', 5, 5000);
+                    speakSequence("康老师，离开课只有5分钟了，请您准备好进教室了，学生们都在等着您呢。", 5, 5000);
                 }
             }
         });
