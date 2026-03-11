@@ -13,7 +13,7 @@
     
     <title>སློབ་ཚན་རེའུ་མིག</title>
     <style>
-        @font-face { font-family: 'TibetWildYak'; src: url('TibetWildYak.ttf') format('truetype'); }
+        @font-face { font-family: 'danzeng'; src: url('danzeng.ttf') format('truetype'); }
         :root { 
             --bg: #f8f9fa; --blue: #007aff; --green: #27ae60; --orange: #e67e22; 
             --white: #ffffff; --tibetan-red: #B22222; --indigo: #004080;
@@ -22,7 +22,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { 
             height: 100svh; width: 100vw; background: var(--bg); 
-            font-family: 'TibetWildYak', -apple-system, sans-serif;
+            font-family: 'danzeng', -apple-system, sans-serif;
             overflow: hidden; position: fixed;
         }
         .wrapper {
@@ -32,14 +32,14 @@
             background: linear-gradient(rgba(248,249,250,0.92), rgba(248,249,250,0.92)), url('apple-touch-icon.png') no-repeat center center;
             background-size: 140px auto; 
         }
-        .nav-bar { position: relative; height: 44px; display: flex; align-items: center; padding: 0 10px; }
+        .nav-bar { position: relative; height: 44px; display: flex; align-items: center; padding: 0 10px; flex-shrink: 0; }
         .nav-left { position: absolute; left: 10px; z-index: 10; }
         .nav-right { position: absolute; right: 10px; z-index: 10; }
         .t-name { width: 100%; text-align: center; font-size: 20px; font-weight: bold; color: var(--indigo); }
         .time-display { font-size: 13px; color: var(--blue); font-weight: bold; }
-        .btn-mini { background: var(--green); color: #fff; border: none; border-radius: 4px; padding: 6px 10px; font-family: 'TibetWildYak'; cursor: pointer; }
+        .btn-mini { background: var(--green); color: #fff; border: none; border-radius: 4px; padding: 6px 10px; font-family: 'danzeng'; cursor: pointer; }
         
-        .status-area { padding: 0 10px; margin-bottom: 4px; }
+        .status-area { padding: 0 10px; margin-bottom: 4px; flex-shrink: 0; }
         #msg { 
             font-size: 18px; font-weight: bold; color: var(--tibetan-red); 
             border: 2px solid var(--tibetan-red); border-top: 4px solid var(--tibetan-red);
@@ -47,20 +47,33 @@
             background: rgba(255, 255, 255, 0.7);
         }
 
-        .content-area { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 0 8px; overflow: hidden; }
+        .content-area { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 0 8px; overflow: hidden; padding-bottom: max(env(safe-area-inset-bottom), 2px); }
         .section-box { 
-            flex: 1; display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.6); 
-            border-radius: 8px; border: 1px solid var(--tibetan-red); border-top: 5px solid var(--tibetan-red); min-height: 0;
+            display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.6); 
+            border-radius: 8px; border: 1px solid var(--tibetan-red); border-top: 5px solid var(--tibetan-red);
         }
-        .grid-row { display: flex; flex: 1; border-bottom: 1px solid rgba(238,238,238,0.5); min-height: 0; }
+        /* 4:3 Ratio Implementation via Flex Grow */
+        #grid-morning { flex: 4; }
+        #grid-afternoon { flex: 3; }
+
+        .grid-row { display: flex; flex: 1; border-bottom: 1px solid var(--indigo); min-height: 0; }
+        .grid-row:last-child { border-bottom: none; }
         .grid-header { background: rgba(252, 252, 252, 0.6); flex: 0 0 32px; font-weight: bold; color: #008080; }
         
-        .cell { flex: 1; display: flex; align-items: center; justify-content: center; border-right: 1px solid rgba(238,238,238,0.5); font-size: 14px; position: relative; overflow: hidden; padding: 0 2px; }
+        .cell { flex: 1; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--indigo); font-size: 14px; position: relative; overflow: hidden; padding: 0 2px; }
+        .cell:last-child { border-right: none; }
         .cell-inner { display: inline-block; white-space: nowrap !important; word-break: keep-all !important; transform-origin: center center; flex-shrink: 0; font-weight: bold; }
         .num-col { flex: 0 0 12%; color: var(--blue); background: rgba(250, 250, 250, 0.6); font-weight: bold; }
-        .active-cell { background-color: var(--tibetan-red) !important; color: #fff !important; }
-        .active-cell .cell-inner { color: #fff !important; }
-        .col-today { background-color: rgba(255, 250, 250, 0.5); }
+        .col-today-header { background-color: rgba(255, 250, 250, 0.8); color: var(--tibetan-red); }
+        .active-cell { background-color: #ADD8E6 !important; color: #000 !important; }
+        .active-cell .cell-inner { color: #000 !important; }
+        
+        @media (orientation: landscape) {
+            .wrapper { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); max-width: 800px; margin: 0 auto; }
+        }
+        @media (orientation: portrait) {
+            .content-area { padding-bottom: 20px; }
+        }
         .diag-svg { position: absolute; width: 100%; height: 100%; top:0; left:0; pointer-events: none; }
 
         .art { color: var(--art-red); }
@@ -84,7 +97,9 @@
 </div>
 
 <script>
-    let audioCtx = null, isAudioMuted = false, currentReminderKey = "";
+    let audioCtx = null, currentReminderKey = "";
+    let isSpeaking = false, stopSpeech = false;
+
     const toM = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 
     const slots = [{s: "09:30", e: "10:10"}, {s: "10:25", e: "11:05"}, {s: "11:30", e: "12:10"}, {s: "12:25", e: "13:05"}, {s: "15:00", e: "15:40"}, {s: "15:55", e: "16:35"}, {s: "16:50", e: "17:30"}];
@@ -113,16 +128,168 @@
     }
     render('grid-morning', mData, 0); render('grid-afternoon', aData, 4);
 
-    function playBeep() {
-        if (!audioCtx || isAudioMuted) return;
-        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-        o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.5);
+    function getCuteVoice(u) {
+        u.lang = 'zh-CN';
+        const voices = window.speechSynthesis.getVoices();
+        
+        // 1. 用户指定使用 "月" (Yue) 的高音质声音
+        // 在语音列表中，名字可能包含 "Yue" (英文系统) 或 "月" (中文系统)
+        // 同时也尝试寻找 Enhanced (高音质) 版本
+        let targetVoice = voices.find(v => v.lang.includes('zh') && (v.name.includes('Yue') || v.name.includes('月')));
+        
+        // 如果有多个 "月"，优先选 Enhanced / Premium 版本
+        if (targetVoice) {
+            const bestYue = voices.find(v => v.lang.includes('zh') && (v.name.includes('Yue') || v.name.includes('月')) && (v.name.includes('Enhanced') || v.name.includes('Premium') || v.name.includes('High Quality')));
+            if (bestYue) targetVoice = bestYue;
+        }
+
+        // 如果找不到 "月"，回退到其他高质量中文语音
+        if (!targetVoice) targetVoice = voices.find(v => v.lang.includes('zh') && v.default);
+        if (!targetVoice) targetVoice = voices.find(v => v.lang.includes('zh'));
+
+        if (targetVoice) {
+            u.voice = targetVoice;
+            // 使用原声，不进行变调，保证高音质的最自然效果
+            u.pitch = 1.0; 
+            u.rate = 1.0; 
+        } else {
+            u.pitch = 1.0; 
+            u.rate = 1.0;
+        }
+        u.volume = 1;
+    }
+
+    function speakSequence(text, count, intervalMs) {
+        if (isSpeaking) window.speechSynthesis.cancel();
+        stopSpeech = false;
+        isSpeaking = true;
+        
+        const btn = document.getElementById('audioBtn');
+        btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // Keep text
+        btn.style.background = "var(--orange)"; // Yellow for playing
+
+        let remaining = count;
+        const speakOne = () => {
+            if (stopSpeech || remaining <= 0) {
+                isSpeaking = false;
+                btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // Audio Activated
+                btn.style.background = "var(--blue)"; // Blue for active
+                return;
+            }
+            
+            const u = new SpeechSynthesisUtterance(text);
+            getCuteVoice(u);
+            
+            u.onend = () => {
+                remaining--;
+                if (remaining > 0 && !stopSpeech) {
+                    setTimeout(speakOne, intervalMs);
+                } else {
+                    isSpeaking = false;
+                    btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།";
+                    btn.style.background = "var(--blue)"; // Blue for active
+                }
+            };
+            u.onerror = () => { isSpeaking = false; };
+            
+            window.speechSynthesis.speak(u);
+        };
+        speakOne();
+    }
+
+    let wakeLock = null;
+
+    // 1. 标准屏幕常亮 API (Screen Wake Lock)
+    // 这是 W3C 标准功能，专门用于保持屏幕开启，无需任何音频 hack
+    // 只要屏幕亮着，倒计时逻辑就会一直运行，不会掉链子
+    async function requestWakeLock() {
+        try {
+            if ('wakeLock' in navigator) {
+                wakeLock = await navigator.wakeLock.request('screen');
+                wakeLock.addEventListener('release', () => {
+                    console.log('Screen Wake Lock released');
+                });
+                console.log('Screen Wake Lock active');
+            }
+        } catch (err) {
+            console.error(`${err.name}, ${err.message}`);
+        }
     }
 
     function activateAudio() {
-        if (currentReminderKey !== "" && !isAudioMuted) { isAudioMuted = true; document.getElementById('audioBtn').style.background = "var(--green)"; return; }
-        try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); playBeep(); document.getElementById('audioBtn').innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; } catch(e){}
+        const btn = document.getElementById('audioBtn');
+        if (isSpeaking) {
+            stopSpeech = true;
+            window.speechSynthesis.cancel();
+            isSpeaking = false;
+            btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // Audio Activated
+            btn.style.background = "var(--green)"; // Reset to Green (Idle)
+            return;
+        }
+        
+        // If already blue (active), do nothing or re-activate? 
+        // User logic implies Green -> Blue. If playing (Yellow) -> Green.
+        // Let's assume Green -> Activate -> Blue.
+
+        // 仅请求保持屏幕常亮
+        requestWakeLock();
+
+        const successText = "老师，提醒声音激活成功";
+        const failText = "老师，提醒声音激活失败了";
+
+        try {
+            if (!window.speechSynthesis) throw new Error("TTS not supported");
+
+            // 确保语音列表已加载（部分浏览器需要等待 onvoiceschanged）
+            if (window.speechSynthesis.getVoices().length === 0) {
+                window.speechSynthesis.onvoiceschanged = () => activateAudio();
+                return;
+            }
+
+            const u = new SpeechSynthesisUtterance(successText);
+            getCuteVoice(u);
+            
+            u.onend = () => {
+                // Success State
+                btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།";
+                btn.style.background = "var(--blue)";
+            };
+
+            u.onerror = (e) => {
+                console.error("TTS Error:", e);
+                // Try to speak failure message if possible
+                const uFail = new SpeechSynthesisUtterance(failText);
+                getCuteVoice(uFail);
+                window.speechSynthesis.speak(uFail);
+                
+                // Fail State
+                btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་མ་ཐུབ།";
+                btn.style.background = "var(--art-red)";
+            };
+
+            window.speechSynthesis.speak(u);
+
+        } catch (e) {
+            console.error(e);
+            alert("您的设备不支持语音播报功能");
+            btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་མ་ཐུབ།";
+            btn.style.background = "var(--art-red)";
+        }
     }
+    
+    // 页面可见性改变时重新申请 Wake Lock，确保切回来时继续常亮
+    document.addEventListener('visibilitychange', async () => {
+        if (wakeLock !== null && document.visibilityState === 'visible') {
+            await requestWakeLock();
+        }
+    });
+    
+    // 页面可见性改变时重新申请 Wake Lock
+    document.addEventListener('visibilitychange', async () => {
+        if (wakeLock !== null && document.visibilityState === 'visible') {
+            await requestWakeLock();
+        }
+    });
 
     function doAutoScale() {
         document.querySelectorAll('.cell').forEach(cell => {
@@ -140,8 +307,17 @@
     function refresh() {
         const now = new Date(), currentM = now.getHours() * 60 + now.getMinutes(), day = now.getDay() || 7;
         document.getElementById('real-time').innerText = now.toTimeString().slice(0, 8);
-        document.querySelectorAll('.cell').forEach(c => c.classList.remove('active-cell', 'col-today'));
-        document.querySelectorAll(`[id$="-${day}"]`).forEach(c => c.classList.add('col-today'));
+        
+        // Reset highlights
+        document.querySelectorAll('.cell').forEach(c => c.classList.remove('active-cell'));
+        document.querySelectorAll('.col-today-header').forEach(c => c.classList.remove('col-today-header'));
+        
+        // Highlight Today Header
+        const dayIdx = day; // 1-7
+        document.querySelectorAll('.grid-header').forEach(headerRow => {
+            const cells = headerRow.querySelectorAll('.cell');
+            if (cells[dayIdx]) cells[dayIdx].classList.add('col-today-header');
+        });
         
         let currentLessonIdx = -1;
         slots.forEach((s, i) => {
@@ -151,19 +327,21 @@
                 document.getElementById(`c-${i}-${day}`)?.classList.add('active-cell');
             }
             if (day < 6) {
-                [40, 5].forEach(off => {
-                    if (currentM === (startM - off) && currentReminderKey !== `r-${i}-${off}`) {
-                        currentReminderKey = `r-${i}-${off}`; isAudioMuted = false;
-                        document.getElementById('audioBtn').style.background = "var(--orange)";
-                        if (now.getSeconds() % 2 === 0) playBeep();
-                    }
-                });
+                // 40 min reminder
+                if (currentM === (startM - 40) && currentReminderKey !== `r-${i}-40`) {
+                    currentReminderKey = `r-${i}-40`;
+                    speakSequence("康老师，离开课只有40分钟，请您准备前往学校，路上注意安全。", 20, 5000);
+                }
+                // 5 min reminder
+                if (currentM === (startM - 5) && currentReminderKey !== `r-${i}-5`) {
+                    currentReminderKey = `r-${i}-5`;
+                    speakSequence("康老师，离开课只有5分钟了，请您准备好进教室了，学生们都在等着您呢。", 5, 5000);
+                }
             }
         });
         
         doAutoScale();
 
-        // 状态栏提示逻辑补回
         const msgEl = document.getElementById('msg');
         const myKeys = ["རི་མོ།", "གླུ་གཞས།", "ཡིགཟུགས།"];
         const fullData = [...mData, ...aData];

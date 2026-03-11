@@ -1,9 +1,9 @@
-const CACHE_NAME = 'kbc-v8.0'; // 提升版本号以强制手机拉取最新的 index.html
+const CACHE_NAME = 'kbc-v9.8'; // Update version
 const ASSETS = [
   './',
   './index.html',
   './apple-touch-icon.png',
-  './TibetWildYak.ttf'
+  './danzeng.ttf'
 ];
 
 self.addEventListener('install', (event) => {
