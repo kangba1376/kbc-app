@@ -47,7 +47,7 @@
             background: rgba(255, 255, 255, 0.7);
         }
 
-        .content-area { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 0 8px; overflow: hidden; padding-bottom: max(env(safe-area-inset-bottom), 2px); }
+        .content-area { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 0 8px; overflow: hidden; padding-bottom: 0; }
         .section-box { 
             display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.6); 
             border-radius: 8px; border: 1px solid var(--tibetan-red); border-top: 5px solid var(--tibetan-red);
@@ -200,15 +200,11 @@
     let wakeLock = null;
 
     // 1. 标准屏幕常亮 API (Screen Wake Lock)
-    // 这是 W3C 标准功能，专门用于保持屏幕开启，无需任何音频 hack
     // 只要屏幕亮着，倒计时逻辑就会一直运行，不会掉链子
     async function requestWakeLock() {
         try {
             if ('wakeLock' in navigator) {
                 wakeLock = await navigator.wakeLock.request('screen');
-                wakeLock.addEventListener('release', () => {
-                    console.log('Screen Wake Lock released');
-                });
                 console.log('Screen Wake Lock active');
             }
         } catch (err) {
@@ -216,23 +212,43 @@
         }
     }
 
+    // 2. 隐藏的音频播放器 - 强制后台保活的关键
+    // 播放一段极短的静音，欺骗 iOS 认为我们在播放音乐，从而允许后台运行 JS
+    let silentAudio = null;
+    
+    function initSilentAudio() {
+        if (!silentAudio) {
+            silentAudio = new Audio();
+            // 使用一个极短的静音 Base64
+            silentAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACAgQAZGF0YQAAAAA=';
+            silentAudio.loop = true;
+            silentAudio.volume = 0.01; // 极低音量，人耳听不见但系统认为在播放
+            
+            // 关键：在用户交互（点击按钮）时必须触发 play()
+            silentAudio.play().then(() => {
+                console.log('Silent audio playing - Background mode active');
+            }).catch(e => console.error("Silent audio failed:", e));
+        }
+    }
+
     function activateAudio() {
         const btn = document.getElementById('audioBtn');
         if (isSpeaking) {
+            // ... (停止逻辑保持不变)
             stopSpeech = true;
             window.speechSynthesis.cancel();
             isSpeaking = false;
             btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // Audio Activated
             btn.style.background = "var(--green)"; // Reset to Green (Idle)
+            // 注意：不要暂停 silentAudio，继续保持后台活性
             return;
         }
         
-        // If already blue (active), do nothing or re-activate? 
-        // User logic implies Green -> Blue. If playing (Yellow) -> Green.
-        // Let's assume Green -> Activate -> Blue.
-
-        // 仅请求保持屏幕常亮
+        // 启动屏幕常亮
         requestWakeLock();
+        
+        // 启动静音音频保活 (这是新加的黑科技)
+        initSilentAudio();
 
         const successText = "老师，提醒声音激活成功";
         const failText = "老师，提醒声音激活失败了";
