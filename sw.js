@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kbc-v10.2'; // Update version
+const CACHE_NAME = 'kbc-v10.3'; // Update version
 const ASSETS = [
   './',
   './index.html',

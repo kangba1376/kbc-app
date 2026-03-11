@@ -181,14 +181,38 @@
         a.loop = false;
     });
 
+    // 关键：在 iOS 上，Audio 对象必须在用户交互（点击）的瞬间被“激活”一次，否则后续无法播放。
+    // 我们修改 playAudio 函数，使其更稳健。
+    
     function playAudio(key, onEnd) {
         const audio = audioFiles[key];
-        if (audio) {
-            audio.currentTime = 0;
-            audio.play().catch(e => console.error("Audio play failed:", e));
-            if (onEnd) {
-                audio.onended = onEnd;
-            }
+        if (!audio) {
+            console.error("Audio key not found:", key);
+            return;
+        }
+
+        // iOS Safari 限制：必须在用户交互中调用 play()
+        // 这里的 playAudio 是在 activateAudio() -> onclick 触发的，所以理论上是有效的。
+        
+        audio.currentTime = 0;
+        const playPromise = audio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                if (onEnd) {
+                    // 使用 once 确保只执行一次
+                    audio.addEventListener('ended', onEnd, { once: true });
+                }
+            }).catch(error => {
+                console.error("Playback failed:", error);
+                // 可能是因为没有用户交互，或者文件不存在
+                // 尝试用 alert 提示，方便调试
+                if (error.name === 'NotAllowedError') {
+                    alert("请点击屏幕以允许播放声音");
+                } else {
+                    // alert("音频播放错误: " + error.message); 
+                }
+            });
         }
     }
 
@@ -246,10 +270,25 @@
         requestWakeLock();
         initSilentAudio();
 
-        // Play success audio
-        playAudio('success');
-        btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // Activated
-        btn.style.background = "var(--blue)";
+        // 关键：在用户点击的这个瞬间，把所有音频都“预热”一下（播放0秒然后暂停）
+        // 这样 iOS 就认为这4个文件都获得了播放权限，后续自动播放才不会被拦截
+        Object.values(audioFiles).forEach(a => {
+            a.volume = 0; // 静音预热
+            a.play().then(() => {
+                a.pause();
+                a.currentTime = 0;
+                a.volume = 1; // 恢复音量
+            }).catch(e => console.error("Warmup failed", e));
+        });
+
+        // Play success audio (真正要播的)
+        // 延迟一点点，确保预热完成
+        setTimeout(() => {
+             playAudio('success', () => {
+                 btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // Activated
+                 btn.style.background = "var(--blue)";
+             });
+        }, 100);
     }
     
     // Update logic to use speakSequence with audioKey instead of text
