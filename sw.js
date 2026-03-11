@@ -1,9 +1,13 @@
-const CACHE_NAME = 'kbc-v10.1'; // Update version
+const CACHE_NAME = 'kbc-v10.2'; // Update version
 const ASSETS = [
   './',
   './index.html',
   './apple-touch-icon.png',
-  './danzeng.ttf'
+  './danzeng.ttf',
+  './success.m4a',
+  './fail.m4a',
+  './reminder40.m4a',
+  './reminder5.m4a'
 ];
 
 self.addEventListener('install', (event) => {
