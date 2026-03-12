@@ -61,6 +61,27 @@
             white-space: nowrap;
             /* 放在左边 */
             z-index: 2;
+            /* 限制最大宽度，防止挡住中间 */
+            max-width: 30vw; /* 屏幕宽度的 30% */
+            overflow: hidden; /* 超出隐藏 */
+            text-overflow: ellipsis; /* 显示省略号? 不，用户要缩小文字 */
+            /* 既然用户要自动缩小文字，我们不能用 ellipsis */
+            /* 但 CSS 很难自动缩小文字以适应宽度。通常用 transform scale */
+            /* 或者，我们让中间的标题层级更高？不，那样会盖住按钮 */
+            
+            /* 方案：Flex 布局已经让它在左边了。 */
+            /* 我们可以用 SVG 或者 JS 来缩放。但 CSS 也可以尝试容器查询？太复杂。 */
+            /* 简单方案：给一个 max-width，并且用 transform scale 缩小 */
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+        }
+        
+        /* 增加一个内部 span 用来缩放 */
+        .btn-text {
+            display: inline-block;
+            transform-origin: left center;
+            white-space: nowrap;
         }
         .title {
             font-size: 1.5rem;
@@ -206,7 +227,9 @@
 <div id="app">
     <!-- Top Bar -->
     <div class="top-bar">
-        <button id="audioBtn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button>
+        <button id="audioBtn" onclick="activateAudio()">
+            <span class="btn-text">སྒྲ་གཏོང་ལམ་བཟོ་བ།</span>
+        </button>
         <div class="title">༢༠༢༦-ཁམས་པ་ཚང་།</div>
         <div id="real-time" style="color:var(--blue); font-weight:bold;"></div>
     </div>
@@ -286,15 +309,19 @@
         isSpeaking = true;
         
         const btn = document.getElementById('audioBtn');
-        btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // Keep text
+        const span = btn.querySelector('.btn-text');
+        
+        span.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // Keep text
         btn.style.background = "var(--orange)"; // Yellow for playing
+        fitButtonText();
 
         let remaining = count;
         const speakOne = () => {
             if (stopSpeech || remaining <= 0) {
                 isSpeaking = false;
-                btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // Audio Activated
+                span.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // Audio Activated
                 btn.style.background = "var(--blue)"; // Blue for active
+                fitButtonText();
                 return;
             }
             
@@ -307,14 +334,16 @@
                     setTimeout(speakOne, intervalMs);
                 } else {
                     isSpeaking = false;
-                    btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།";
+                    span.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།";
                     btn.style.background = "var(--blue)"; // Blue for active
+                    fitButtonText();
                 }
             };
             u.onerror = () => { 
                 isSpeaking = false; 
-                btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།";
+                span.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།";
                 btn.style.background = "var(--blue)";
+                fitButtonText();
             };
             
             window.speechSynthesis.speak(u);
@@ -345,14 +374,36 @@
         }
     }
 
+    function fitButtonText() {
+        const btn = document.getElementById('audioBtn');
+        const span = btn.querySelector('.btn-text');
+        if (!btn || !span) return;
+        
+        // Reset
+        span.style.transform = 'none';
+        
+        // Max width available for button (e.g., 30% of screen)
+        const maxW = window.innerWidth * 0.30; 
+        // Actual width of text
+        const textW = span.scrollWidth;
+        
+        if (textW > maxW) {
+            const scale = maxW / textW;
+            span.style.transform = `scale(${scale})`;
+        }
+    }
+
     function activateAudio() {
         const btn = document.getElementById('audioBtn');
+        const span = btn.querySelector('.btn-text');
+        
         if (isSpeaking) {
             stopSpeech = true;
             window.speechSynthesis.cancel();
             isSpeaking = false;
-            btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; 
+            span.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; 
             btn.style.background = "var(--green)"; 
+            fitButtonText();
             return;
         }
         
@@ -371,23 +422,26 @@
             getCuteVoice(u);
             
             u.onend = () => {
-                btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།";
+                span.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།";
                 btn.style.background = "var(--blue)";
+                fitButtonText();
             };
 
             u.onerror = () => {
                 const uFail = new SpeechSynthesisUtterance("老师，提醒声音激活失败了");
                 getCuteVoice(uFail);
                 window.speechSynthesis.speak(uFail);
-                btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་མ་ཐུབ།";
+                span.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་མ་ཐུབ།";
                 btn.style.background = "var(--art-red)";
+                fitButtonText();
             };
 
             window.speechSynthesis.speak(u);
 
         } catch (e) {
-            btn.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་མ་ཐུབ།";
+            span.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་མ་ཐུབ།";
             btn.style.background = "var(--art-red)";
+            fitButtonText();
         }
     }
     
