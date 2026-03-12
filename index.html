@@ -77,11 +77,36 @@
             justify-content: center;
         }
         
-        /* 增加一个内部 span 用来缩放 */
+        /* 增加一个内部 span 用来缩放或滚动 */
         .btn-text {
             display: inline-block;
-            transform-origin: left center;
             white-space: nowrap;
+            /* 初始状态：无动画 */
+        }
+        
+        /* 跑马灯动画 */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(0); } /* 停顿一下 */
+            100% { transform: translateX(-100%); } /* 滚出去 */
+        }
+        
+        .scrolling {
+            /* 只有当开启滚动时才应用动画 */
+            /* 但是 translateX(-100%) 会完全滚出视野。我们需要它滚到末尾停下？还是循环？ */
+            /* 真正的跑马灯：文字在容器内滚动。容器 overflow: hidden */
+            /* 这里的 button 就是容器 */
+            /* 让文字稍微往左滚一点，直到显示完末尾? */
+            /* 既然是循环播放，就一直滚 */
+            /* 为了平滑连接，通常需要复制一份文字。但这里简化处理：往复滚动 */
+            animation: scroll-left-right linear infinite alternate;
+        }
+        
+        @keyframes scroll-left-right {
+            0% { transform: translateX(0); }
+            15% { transform: translateX(0); }
+            85% { transform: translateX(calc(25vw - 100% - 16px)); } /* 25vw是容器宽，100%是文字宽，16px是padding */
+            100% { transform: translateX(calc(25vw - 100% - 16px)); }
         }
         .title {
             font-size: 1.5rem;
@@ -381,15 +406,26 @@
         
         // Reset
         span.style.transform = 'none';
+        span.classList.remove('scrolling'); // Stop scrolling to measure
         
         // Max width available for button (e.g., 25% of screen)
         const maxW = window.innerWidth * 0.25; 
         // Actual width of text
         const textW = span.scrollWidth;
         
+        // 如果文字太长，开启滚动
         if (textW > maxW) {
-            const scale = maxW / textW;
-            span.style.transform = `scale(${scale})`;
+            // 文字比按钮宽，开启跑马灯
+            // 计算滚动距离：textW - maxW + padding?
+            // CSS 动画需要知道具体宽度吗？不需要，translate 百分比即可。
+            // 但是为了平滑，我们需要一个容器来裁剪。
+            span.classList.add('scrolling');
+            // 设置动画时长，字越多滚得越久，保持速度一致
+            // 假设速度 50px/s
+            const duration = textW / 30; // 30px/s
+            span.style.animationDuration = `${Math.max(duration, 3)}s`; // 至少3秒
+        } else {
+            span.classList.remove('scrolling');
         }
     }
 

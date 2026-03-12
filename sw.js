@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kbc-v10.9'; // Header Layout fix
+const CACHE_NAME = 'kbc-v11.01'; // Marquee text fix
 const ASSETS = [
   './',
   './index.html',
