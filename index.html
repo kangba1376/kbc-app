@@ -14,56 +14,155 @@
     <title>སློབ་ཚན་རེའུ་མིག</title>
     <style>
         @font-face { font-family: 'danzeng'; src: url('danzeng.ttf') format('truetype'); }
-        :root { 
-            --bg: #f8f9fa; --blue: #007aff; --green: #27ae60; --orange: #e67e22; 
-            --white: #ffffff; --tibetan-red: #B22222; --indigo: #004080;
-            --art-red: #FF0000; --music-blue: #0000FF; --calligraphy-navy: #000080; --other-gray: #A9A9A9;
+        /* Base Reset */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --bg: #f8f9fa;
+            --deep-blue: #004080;
+            --tibetan-red: #B22222;
+            --blue: #007bff;
+            --green: #28a745;
+            --orange: #e67e22;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { 
-            height: 100svh; width: 100vw; background: var(--bg); 
-            font-family: 'danzeng', -apple-system, sans-serif;
-            overflow: hidden; position: fixed;
+        html, body {
+            width: 100%; height: 100%; overflow: hidden;
+            font-family: 'danzeng', sans-serif;
+            background: var(--bg);
+            user-select: none;
+            -webkit-user-select: none;
         }
-        .wrapper {
-            position: absolute; top: 0; left: 0; bottom: 0; right: 0;
-            display: flex; flex-direction: column;
-            padding-top: env(safe-area-inset-top);
-            background: linear-gradient(rgba(248,249,250,0.92), rgba(248,249,250,0.92)), url('apple-touch-icon.png') no-repeat center center;
-            background-size: 140px auto; 
-        }
-        .nav-bar { position: relative; height: 44px; display: flex; align-items: center; padding: 0 10px; flex-shrink: 0; }
-        .nav-left { position: absolute; left: 10px; z-index: 10; }
-        .nav-right { position: absolute; right: 10px; z-index: 10; }
-        .t-name { width: 100%; text-align: center; font-size: 20px; font-weight: bold; color: var(--indigo); }
-        .time-display { font-size: 13px; color: var(--blue); font-weight: bold; }
-        .btn-mini { background: var(--green); color: #fff; border: none; border-radius: 4px; padding: 6px 10px; font-family: 'danzeng'; cursor: pointer; }
-        
-        .status-area { padding: 0 10px; margin-bottom: 4px; flex-shrink: 0; }
-        #msg { 
-            font-size: 18px; font-weight: bold; color: var(--tibetan-red); 
-            border: 2px solid var(--tibetan-red); border-top: 4px solid var(--tibetan-red);
-            border-radius: 8px; padding: 8px; text-align: center; min-height: 44px;
-            background: rgba(255, 255, 255, 0.7);
+        #app {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
-        .content-area { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 0 8px; overflow: hidden; padding-bottom: 0; }
-        .section-box { 
-            display: flex; flex-direction: column; background: rgba(255, 255, 255, 0.6); 
-            border-radius: 8px; border: 1px solid var(--tibetan-red); border-top: 5px solid var(--tibetan-red);
+        /* Top Bar */
+        .top-bar {
+            flex: 0 0 44px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+            background: transparent;
         }
+        .top-bar button {
+            font-family: 'danzeng';
+            font-size: 1.2rem;
+            padding: 4px 8px;
+            background: var(--green);
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        .title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--deep-blue);
+        }
+
+        /* Status Bar */
+.status-bar {
+    flex: 0 0 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: var(--tibetan-red);
+    background: rgba(255,255,255,0.7);
+    margin: 0 10px 5px 10px;
+    /* 外边框：藏红色，默认 2px */
+    border: 2px solid var(--tibetan-red);
+    /* 顶部边框：特粗 7px (5px + 2px) */
+    border-top: 7px solid var(--tibetan-red);
+    border-radius: 8px;
+}
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0 10px 10px 10px;
+            gap: 5px;
+            overflow: hidden;
+        }
+
+        .grid-container {
+    width: 100%;
+    /* 外边框：藏红色，默认 2px */
+    border: 2px solid var(--tibetan-red);
+    /* 顶部边框：特粗 7px (5px + 2px) */
+    border-top: 7px solid var(--tibetan-red);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.8);
+    display: flex;
+    flex-direction: column;
+}
         /* 4:3 Ratio Implementation via Flex Grow */
         #grid-morning { flex: 4; }
         #grid-afternoon { flex: 3; }
 
-        .grid-row { display: flex; flex: 1; border-bottom: 1px solid var(--indigo); min-height: 0; }
-        .grid-row:last-child { border-bottom: none; }
-        .grid-header { background: rgba(252, 252, 252, 0.6); flex: 0 0 32px; font-weight: bold; color: #008080; }
-        
-        .cell { flex: 1; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--indigo); font-size: 14px; position: relative; overflow: hidden; padding: 0 2px; }
-        .cell:last-child { border-right: none; }
-        .cell-inner { display: inline-block; white-space: nowrap !important; word-break: keep-all !important; transform-origin: center center; flex-shrink: 0; font-weight: bold; }
-        .num-col { flex: 0 0 12%; color: var(--blue); background: rgba(250, 250, 250, 0.6); font-weight: bold; }
+        /* Grid */
+        .grid-header, .grid-row {
+            display: flex;
+            width: 100%;
+        }
+        .grid-header { 
+            flex: 0 0 32px; 
+            background: rgba(255,255,255,0.6); 
+            font-size: 1.4rem; 
+            font-weight: bold; color: #008080;
+            /* Header Bottom Border: Deep Blue */
+            border-bottom: 1px solid var(--deep-blue);
+        }
+        .grid-row { 
+            flex: 1; 
+            min-height: 0;
+            /* Row Bottom Border (except last): Deep Blue */
+            border-bottom: 1px solid var(--deep-blue); 
+        }
+        .grid-row:last-child {
+            border-bottom: none;
+        }
+
+        .cell {
+            flex: 1; 
+            /* Cell Right Border: Deep Blue */
+            border-right: 1px solid var(--deep-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 1.6rem; 
+            padding: 2px;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+        .cell:last-child {
+            border-right: none;
+        }
+        /* Cell Content */
+        .cell-inner {
+            display: inline-block;
+            white-space: nowrap;
+            transform-origin: center; /* Scale from center */
+            /* Ensure no wrapping */
+        }
+        .num-col {
+            flex: 0 0 45px; 
+            background: #f8f9fa;
+            color: var(--blue);
+            font-weight: bold;
+            font-size: 1.4rem;
+            /* Num Col Right Border: Deep Blue */
+            border-right: 2px solid var(--deep-blue); /* Thicker separator */
+        }
         .col-today-header { background-color: rgba(255, 250, 250, 0.8); color: var(--tibetan-red); }
         .active-cell { background-color: #ADD8E6 !important; color: #000 !important; }
         .active-cell .cell-inner { color: #000 !important; }
@@ -76,23 +175,28 @@
         }
         .diag-svg { position: absolute; width: 100%; height: 100%; top:0; left:0; pointer-events: none; }
 
-        .art { color: var(--art-red); }
-        .music { color: var(--music-blue); }
-        .calligraphy { color: var(--calligraphy-navy); }
-        .other { color: var(--other-gray); }
+        .c-red { color: #f00 !important; font-weight: bold; }
+        .c-blue { color: #00f !important; font-weight: bold; }
+        .c-navy { color: #000080 !important; font-weight: bold; }
+        .c-gray { color: #808080 !important; font-weight: bold; }
     </style>
 </head>
 <body>
-<div class="wrapper">
-    <div class="nav-bar">
-        <div class="nav-left"><button class="btn-mini" id="audioBtn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button></div>
-        <div class="t-name">༢༠༢༦-ཁམས་པ་ཚང་།</div>
-        <div class="nav-right"><div class="time-display" id="real-time">--:--:--</div></div>
+<div id="app">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <button id="audioBtn" onclick="activateAudio()">སྒྲ་གཏོང་ལམ་བཟོ་བ།</button>
+        <div class="title">༢༠༢༦-ཁམས་པ་ཚང་།</div>
+        <div id="real-time" style="color:var(--blue); font-weight:bold;"></div>
     </div>
-    <div class="status-area"><div id="msg">...</div></div>
+
+    <!-- Status Bar -->
+    <div class="status-bar" id="status-text">...</div>
+
+    <!-- Content Area -->
     <div class="content-area">
-        <div class="section-box" id="grid-morning"></div>
-        <div class="section-box" id="grid-afternoon"></div>
+        <div id="grid-morning" class="grid-container"></div>
+        <div id="grid-afternoon" class="grid-container"></div>
     </div>
 </div>
 
@@ -104,27 +208,38 @@
     const toM = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 
     const slots = [{s: "09:30", e: "10:10"}, {s: "10:25", e: "11:05"}, {s: "11:30", e: "12:10"}, {s: "12:25", e: "13:05"}, {s: "15:00", e: "15:40"}, {s: "15:55", e: "16:35"}, {s: "16:50", e: "17:30"}];
-    const mData = [["༡","","","","","","",""],["༢","","","","","","",""],["༣","རི་མོ།༢","","","རི་མོ།༢","","",""],["༤","ངལ་རྩོལ།","","","","ཡིགཟུགས།","",""]];
-    const aData = [["༡","","རི་མོ།༢","","","","",""],["༢","","","གླུ་གཞས།","","སློབ་གསོ།","",""],["༣","","རི་མོ།༡","","","","",""]];
+    // Data
+    // 0:Num, 1:Mon, 2:Tue, 3:Wed, 4:Thu, 5:Fri (Removed Sat/Sun)
+    const mData = [
+        ["༡","","","","",""],
+        ["༢","","","","",""],
+        ["༣","རི་མོ།༢","","","རི་མོ།༢",""],
+        ["༤","ངལ་རྩོལ།","","","","ཡིགཟུགས།"]
+    ];
+    const aData = [
+        ["༡","","རི་མོ།༢","","",""],
+        ["༢","","","གླུ་གཞས།","","སློབ་གསོ།"],
+        ["༣","","རི་མོ།༡","","",""]
+    ];
 
     function getLessonClass(name) {
         if (!name) return "";
-        if (name.includes("རི་མོ།")) return "art";
-        if (name.includes("གླུ་གཞས།")) return "music";
-        if (name.includes("ཡིགཟུགས།")) return "calligraphy";
-        return "other";
+        if (name.includes("རི་མོ།")) return "c-red";
+        if (name.includes("གླུ་གཞས།")) return "c-blue";
+        if (name.includes("ཡིགཟུགས།")) return "c-navy";
+        return "c-gray";
     }
+
+    const days = ["ཟླ་བ།","མིག་དམར།","ལྷག་པ།","ཕུར་བུ།","པ་སངས་།"];
 
     function render(id, data, startIdx) {
         const el = document.getElementById(id);
         let h = `<div class="grid-row grid-header"><div class="cell num-col" style="position:relative"><svg class="diag-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1.5"/></svg></div>`;
-        ["ཟླ་བ།","མིག་དམར།","ལྷག་པ།","ཕུར་བུ།","པ་སངས་།","སྤེན་པ།","ཉི་མ།"].forEach(d => h += `<div class="cell"><span class="cell-inner">${d}</span></div>`);
+        days.forEach(d => h += `<div class="cell"><span class="cell-inner">${d}</span></div>`);
         el.innerHTML = h + `</div>` + data.map((r, i) => 
             `<div class="grid-row"><div class="cell num-col"><span class="cell-inner">${r[0]}</span></div>` + 
-            r.slice(1).map((c, j) => {
-                const cls = c ? getLessonClass(c) : "";
-                return `<div class="cell" id="c-${startIdx+i}-${j+1}"><span class="cell-inner ${cls}">${c}</span></div>`;
-            }).join('') + `</div>`
+            r.slice(1).map((c, j) => `<div class="cell ${getLessonClass(c)}" id="c-${startIdx + i}-${j + 1}"><span class="cell-inner">${c}</span></div>`).join('') + 
+            `</div>`
         ).join('');
     }
     render('grid-morning', mData, 0); render('grid-afternoon', aData, 4);
@@ -133,11 +248,13 @@
         u.lang = 'zh-CN';
         const voices = window.speechSynthesis.getVoices();
         let targetVoice = null;
+        // 强制优先寻找 "Yue" (Premium/Enhanced)
         targetVoice = voices.find(v => v.lang.includes('zh') && (v.name.includes('Yue') || v.name.includes('月')));
+        
+        // 如果没有 Yue，才考虑其他的
         if (!targetVoice) targetVoice = voices.find(v => v.lang.includes('zh') && v.default);
-        if (!targetVoice) targetVoice = voices.find(v => v.lang.includes('zh') && v.name.includes('Siri'));
-        if (!targetVoice) targetVoice = voices.find(v => v.lang.includes('zh') && (v.name.includes('Ting-Ting') || v.name.includes('婷婷')));
         if (!targetVoice) targetVoice = voices.find(v => v.lang.includes('zh'));
+        
         if (targetVoice) { u.voice = targetVoice; u.pitch = 1.0; u.rate = 1.0; }
         u.volume = 1;
     }
@@ -273,65 +390,132 @@
     });
 
     function doAutoScale() {
-        document.querySelectorAll('.cell').forEach(cell => {
-            const inner = cell.querySelector('.cell-inner');
-            if (!inner || inner.innerText.trim() === "") return;
-            inner.style.transform = 'scale(1)'; 
-            const containerWidth = cell.clientWidth - 4; 
-            const contentWidth = inner.offsetWidth; 
-            if (contentWidth > containerWidth && containerWidth > 0) {
-                inner.style.transform = `scale(${containerWidth / contentWidth})`;
-            }
-        });
+        const container = document.querySelector('.content-area');
+        const totalH = container.clientHeight;
+        const availableH = totalH - 4; // gap
+        
+        // 4:3 Ratio
+        const morningH = (availableH * 4) / 7;
+        const afternoonH = (availableH * 3) / 7;
+        
+        document.getElementById('grid-morning').style.height = `${morningH}px`;
+        document.getElementById('grid-afternoon').style.height = `${afternoonH}px`;
+        
+        // Auto Scale Font & Content Fit
+    // Header (1) + Morning Rows (4) = 5
+    const cellH = morningH / 5;
+    // Increase font size base.
+    const baseSize = Math.min(window.innerWidth / 16, cellH * 0.5); 
+    document.body.style.fontSize = `${baseSize}px`;
+    
+    // Force fit text into cells (No truncation)
+    // We iterate over all cells, check if content overflows width, and scale down if needed.
+    document.querySelectorAll('.cell-inner').forEach(span => {
+        // Reset transform first
+        span.style.transform = 'none';
+        span.style.display = 'inline-block';
+        
+        const parent = span.parentElement;
+        const parentW = parent.clientWidth - 4; // Padding 2px * 2
+        const spanW = span.scrollWidth;
+        
+        if (spanW > parentW && parentW > 0) {
+            const scale = parentW / spanW;
+            // Use transform to shrink, but keep it centered
+            span.style.transform = `scale(${scale})`;
+            // Transform origin left or center? Center is better for aesthetics.
+            // But we need to make sure it doesn't overflow.
+            // Actually, if we scale down, the width stays same in layout flow, so we might need width: 100%?
+            // Better: layout logic.
+        }
+    });
     }
 
     function refresh() {
         const now = new Date(), currentM = now.getHours() * 60 + now.getMinutes(), day = now.getDay() || 7;
         document.getElementById('real-time').innerText = now.toTimeString().slice(0, 8);
         
-        // Reset highlights
-        document.querySelectorAll('.cell').forEach(c => c.classList.remove('active-cell'));
-        document.querySelectorAll('.col-today-header').forEach(c => c.classList.remove('col-today-header'));
-        
-        // Highlight Today Header
-        const dayIdx = day; // 1-7
-        document.querySelectorAll('.grid-header').forEach(headerRow => {
-            const cells = headerRow.querySelectorAll('.cell');
-            if (cells[dayIdx]) cells[dayIdx].classList.add('col-today-header');
+        // 1. Reset highlights
+        document.querySelectorAll('.cell').forEach(c => {
+            c.style.background = 'transparent';
+            c.style.color = ''; 
         });
         
+        // 2. Highlight Today Header (If Mon-Fri)
+        if (day >= 1 && day <= 5) {
+             const dayIdx = day; 
+             document.querySelectorAll('.grid-header').forEach(header => {
+                 const cells = header.querySelectorAll('.cell');
+                 if (cells[dayIdx]) {
+                     cells[dayIdx].style.background = 'rgba(255, 235, 235, 0.9)';
+                     cells[dayIdx].style.color = 'var(--tibetan-red)';
+                 }
+             });
+        }
+
+        // 3. Find MY lessons for today
+        const myKeys = ["རི་མོ།", "གླུ་གཞས།", "ཡིགཟུགས།"];
+        let myLessonIndices = [];
+        
+        const fullData = [...mData, ...aData];
+        fullData.forEach((row, idx) => {
+            if (myKeys.some(k => row[day] && row[day].includes(k))) {
+                myLessonIndices.push(idx);
+            }
+        });
+
+        // 4. Main Loop: Check slots for current status and reminders
         let currentLessonIdx = -1;
+        
         slots.forEach((s, i) => {
             const startM = toM(s.s), endM = toM(s.e);
+            
+            // A. Check Current Lesson Status
             if (currentM >= startM && currentM < endM) {
                 currentLessonIdx = i;
-                document.getElementById(`c-${i}-${day}`)?.classList.add('active-cell');
-            }
-            if (day < 6) {
-                // 40 min reminder
-                if (currentM === (startM - 40) && currentReminderKey !== `r-${i}-40`) {
-                    currentReminderKey = `r-${i}-40`;
-                    speakSequence("康老师，离开课只有40分钟，请您准备前往学校，路上注意安全。", 16, 5000);
+                // Highlight active cell (only Mon-Fri)
+                if (day >= 1 && day <= 5) {
+                    const cellId = `c-${i}-${day}`;
+                    const cell = document.getElementById(cellId);
+                    if (cell) {
+                        cell.style.background = '#ADD8E6'; 
+                    }
                 }
-                // 5 min reminder
-                if (currentM === (startM - 5) && currentReminderKey !== `r-${i}-5`) {
-                    currentReminderKey = `r-${i}-5`;
-                    speakSequence("康老师，离开课只有5分钟了，请您准备好进教室了，学生们都在等着您呢。", 5, 5000);
+            }
+            
+            // B. Check Reminders (Only Mon-Fri)
+            if (day >= 1 && day <= 5) {
+                // Only for MY lessons
+                if (myLessonIndices.includes(i)) {
+                    // 40 min reminder
+                    if (currentM === (startM - 40) && currentReminderKey !== `r-${day}-${i}-40`) {
+                        currentReminderKey = `r-${day}-${i}-40`;
+                        speakSequence("康老师，离开课只有40分钟，请您准备前往学校，路上注意安全。", 16, 5000);
+                    }
+                    // 5 min reminder
+                    if (currentM === (startM - 5) && currentReminderKey !== `r-${day}-${i}-5`) {
+                        currentReminderKey = `r-${day}-${i}-5`;
+                        speakSequence("康老师，离开课只有5分钟了，请您准备好进教室了，学生们都在等着您呢。", 5, 5000);
+                    }
                 }
             }
         });
         
         doAutoScale();
 
-        const msgEl = document.getElementById('msg');
-        const myKeys = ["རི་མོ།", "གླུ་གཞས།", "ཡིགཟུགས།"];
-        const fullData = [...mData, ...aData];
-        const myTodayLessons = fullData.map((r, i) => myKeys.some(k => r[day].includes(k)) ? i : -1).filter(i => i !== -1);
-        
-        if (day >= 6) { msgEl.innerText = "དགེན་ལགས་གཟའ་མཇུག་སྤྲོ། ངལ་གསོ་ལྷོད་ལྷོད་གནང་རོགས།"; } 
-        else if (currentLessonIdx !== -1 && myTodayLessons.includes(currentLessonIdx)) { msgEl.innerText = "ད་ལྟ་སློབ་ཚན་ཚོགས་བཞིན་པ་ཡིན།"; } 
-        else if (myTodayLessons.length > 0 && currentM >= toM(slots[myTodayLessons[myTodayLessons.length-1]].e)) { msgEl.innerText = "དེ་རིང་གི་སློབ་ཚན་མཇུག་སྒྲིལ་ཟིན།"; } 
-        else { msgEl.innerText = "དགེན་ལགས་དེ་རིང་སློབ་ཚན་ཡོད།"; }
+        // 5. Update Status Text
+        const statusEl = document.getElementById('status-text');
+        if (statusEl) {
+             if (day >= 6) { 
+                 statusEl.innerText = "དགེན་ལགས་གཟའ་མཇུག་སྤྲོ། ངལ་གསོ་ལྷོད་ལྷོད་གནང་རོགས།"; 
+             } else if (currentLessonIdx !== -1 && myLessonIndices.includes(currentLessonIdx)) { 
+                 statusEl.innerText = "ད་ལྟ་སློབ་ཚན་ཚོགས་བཞིན་པ་ཡིན།"; 
+             } else if (myLessonIndices.length > 0 && currentM >= toM(slots[myLessonIndices[myLessonIndices.length-1]].e)) { 
+                 statusEl.innerText = "དེ་རིང་གི་སློབ་ཚན་མཇུག་སྒྲིལ་ཟིན།"; 
+             } else { 
+                 statusEl.innerText = "དགེན་ལགས་དེ་རིང་སློབ་ཚན་ཡོད།"; 
+             }
+        }
     }
 
     setInterval(refresh, 1000);
