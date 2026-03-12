@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kbc-v10.6'; // Font scaling fix
+const CACHE_NAME = 'kbc-v10.7'; // Header Layout fix
 const ASSETS = [
   './',
   './index.html',

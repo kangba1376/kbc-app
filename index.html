@@ -44,9 +44,10 @@
             flex: 0 0 44px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            /* justify-content: space-between; */
             padding: 0 10px;
             background: transparent;
+            position: relative; /* For absolute centering */
         }
         .top-bar button {
             font-family: 'danzeng';
@@ -56,11 +57,29 @@
             color: white;
             border: none;
             border-radius: 4px;
+            /* 强制不换行 */
+            white-space: nowrap;
+            /* 放在左边 */
+            z-index: 2;
         }
         .title {
             font-size: 1.5rem;
             font-weight: bold;
             color: var(--deep-blue);
+            white-space: nowrap;
+            /* 绝对居中 */
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+            width: auto;
+        }
+        #real-time {
+            /* 强制不换行 */
+            white-space: nowrap;
+            /* 放在右边 */
+            margin-left: auto;
+            z-index: 2;
         }
 
         /* Status Bar */
@@ -148,12 +167,14 @@
             border-right: none;
         }
         /* Cell Content */
-        .cell-inner {
-            display: inline-block;
-            white-space: nowrap;
-            transform-origin: center; /* Scale from center */
-            /* Ensure no wrapping */
-        }
+.cell-inner {
+    display: inline-block;
+    white-space: nowrap;
+    transform-origin: center; /* Scale from center */
+    font-size: 100%; /* Ensure base size */
+    line-height: 1.5; /* 增加行高，给上加字留空间 */
+    padding-top: 4px; /* 稍微给点顶部内边距 */
+}
         .num-col {
             flex: 0 0 45px; 
             background: #f8f9fa;
@@ -370,19 +391,7 @@
         }
     }
     
-    // Update logic to use speakSequence with audioKey instead of text
-    // In checkReminders:
-    // speakSequence('reminder40', 16, 5000);
-    // speakSequence('reminder5', 5, 5000);
-    
     // 页面可见性改变时重新申请 Wake Lock，确保切回来时继续常亮
-    document.addEventListener('visibilitychange', async () => {
-        if (wakeLock !== null && document.visibilityState === 'visible') {
-            await requestWakeLock();
-        }
-    });
-    
-    // 页面可见性改变时重新申请 Wake Lock
     document.addEventListener('visibilitychange', async () => {
         if (wakeLock !== null && document.visibilityState === 'visible') {
             await requestWakeLock();
@@ -401,34 +410,59 @@
         document.getElementById('grid-morning').style.height = `${morningH}px`;
         document.getElementById('grid-afternoon').style.height = `${afternoonH}px`;
         
-        // Auto Scale Font & Content Fit
-    // Header (1) + Morning Rows (4) = 5
-    const cellH = morningH / 5;
-    // Increase font size base.
-    const baseSize = Math.min(window.innerWidth / 16, cellH * 0.5); 
-    document.body.style.fontSize = `${baseSize}px`;
-    
-    // Force fit text into cells (No truncation)
-    // We iterate over all cells, check if content overflows width, and scale down if needed.
-    document.querySelectorAll('.cell-inner').forEach(span => {
-        // Reset transform first
-        span.style.transform = 'none';
-        span.style.display = 'inline-block';
+        // Auto Scale Font & Content Fit (Unified)
+        // 1. Calculate base size from grid height
+        const cellH = morningH / 5;
+        const baseSize = Math.min(window.innerWidth / 16, cellH * 0.5); 
+        document.body.style.fontSize = `${baseSize}px`;
         
-        const parent = span.parentElement;
-        const parentW = parent.clientWidth - 4; // Padding 2px * 2
-        const spanW = span.scrollWidth;
+        // 2. Calculate Uniform Scale for Grid Content
+        // 以“星期二”这列的文字大小为基准，所有文字都必须和它一样大。
         
-        if (spanW > parentW && parentW > 0) {
-            const scale = parentW / spanW;
-            // Use transform to shrink, but keep it centered
-            span.style.transform = `scale(${scale})`;
-            // Transform origin left or center? Center is better for aesthetics.
-            // But we need to make sure it doesn't overflow.
-            // Actually, if we scale down, the width stays same in layout flow, so we might need width: 100%?
-            // Better: layout logic.
+        let targetScale = 1.0;
+        // 找到表头里的星期二 (index 2 in days array, so it's the 3rd cell in header row)
+        const headerRow = document.querySelector('.grid-header');
+        if (headerRow) {
+            const cells = headerRow.querySelectorAll('.cell');
+            if (cells[2]) { // Tue
+                const span = cells[2].querySelector('.cell-inner');
+                if (span) {
+                    // Reset to measure
+                    span.style.transform = 'none';
+                    span.style.display = 'inline-block';
+                    const pW = span.parentElement.clientWidth - 4;
+                    const sW = span.scrollWidth;
+                    if (sW > pW && pW > 0) {
+                        targetScale = pW / sW;
+                    }
+                }
+            }
         }
-    });
+        
+        const cells = document.querySelectorAll('.cell-inner');
+        cells.forEach(span => {
+            span.style.transform = 'none';
+            span.style.display = 'inline-block';
+            
+            const parent = span.parentElement;
+            const parentW = parent.clientWidth - 4;
+            const spanW = span.scrollWidth;
+            const parentH = parent.clientHeight - 4;
+            const spanH = span.scrollHeight;
+            
+            let selfScaleW = 1.0;
+            if (spanW > parentW && parentW > 0) selfScaleW = parentW / spanW;
+            
+            let selfScaleH = 1.0;
+            if (spanH > parentH && parentH > 0) selfScaleH = parentH / spanH;
+            
+            const selfScale = Math.min(selfScaleW, selfScaleH);
+            
+            // 结合用户意图：“文字大小为星期二的名字来统一”。
+            // 所以最终 scale = Math.min(selfScale, targetScale);
+            
+            span.style.transform = `scale(${Math.min(selfScale, targetScale) * 0.95})`;
+        });
     }
 
     function refresh() {
@@ -437,8 +471,11 @@
         
         // 1. Reset highlights
         document.querySelectorAll('.cell').forEach(c => {
-            c.style.background = 'transparent';
+            // c.style.background = 'transparent'; // Keep background transparent (default) or whatever CSS set
+            // Wait, active-cell sets background. We need to clear inline background if we set it before.
+            c.style.background = ''; // Clear inline background
             c.style.color = ''; 
+            c.style.fontWeight = ''; // Clear inline font-weight
         });
         
         // 2. Highlight Today Header (If Mon-Fri)
@@ -447,8 +484,10 @@
              document.querySelectorAll('.grid-header').forEach(header => {
                  const cells = header.querySelectorAll('.cell');
                  if (cells[dayIdx]) {
-                     cells[dayIdx].style.background = 'rgba(255, 235, 235, 0.9)';
-                     cells[dayIdx].style.color = 'var(--tibetan-red)';
+                     // 只改变文字颜色，不改变背景色
+                     // cells[dayIdx].style.background = 'rgba(255, 235, 235, 0.9)'; // Removed background highlight
+                     cells[dayIdx].style.color = 'var(--tibetan-red)'; // Text color only
+                     cells[dayIdx].style.fontWeight = 'bold'; // Optional: make it bolder
                  }
              });
         }
