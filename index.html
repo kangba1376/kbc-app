@@ -78,12 +78,12 @@
 
         /* Status Bar */
 .status-bar {
-    flex: 0 0 60px;
+    flex: 0 0 50px; /* Reduced height to match smaller font */
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.6rem;
-    font-weight: bold;
+    font-size: 1.2rem; /* Reduced to match top-bar items */
+    /* font-weight: bold; */ /* Removed bold to fix Tibetan stacking issues */
     color: var(--tibetan-red);
     background: rgba(255,255,255,0.7);
     margin: 0 10px 5px 10px;
@@ -94,31 +94,28 @@
     border-radius: 8px;
 }
 
-        /* Content Area */
+/* 移除多余样式，改为弹性比例 */
         .content-area {
             flex: 1;
             display: flex;
             flex-direction: column;
             padding: 0 10px 10px 10px;
-            gap: 5px;
+            gap: 0; /* No gap for single grid */
             overflow: hidden;
         }
 
         .grid-container {
-    width: 100%;
-    /* 外边框：藏红色，默认 2px */
-    border: 2px solid var(--tibetan-red);
-    /* 顶部边框：特粗 7px (5px + 2px) */
-    border-top: 7px solid var(--tibetan-red);
-    border-radius: 8px;
-    overflow: hidden;
-    background: rgba(255,255,255,0.8);
-    display: flex;
-    flex-direction: column;
-}
-        /* 4:3 Ratio Implementation via Flex Grow */
-        #grid-morning { flex: 4; }
-        #grid-afternoon { flex: 3; }
+            flex: 1; /* Force expand to fill parent */
+            width: 100%;
+            border: 2px solid var(--tibetan-red);
+            border-top: 7px solid var(--tibetan-red);
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            flex-direction: column;
+        }
+/* Removed split ratio */
 
         /* Grid */
         .grid-header, .grid-row {
@@ -182,10 +179,7 @@
         .active-cell { background-color: #ADD8E6 !important; color: #000 !important; }
         .active-cell .cell-inner { color: #000 !important; }
         
-        /* Cleaned CSS */
-        @media (orientation: portrait) {
-            .content-area { padding-bottom: 20px; }
-        }
+/* Cleaned CSS */
         .diag-svg { position: absolute; width: 100%; height: 100%; top:0; left:0; pointer-events: none; }
 
         .c-red { color: #f00 !important; font-weight: bold; }
@@ -208,28 +202,26 @@
 
     <!-- Content Area -->
     <div class="content-area">
-        <div id="grid-morning" class="grid-container"></div>
-        <div id="grid-afternoon" class="grid-container"></div>
+        <div id="grid-combined" class="grid-container"></div>
     </div>
 </div>
 
 <script>
-/* REMOVED Audio variables */
+/* Logic cleaned */
 
     const toM = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 
     const slots = [{s: "09:30", e: "10:10"}, {s: "10:25", e: "11:05"}, {s: "11:30", e: "12:10"}, {s: "12:25", e: "13:05"}, {s: "15:00", e: "15:40"}, {s: "15:55", e: "16:35"}, {s: "16:50", e: "17:30"}];
-    // Clean Data Arrays
-    const mData = [
+    // Data
+    // Combined 1-7
+    const allData = [
         ["༡","","","","",""],
         ["༢","","","","",""],
         ["༣","རི་མོ།༢","","","རི་མོ།༢",""],
-        ["༤","ངལ་རྩོལ།","","","","ཡིགཟུགས།"]
-    ];
-    const aData = [
-        ["༡","","རི་མོ།༢","","",""],
-        ["༢","","","གླུ་གཞས།","","སློབ་གསོ།"],
-        ["༣","","རི་མོ།༡","","",""]
+        ["༤","ངལ་རྩོལ།","","","","ཡིགཟུགས།"],
+        ["༥","","རི་མོ།༢","","",""],
+        ["༦","","","གླུ་གཞས།","","སློབ་གསོ།"],
+        ["༧","","རི་མོ།༡","","",""]
     ];
 
     function getLessonClass(name) {
@@ -242,111 +234,32 @@
 
     const days = ["ཟླ་བ།","མིག་དམར།","ལྷག་པ།","ཕུར་བུ།","པ་སངས་།","སྤེན་པ།","ཉི་མ།"];
 
-    // Color Logic for Diagonal Header
-    // 上面一半 (Triangle Top-Left) -> Color of Weekday Header text? No, user said "color of weekday name".
-    // Weekday names are usually blue or red? 
-    // Wait, the user said: "上面一半改成后面的星期名字的颜色一样铺满"
-    // The weekday names (Mon, Tue...) text color is defined in CSS .grid-header.
-    // In CSS: .grid-header { ... color: #008080; ... } Wait, that was old.
-    // In refresh(): cells[dayIdx].style.color = 'var(--tibetan-red)'; if active.
-    // Default color for header cells? Not explicitly set, inherits or black/gray.
-    // But user might mean the BACKGROUND color of the header?
-    // "星期名字的颜色" usually means the text color.
-    // Let's assume the user wants a specific background color for the top triangle.
-    // And "下面一般的根1234 123 颜色一样铺满" -> The number column background color.
-    // .num-col background is #f8f9fa.
+/* Logic cleaned */
     
-    // User Input: "上面一半改成后面的星期名字的颜色一样铺满"
-    // Let's look at the header cells again. They have `background: rgba(255,255,255,0.6)`.
-    // So the top triangle should be `rgba(255,255,255,0.6)`.
-    
-    // "下面一般的根1234 123 颜色一样铺满"
-    // The numbers 1,2,3,4 are in .num-col.
-    // .num-col background is #f8f9fa.
-    // So the bottom triangle should be `#f8f9fa`.
-    
-    // Gradient:
-    // Bottom-Left (Start) -> Top-Right (End).
-    // Bottom-Left Triangle is the "Lower" half?
-    // Wait, SVG line is `x1="0" y1="100" x2="100" y2="0"`. This is Bottom-Left to Top-Right diagonal.
-    // This divides the square into:
-    // 1. Top-Left Triangle (Upper)
-    // 2. Bottom-Right Triangle (Lower) -> Wait.
-    // 0,100 is Bottom-Left. 100,0 is Top-Right.
-    // The line connects them.
-    // So we have a triangle above the line (Top-Left) and a triangle below the line (Bottom-Right).
-    
-    // User said: "左上角第一个格子... 上面一半... 下面一半..."
-    // "上面一半" (Top-Left Triangle) -> "后面的星期名字的颜色一样铺满" -> Header Background (`rgba(255,255,255,0.6)`).
-    // "下面一半" (Bottom-Right Triangle) -> "根1234 123 颜色一样铺满" -> Number Column Background (`#f8f9fa`).
-    
-    // CSS Linear Gradient for Top-Left to Bottom-Right split:
-    // `linear-gradient(to bottom right, TopColor 50%, BottomColor 50%)`
-    // Top-Left is the start. Bottom-Right is the end.
-    // So `to bottom right` starts at Top-Left.
-    // 0% -> 50%: Top Color.
-    // 50% -> 100%: Bottom Color.
-    
-    // Top Color: `rgba(255,255,255,0.6)` (Header BG)
-    // Bottom Color: `#f8f9fa` (Num Col BG)
-    
-    // Let's refine the SVG line to match perfectly.
-    // If gradient is `to bottom right`, the line should be `x1="0" y1="0" x2="100" y2="100"`?
-    // No, user said "斜着分开".
-    // If I use `to bottom right`, the division is from Top-Right to Bottom-Left? No.
-    // `to bottom right` goes from TL to BR.
-    // The color stop is a line perpendicular to the gradient direction.
-    // So a `to bottom right` gradient has a dividing line from Bottom-Left to Top-Right.
-    // Perfect! That matches `x1="0" y1="100" x2="100" y2="0"`.
-    
-    // So:
-    // Top-Left Triangle (Upper): Header BG `rgba(255,255,255,0.6)`
-    // Bottom-Right Triangle (Lower): Num Col BG `#f8f9fa`
-    
-    // Wait, "下面一半...根1234...颜色一样".
-    // The numbers 1, 2, 3, 4 are in the column *below* this header cell.
-    // So the *bottom* part of this header cell should visually connect to the column below.
-    // So the Bottom Triangle should be `#f8f9fa`.
-    // The Top Triangle connects to the Header Row (Days).
-    // The Header Row background is `rgba(255,255,255,0.6)`.
-    // So Top Triangle = `rgba(255,255,255,0.6)`.
-    
-    // Implementation:
-    // background: linear-gradient(to bottom right, rgba(255,255,255,0.6) 50%, #f8f9fa 50%);
-    // SVG Line: x1="0" y1="100" x2="100" y2="0". (Bottom-Left to Top-Right).
-    // This matches.
-    
-    // And stroke color?
-    // The grid lines are `var(--deep-blue)`.
-    // So the diagonal line should be `var(--deep-blue)`.
-    
-    function render(id, data, startIdx) {
+    // Unified Render
+    function render(id, data) {
         const el = document.getElementById(id);
-        let h = `<div class="grid-row grid-header"><div class="cell num-col" style="position:relative"><svg class="diag-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1.5"/></svg></div>`;
-        // Only Mon-Fri (Index 0-4 of days array)
+        let h = `<div class="grid-row grid-header"><div class="cell num-col" style="position:relative; background: linear-gradient(to bottom right, rgba(255,255,255,0.6) 50%, #f8f9fa 50%); border-right: 2px solid var(--deep-blue);"><svg class="diag-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="100" x2="100" y2="0" stroke="var(--deep-blue)" stroke-width="1.5"/></svg></div>`;
         days.slice(0, 5).forEach(d => h += `<div class="cell"><span class="cell-inner">${d}</span></div>`);
         el.innerHTML = h + `</div>` + data.map((r, i) => 
-            `<div class="grid-row"><div class="cell num-col"><span class="cell-inner">${r[0]}</span></div>` + 
-            r.slice(1).map((c, j) => `<div class="cell ${getLessonClass(c)}" id="c-${startIdx + i}-${j + 1}"><span class="cell-inner">${c}</span></div>`).join('') + 
+            `<div class="grid-row"><div class="cell num-col"><span class="cell-inner">${r[0]}</span></div>` +
+            r.slice(1).map((c, j) => `<div class="cell ${getLessonClass(c)}" id="c-${i}-${j + 1}"><span class="cell-inner">${c}</span></div>`).join('') + 
             `</div>`
         ).join('');
     }
-    render('grid-morning', mData, 0); render('grid-afternoon', aData, 4);
+    render('grid-combined', allData);
 
     function doAutoScale() {
         const container = document.querySelector('.content-area');
         const totalH = container.clientHeight;
         const availableH = totalH - 4; // gap
         
-        // 4:3 Ratio
-        const morningH = (availableH * 4) / 7;
-        const afternoonH = (availableH * 3) / 7;
-        
-        document.getElementById('grid-morning').style.height = `${morningH}px`;
-        document.getElementById('grid-afternoon').style.height = `${afternoonH}px`;
+        // Single Grid Full Height
+        document.getElementById('grid-combined').style.height = `${availableH}px`;
         
         // Auto Scale Font & Content Fit (Unified)
-        const cellH = morningH / 5;
+        // Header (1) + Rows (7) = 8
+        const cellH = availableH / 8;
         const baseSize = Math.min(window.innerWidth / 16, cellH * 0.5); 
         document.body.style.fontSize = `${baseSize}px`;
         
@@ -416,8 +329,7 @@
         const myKeys = ["རི་མོ།", "གླུ་གཞས།", "ཡིགཟུགས།"];
         let myLessonIndices = [];
         
-        const fullData = [...mData, ...aData];
-        fullData.forEach((row, idx) => {
+        allData.forEach((row, idx) => {
             if (myKeys.some(k => row[day] && row[day].includes(k))) {
                 myLessonIndices.push(idx);
             }
@@ -440,16 +352,35 @@
         
         doAutoScale();
 
+        // 5. Update Status Text
         const statusEl = document.getElementById('status-text');
         if (statusEl) {
+             // 逻辑修正：严格按照用户要求
+             
+             // 1. 周末 -> 休息
              if (day >= 6) { 
                  statusEl.innerText = "དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།";
-             } else if (currentLessonIdx !== -1 && myLessonIndices.includes(currentLessonIdx)) { 
+             } 
+             // 2. 今天完全没课 -> 提示无课
+             else if (myLessonIndices.length === 0) {
+                 statusEl.innerText = "དེ་རིང་སློབ་ཚན་མེད།";
+             }
+             // 3. 正在上我的课 -> 提示上课中
+             else if (currentLessonIdx !== -1 && myLessonIndices.includes(currentLessonIdx)) { 
                  statusEl.innerText = "ད་ལྟ་སློབ་ཚན་ཚོགས་བཞིན་པ་ཡིན།"; 
-             } else if (myLessonIndices.length > 0 && currentM >= toM(slots[myLessonIndices[myLessonIndices.length-1]].e)) { 
-                 statusEl.innerText = "དེ་རིང་གི་སློབ་ཚན་མཇུག་སྒྲིལ་ཟིན།"; 
-             } else { 
-                 statusEl.innerText = "དགེན་ལགས་དེ་རིང་སློབ་ཚན་ཡོད།"; 
+             } 
+             // 4. 我的课全部结束 -> 提示结束
+             // 只有当时间超过了我最后一节课的结束时间
+             else {
+                 const lastMyLessonIdx = myLessonIndices[myLessonIndices.length - 1];
+                 const lastEndTime = toM(slots[lastMyLessonIdx].e);
+                 
+                 if (currentM >= lastEndTime) {
+                     statusEl.innerText = "དེ་རིང་གི་སློབ་ཚན་མཇུག་སྒྲིལ་ཟིན།"; 
+                 } else {
+                     // 5. 有课但还没开始（或课间） -> 提示有课
+                     statusEl.innerText = "དགེན་ལགས་དེ་རིང་སློབ་ཚན་ཡོད།"; 
+                 }
              }
         }
     }

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kbc-v11.06'; // Marquee text fix
+const CACHE_NAME = 'kbc-v11.08'; // Marquee text fix
 const ASSETS = [
   './',
   './index.html',
