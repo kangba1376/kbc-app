@@ -77,36 +77,11 @@
             justify-content: center;
         }
         
-        /* 增加一个内部 span 用来缩放或滚动 */
+        /* 增加一个内部 span 用来缩放 */
         .btn-text {
             display: inline-block;
             white-space: nowrap;
-            /* 初始状态：无动画 */
-        }
-        
-        /* 跑马灯动画 */
-        @keyframes marquee {
-            0% { transform: translateX(0); }
-            20% { transform: translateX(0); } /* 停顿一下 */
-            100% { transform: translateX(-100%); } /* 滚出去 */
-        }
-        
-        .scrolling {
-            /* 只有当开启滚动时才应用动画 */
-            /* 但是 translateX(-100%) 会完全滚出视野。我们需要它滚到末尾停下？还是循环？ */
-            /* 真正的跑马灯：文字在容器内滚动。容器 overflow: hidden */
-            /* 这里的 button 就是容器 */
-            /* 让文字稍微往左滚一点，直到显示完末尾? */
-            /* 既然是循环播放，就一直滚 */
-            /* 为了平滑连接，通常需要复制一份文字。但这里简化处理：往复滚动 */
-            animation: scroll-left-right linear infinite alternate;
-        }
-        
-        @keyframes scroll-left-right {
-            0% { transform: translateX(0); }
-            15% { transform: translateX(0); }
-            85% { transform: translateX(calc(25vw - 100% - 16px)); } /* 25vw是容器宽，100%是文字宽，16px是padding */
-            100% { transform: translateX(calc(25vw - 100% - 16px)); }
+            transform-origin: left center; /* Scale from left */
         }
         .title {
             font-size: 1.5rem;
@@ -253,7 +228,7 @@
     <!-- Top Bar -->
     <div class="top-bar">
         <button id="audioBtn" onclick="activateAudio()">
-            <span class="btn-text">སྒྲ་གཏོང་ལམ་བཟོ་བ།</span>
+            <span class="btn-text">སྒྲ་གཏོང་བ།</span>
         </button>
         <div class="title">༢༠༢༦-ཁམས་པ་ཚང་།</div>
         <div id="real-time" style="color:var(--blue); font-weight:bold;"></div>
@@ -336,17 +311,17 @@
         const btn = document.getElementById('audioBtn');
         const span = btn.querySelector('.btn-text');
         
-        span.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // Keep text
+        span.innerText = "སྒྲ་བཟོས་ཟིན།"; // Keep text
         btn.style.background = "var(--orange)"; // Yellow for playing
-        fitButtonText();
+        // fitButtonText();
 
         let remaining = count;
         const speakOne = () => {
             if (stopSpeech || remaining <= 0) {
                 isSpeaking = false;
-                span.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; // Audio Activated
+                span.innerText = "སྒྲ་བཟོས་ཟིན།"; // Audio Activated
                 btn.style.background = "var(--blue)"; // Blue for active
-                fitButtonText();
+                // fitButtonText();
                 return;
             }
             
@@ -359,16 +334,16 @@
                     setTimeout(speakOne, intervalMs);
                 } else {
                     isSpeaking = false;
-                    span.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།";
+                    span.innerText = "སྒྲ་བཟོས་ཟིན།";
                     btn.style.background = "var(--blue)"; // Blue for active
-                    fitButtonText();
+                    // fitButtonText();
                 }
             };
             u.onerror = () => { 
                 isSpeaking = false; 
-                span.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།";
+                span.innerText = "སྒྲ་བཟོས་ཟིན།";
                 btn.style.background = "var(--blue)";
-                fitButtonText();
+                // fitButtonText();
             };
             
             window.speechSynthesis.speak(u);
@@ -399,35 +374,7 @@
         }
     }
 
-    function fitButtonText() {
-        const btn = document.getElementById('audioBtn');
-        const span = btn.querySelector('.btn-text');
-        if (!btn || !span) return;
-        
-        // Reset
-        span.style.transform = 'none';
-        span.classList.remove('scrolling'); // Stop scrolling to measure
-        
-        // Max width available for button (e.g., 25% of screen)
-        const maxW = window.innerWidth * 0.25; 
-        // Actual width of text
-        const textW = span.scrollWidth;
-        
-        // 如果文字太长，开启滚动
-        if (textW > maxW) {
-            // 文字比按钮宽，开启跑马灯
-            // 计算滚动距离：textW - maxW + padding?
-            // CSS 动画需要知道具体宽度吗？不需要，translate 百分比即可。
-            // 但是为了平滑，我们需要一个容器来裁剪。
-            span.classList.add('scrolling');
-            // 设置动画时长，字越多滚得越久，保持速度一致
-            // 假设速度 50px/s
-            const duration = textW / 30; // 30px/s
-            span.style.animationDuration = `${Math.max(duration, 3)}s`; // 至少3秒
-        } else {
-            span.classList.remove('scrolling');
-        }
-    }
+    // function fitButtonText() { ... } // REMOVED
 
     function activateAudio() {
         const btn = document.getElementById('audioBtn');
@@ -437,9 +384,9 @@
             stopSpeech = true;
             window.speechSynthesis.cancel();
             isSpeaking = false;
-            span.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།"; 
+            span.innerText = "སྒྲ་བཟོས་ཟིན།"; 
             btn.style.background = "var(--green)"; 
-            fitButtonText();
+            // fitButtonText(); // REMOVED: No longer needed
             return;
         }
         
@@ -458,29 +405,28 @@
             getCuteVoice(u);
             
             u.onend = () => {
-                span.innerText = "སྒྲ་གཏོང་ལམ་བཟོས་ཟིན།";
+                span.innerText = "སྒྲ་བཟོས་ཟིན།";
                 btn.style.background = "var(--blue)";
-                fitButtonText();
+                // fitButtonText();
             };
 
             u.onerror = () => {
                 const uFail = new SpeechSynthesisUtterance("老师，提醒声音激活失败了");
                 getCuteVoice(uFail);
                 window.speechSynthesis.speak(uFail);
-                span.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་མ་ཐུབ།";
-                btn.style.background = "var(--art-red)";
-                fitButtonText();
+                span.innerText = "སྒྲ་བཟོ་མ་ཐུབ།";
+                btn.style.background = "var(--tibetan-red)";
+                // fitButtonText();
             };
 
             window.speechSynthesis.speak(u);
 
         } catch (e) {
-            span.innerText = "སྒྲ་གཏོང་ལམ་བཟོ་མ་ཐུབ།";
-            btn.style.background = "var(--art-red)";
-            fitButtonText();
+            span.innerText = "སྒྲ་བཟོ་མ་ཐུབ།";
+            btn.style.background = "var(--tibetan-red)";
+            // fitButtonText();
         }
     }
-    
     // 页面可见性改变时重新申请 Wake Lock，确保切回来时继续常亮
     document.addEventListener('visibilitychange', async () => {
         if (wakeLock !== null && document.visibilityState === 'visible') {
@@ -636,7 +582,7 @@
         const statusEl = document.getElementById('status-text');
         if (statusEl) {
              if (day >= 6) { 
-                 statusEl.innerText = "དགེན་ལགས་གཟའ་མཇུག་སྤྲོ། ངལ་གསོ་ལྷོད་ལྷོད་གནང་རོགས།"; 
+                 statusEl.innerText = "དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།"; // Removed extra text
              } else if (currentLessonIdx !== -1 && myLessonIndices.includes(currentLessonIdx)) { 
                  statusEl.innerText = "ད་ལྟ་སློབ་ཚན་ཚོགས་བཞིན་པ་ཡིན།"; 
              } else if (myLessonIndices.length > 0 && currentM >= toM(slots[myLessonIndices[myLessonIndices.length-1]].e)) { 
