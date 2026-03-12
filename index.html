@@ -62,7 +62,7 @@
             /* 放在左边 */
             z-index: 2;
             /* 限制最大宽度，防止挡住中间 */
-            max-width: 30vw; /* 屏幕宽度的 30% */
+            max-width: 25vw; /* 屏幕宽度的 25% */
             overflow: hidden; /* 超出隐藏 */
             text-overflow: ellipsis; /* 显示省略号? 不，用户要缩小文字 */
             /* 既然用户要自动缩小文字，我们不能用 ellipsis */
@@ -382,8 +382,8 @@
         // Reset
         span.style.transform = 'none';
         
-        // Max width available for button (e.g., 30% of screen)
-        const maxW = window.innerWidth * 0.30; 
+        // Max width available for button (e.g., 25% of screen)
+        const maxW = window.innerWidth * 0.25; 
         // Actual width of text
         const textW = span.scrollWidth;
         
