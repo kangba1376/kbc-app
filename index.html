@@ -116,15 +116,19 @@
             display: flex;
             flex-direction: column;
         }
-/* Removed split ratio */
+    /* 5:3 Ratio */
+    #grid-morning { flex: 5; }
+    #grid-afternoon { flex: 3; }
 
         /* Grid */
         .grid-header, .grid-row {
             display: flex;
             width: 100%;
+            /* 修正：让表头和内容行都自动平分高度 */
+            flex: 1; 
         }
         .grid-header { 
-            flex: 0 0 32px; 
+            /* flex: 0 0 32px; */ /* Removed fixed height */
             background: rgba(255,255,255,0.6); 
             font-size: 1.4rem; 
             font-weight: bold; color: #008080;
@@ -258,32 +262,28 @@
     render('grid-afternoon', aData, false); // No header for afternoon
 
     function doAutoScale() {
-        // 修正：不使用 clientHeight，改用 window.innerHeight
-        // 确保计算高度时不受当前内容撑开的影响
-        const totalH = window.innerHeight - 
-            (parseFloat(getComputedStyle(document.querySelector('#app')).paddingTop) || 0) -
-            (parseFloat(getComputedStyle(document.querySelector('#app')).paddingBottom) || 0);
-            
-        // 减去顶部栏(50px)和状态栏(50px + margin 5px) = 105px
-        // 再减去 content-area 的 gap (5px)
-        // 保守起见减去 120px
-        const availableH = totalH - 50 - 60 - 20; 
+        // 修正：不再使用 JS 设置 px 高度
+        // 直接依赖 Flex 布局的 flex: 5 和 flex: 3 自动平分剩余高度
         
-        // 5:3 Ratio (Morning 5 rows vs Afternoon 3 rows)
-        // Morning: Header (1) + Rows (4) = 5 rows
-        // Afternoon: Rows (3) = 3 rows
-        // Total rows unit = 5 + 3 = 8
-        const morningH = (availableH * 5) / 8;
-        const afternoonH = (availableH * 3) / 8;
+        // 我们只需要计算字体大小
+        // 总行数 = 8 (5 + 3)
+        // 获取实际可用的容器高度 (大致估算即可，仅用于字体)
+        const container = document.querySelector('.content-area');
+        const availableH = container.clientHeight;
         
-        document.getElementById('grid-morning').style.height = `${morningH}px`;
-        document.getElementById('grid-afternoon').style.height = `${afternoonH}px`;
-        
-        // Auto Scale Font & Content Fit (Unified)
-        // Morning: Header (1) + Rows (4) = 5
-        const cellH = morningH / 5;
+        // 每个单元格高度 (平均值)
+        const cellH = availableH / 8;
         const baseSize = Math.min(window.innerWidth / 16, cellH * 0.5); 
         document.body.style.fontSize = `${baseSize}px`;
+        
+        // Uniform Scale based on Tuesday
+        // ... (保持不变)
+        
+        // 移除旧的高度设置代码
+        // document.getElementById('grid-morning').style.height = `${morningH}px`;
+        // document.getElementById('grid-afternoon').style.height = `${afternoonH}px`;
+        
+        // ... (保持后续的 scale 逻辑)
         
         // Uniform Scale based on Tuesday
         let targetScale = 1.0;
