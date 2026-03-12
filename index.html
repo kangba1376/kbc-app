@@ -31,15 +31,13 @@
             background: var(--bg);
             user-select: none;
             -webkit-user-select: none;
-            /* 修正：确保在某些浏览器下 body 也能撑满 */
-            display: flex;
-            flex-direction: column;
+            /* 修正：移除 flex:1 自动撑开，改回绝对高度控制，防止循环拉伸 */
         }
         #app {
             display: flex;
             flex-direction: column;
-            flex: 1; /* 占据所有 body 空间 */
             width: 100%;
+            height: 100%; /* 强制100% */
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
@@ -260,9 +258,16 @@
     render('grid-afternoon', aData, false); // No header for afternoon
 
     function doAutoScale() {
-        const container = document.querySelector('.content-area');
-        const totalH = container.clientHeight;
-        const availableH = totalH - 5; // gap
+        // 修正：不使用 clientHeight，改用 window.innerHeight
+        // 确保计算高度时不受当前内容撑开的影响
+        const totalH = window.innerHeight - 
+            (parseFloat(getComputedStyle(document.querySelector('#app')).paddingTop) || 0) -
+            (parseFloat(getComputedStyle(document.querySelector('#app')).paddingBottom) || 0);
+            
+        // 减去顶部栏(50px)和状态栏(50px + margin 5px) = 105px
+        // 再减去 content-area 的 gap (5px)
+        // 保守起见减去 120px
+        const availableH = totalH - 50 - 60 - 20; 
         
         // 5:3 Ratio (Morning 5 rows vs Afternoon 3 rows)
         // Morning: Header (1) + Rows (4) = 5 rows
