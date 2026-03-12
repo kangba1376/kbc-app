@@ -24,18 +24,22 @@
             --green: #28a745;
             --orange: #e67e22;
         }
+/* 确保界面内容铺满 iPhone 16 Pro Max 这种长屏幕 */
         html, body {
             width: 100%; height: 100%; overflow: hidden;
             font-family: 'danzeng', sans-serif;
             background: var(--bg);
             user-select: none;
             -webkit-user-select: none;
+            /* 修正：确保在某些浏览器下 body 也能撑满 */
+            display: flex;
+            flex-direction: column;
         }
         #app {
             display: flex;
             flex-direction: column;
+            flex: 1; /* 占据所有 body 空间 */
             width: 100%;
-            height: 100%;
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
@@ -100,12 +104,11 @@
             display: flex;
             flex-direction: column;
             padding: 0 10px 10px 10px;
-            gap: 0; /* No gap for single grid */
+            gap: 5px; /* Gap between morning and afternoon */
             overflow: hidden;
         }
 
         .grid-container {
-            flex: 1; /* Force expand to fill parent */
             width: 100%;
             border: 2px solid var(--tibetan-red);
             border-top: 7px solid var(--tibetan-red);
@@ -202,7 +205,8 @@
 
     <!-- Content Area -->
     <div class="content-area">
-        <div id="grid-combined" class="grid-container"></div>
+        <div id="grid-morning" class="grid-container"></div>
+        <div id="grid-afternoon" class="grid-container"></div>
     </div>
 </div>
 
@@ -212,13 +216,14 @@
     const toM = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 
     const slots = [{s: "09:30", e: "10:10"}, {s: "10:25", e: "11:05"}, {s: "11:30", e: "12:10"}, {s: "12:25", e: "13:05"}, {s: "15:00", e: "15:40"}, {s: "15:55", e: "16:35"}, {s: "16:50", e: "17:30"}];
-    // Data
-    // Combined 1-7
-    const allData = [
+    // Split Data
+    const mData = [
         ["༡","","","","",""],
         ["༢","","","","",""],
         ["༣","རི་མོ།༢","","","རི་མོ།༢",""],
-        ["༤","ངལ་རྩོལ།","","","","ཡིགཟུགས།"],
+        ["༤","ངལ་རྩོལ།","","","","ཡིགཟུགས།"]
+    ];
+    const aData = [
         ["༥","","རི་མོ།༢","","",""],
         ["༦","","","གླུ་གཞས།","","སློབ་གསོ།"],
         ["༧","","རི་མོ།༡","","",""]
@@ -237,29 +242,41 @@
 /* Logic cleaned */
     
     // Unified Render
-    function render(id, data) {
+    function render(id, data, showHeader) {
         const el = document.getElementById(id);
-        let h = `<div class="grid-row grid-header"><div class="cell num-col" style="position:relative; background: linear-gradient(to bottom right, rgba(255,255,255,0.6) 50%, #f8f9fa 50%); border-right: 2px solid var(--deep-blue);"><svg class="diag-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="100" x2="100" y2="0" stroke="var(--deep-blue)" stroke-width="1.5"/></svg></div>`;
-        days.slice(0, 5).forEach(d => h += `<div class="cell"><span class="cell-inner">${d}</span></div>`);
-        el.innerHTML = h + `</div>` + data.map((r, i) => 
-            `<div class="grid-row"><div class="cell num-col"><span class="cell-inner">${r[0]}</span></div>` +
-            r.slice(1).map((c, j) => `<div class="cell ${getLessonClass(c)}" id="c-${i}-${j + 1}"><span class="cell-inner">${c}</span></div>`).join('') + 
+        let h = '';
+        if (showHeader) {
+            h = `<div class="grid-row grid-header"><div class="cell num-col" style="position:relative; background: linear-gradient(to bottom right, rgba(255,255,255,0.6) 50%, #f8f9fa 50%); border-right: 2px solid var(--deep-blue);"><svg class="diag-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="100" y2="100" stroke="var(--deep-blue)" stroke-width="1.5"/></svg></div>`;
+            days.slice(0, 5).forEach(d => h += `<div class="cell"><span class="cell-inner">${d}</span></div>`);
+            h += `</div>`;
+        }
+        el.innerHTML = h + data.map((r, i) => 
+            `<div class="grid-row"><div class="cell num-col"><span class="cell-inner">${r[0]}</span></div>` + 
+            r.slice(1).map((c, j) => `<div class="cell ${getLessonClass(c)}" id="c-${showHeader ? i : i+4}-${j + 1}"><span class="cell-inner">${c}</span></div>`).join('') + 
             `</div>`
         ).join('');
     }
-    render('grid-combined', allData);
+    render('grid-morning', mData, true);
+    render('grid-afternoon', aData, false); // No header for afternoon
 
     function doAutoScale() {
         const container = document.querySelector('.content-area');
         const totalH = container.clientHeight;
-        const availableH = totalH - 4; // gap
+        const availableH = totalH - 5; // gap
         
-        // Single Grid Full Height
-        document.getElementById('grid-combined').style.height = `${availableH}px`;
+        // 5:3 Ratio (Morning 5 rows vs Afternoon 3 rows)
+        // Morning: Header (1) + Rows (4) = 5 rows
+        // Afternoon: Rows (3) = 3 rows
+        // Total rows unit = 5 + 3 = 8
+        const morningH = (availableH * 5) / 8;
+        const afternoonH = (availableH * 3) / 8;
+        
+        document.getElementById('grid-morning').style.height = `${morningH}px`;
+        document.getElementById('grid-afternoon').style.height = `${afternoonH}px`;
         
         // Auto Scale Font & Content Fit (Unified)
-        // Header (1) + Rows (7) = 8
-        const cellH = availableH / 8;
+        // Morning: Header (1) + Rows (4) = 5
+        const cellH = morningH / 5;
         const baseSize = Math.min(window.innerWidth / 16, cellH * 0.5); 
         document.body.style.fontSize = `${baseSize}px`;
         
@@ -329,7 +346,8 @@
         const myKeys = ["རི་མོ།", "གླུ་གཞས།", "ཡིགཟུགས།"];
         let myLessonIndices = [];
         
-        allData.forEach((row, idx) => {
+        const fullData = [...mData, ...aData];
+        fullData.forEach((row, idx) => {
             if (myKeys.some(k => row[day] && row[day].includes(k))) {
                 myLessonIndices.push(idx);
             }
