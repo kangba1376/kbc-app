@@ -41,48 +41,15 @@
 
         /* Top Bar */
         .top-bar {
-            flex: 0 0 44px;
+            flex: 0 0 50px;
             display: flex;
             align-items: center;
-            /* justify-content: space-between; */
+            justify-content: space-between; /* Space out left/right */
             padding: 0 10px;
             background: transparent;
             position: relative; /* For absolute centering */
         }
-        .top-bar button {
-            font-family: 'danzeng';
-            font-size: 1.2rem;
-            padding: 4px 8px;
-            background: var(--green);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            /* 强制不换行 */
-            white-space: nowrap;
-            /* 放在左边 */
-            z-index: 2;
-            /* 限制最大宽度，防止挡住中间 */
-            max-width: 25vw; /* 屏幕宽度的 25% */
-            overflow: hidden; /* 超出隐藏 */
-            text-overflow: ellipsis; /* 显示省略号? 不，用户要缩小文字 */
-            /* 既然用户要自动缩小文字，我们不能用 ellipsis */
-            /* 但 CSS 很难自动缩小文字以适应宽度。通常用 transform scale */
-            /* 或者，我们让中间的标题层级更高？不，那样会盖住按钮 */
-            
-            /* 方案：Flex 布局已经让它在左边了。 */
-            /* 我们可以用 SVG 或者 JS 来缩放。但 CSS 也可以尝试容器查询？太复杂。 */
-            /* 简单方案：给一个 max-width，并且用 transform scale 缩小 */
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-        }
         
-        /* 增加一个内部 span 用来缩放 */
-        .btn-text {
-            display: inline-block;
-            white-space: nowrap;
-            transform-origin: left center; /* Scale from left */
-        }
         .title {
             font-size: 1.5rem;
             font-weight: bold;
@@ -93,13 +60,19 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 1;
-            width: auto;
         }
+        
+        #weekday-display {
+            font-size: 1.2rem; /* Slightly smaller than title (1.5) */
+            color: var(--blue);
+            font-weight: bold;
+            z-index: 2;
+        }
+        
         #real-time {
-            /* 强制不换行 */
-            white-space: nowrap;
-            /* 放在右边 */
-            margin-left: auto;
+            font-size: 1.2rem; /* Same as weekday */
+            color: var(--blue);
+            font-weight: bold;
             z-index: 2;
         }
 
@@ -209,9 +182,7 @@
         .active-cell { background-color: #ADD8E6 !important; color: #000 !important; }
         .active-cell .cell-inner { color: #000 !important; }
         
-        @media (orientation: landscape) {
-            .wrapper { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); max-width: 800px; margin: 0 auto; }
-        }
+        /* Cleaned CSS */
         @media (orientation: portrait) {
             .content-area { padding-bottom: 20px; }
         }
@@ -227,11 +198,9 @@
 <div id="app">
     <!-- Top Bar -->
     <div class="top-bar">
-        <button id="audioBtn" onclick="activateAudio()">
-            <span class="btn-text">སྒྲ་གཏོང་བ།</span>
-        </button>
+        <div id="weekday-display">གཟའ་...</div>
         <div class="title">༢༠༢༦-ཁམས་པ་ཚང་།</div>
-        <div id="real-time" style="color:var(--blue); font-weight:bold;"></div>
+        <div id="real-time">...</div>
     </div>
 
     <!-- Status Bar -->
@@ -245,15 +214,12 @@
 </div>
 
 <script>
-    let audioCtx = null, currentReminderKey = "";
-    let isSpeaking = false, stopSpeech = false;
-    // let isAudioActivated = false; // REMOVED
+/* REMOVED Audio variables */
 
     const toM = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
 
     const slots = [{s: "09:30", e: "10:10"}, {s: "10:25", e: "11:05"}, {s: "11:30", e: "12:10"}, {s: "12:25", e: "13:05"}, {s: "15:00", e: "15:40"}, {s: "15:55", e: "16:35"}, {s: "16:50", e: "17:30"}];
-    // Data
-    // 0:Num, 1:Mon, 2:Tue, 3:Wed, 4:Thu, 5:Fri (Removed Sat/Sun)
+    // Clean Data Arrays
     const mData = [
         ["༡","","","","",""],
         ["༢","","","","",""],
@@ -274,12 +240,91 @@
         return "c-gray";
     }
 
-    const days = ["ཟླ་བ།","མིག་དམར།","ལྷག་པ།","ཕུར་བུ།","པ་སངས་།"];
+    const days = ["ཟླ་བ།","མིག་དམར།","ལྷག་པ།","ཕུར་བུ།","པ་སངས་།","སྤེན་པ།","ཉི་མ།"];
 
+    // Color Logic for Diagonal Header
+    // 上面一半 (Triangle Top-Left) -> Color of Weekday Header text? No, user said "color of weekday name".
+    // Weekday names are usually blue or red? 
+    // Wait, the user said: "上面一半改成后面的星期名字的颜色一样铺满"
+    // The weekday names (Mon, Tue...) text color is defined in CSS .grid-header.
+    // In CSS: .grid-header { ... color: #008080; ... } Wait, that was old.
+    // In refresh(): cells[dayIdx].style.color = 'var(--tibetan-red)'; if active.
+    // Default color for header cells? Not explicitly set, inherits or black/gray.
+    // But user might mean the BACKGROUND color of the header?
+    // "星期名字的颜色" usually means the text color.
+    // Let's assume the user wants a specific background color for the top triangle.
+    // And "下面一般的根1234 123 颜色一样铺满" -> The number column background color.
+    // .num-col background is #f8f9fa.
+    
+    // User Input: "上面一半改成后面的星期名字的颜色一样铺满"
+    // Let's look at the header cells again. They have `background: rgba(255,255,255,0.6)`.
+    // So the top triangle should be `rgba(255,255,255,0.6)`.
+    
+    // "下面一般的根1234 123 颜色一样铺满"
+    // The numbers 1,2,3,4 are in .num-col.
+    // .num-col background is #f8f9fa.
+    // So the bottom triangle should be `#f8f9fa`.
+    
+    // Gradient:
+    // Bottom-Left (Start) -> Top-Right (End).
+    // Bottom-Left Triangle is the "Lower" half?
+    // Wait, SVG line is `x1="0" y1="100" x2="100" y2="0"`. This is Bottom-Left to Top-Right diagonal.
+    // This divides the square into:
+    // 1. Top-Left Triangle (Upper)
+    // 2. Bottom-Right Triangle (Lower) -> Wait.
+    // 0,100 is Bottom-Left. 100,0 is Top-Right.
+    // The line connects them.
+    // So we have a triangle above the line (Top-Left) and a triangle below the line (Bottom-Right).
+    
+    // User said: "左上角第一个格子... 上面一半... 下面一半..."
+    // "上面一半" (Top-Left Triangle) -> "后面的星期名字的颜色一样铺满" -> Header Background (`rgba(255,255,255,0.6)`).
+    // "下面一半" (Bottom-Right Triangle) -> "根1234 123 颜色一样铺满" -> Number Column Background (`#f8f9fa`).
+    
+    // CSS Linear Gradient for Top-Left to Bottom-Right split:
+    // `linear-gradient(to bottom right, TopColor 50%, BottomColor 50%)`
+    // Top-Left is the start. Bottom-Right is the end.
+    // So `to bottom right` starts at Top-Left.
+    // 0% -> 50%: Top Color.
+    // 50% -> 100%: Bottom Color.
+    
+    // Top Color: `rgba(255,255,255,0.6)` (Header BG)
+    // Bottom Color: `#f8f9fa` (Num Col BG)
+    
+    // Let's refine the SVG line to match perfectly.
+    // If gradient is `to bottom right`, the line should be `x1="0" y1="0" x2="100" y2="100"`?
+    // No, user said "斜着分开".
+    // If I use `to bottom right`, the division is from Top-Right to Bottom-Left? No.
+    // `to bottom right` goes from TL to BR.
+    // The color stop is a line perpendicular to the gradient direction.
+    // So a `to bottom right` gradient has a dividing line from Bottom-Left to Top-Right.
+    // Perfect! That matches `x1="0" y1="100" x2="100" y2="0"`.
+    
+    // So:
+    // Top-Left Triangle (Upper): Header BG `rgba(255,255,255,0.6)`
+    // Bottom-Right Triangle (Lower): Num Col BG `#f8f9fa`
+    
+    // Wait, "下面一半...根1234...颜色一样".
+    // The numbers 1, 2, 3, 4 are in the column *below* this header cell.
+    // So the *bottom* part of this header cell should visually connect to the column below.
+    // So the Bottom Triangle should be `#f8f9fa`.
+    // The Top Triangle connects to the Header Row (Days).
+    // The Header Row background is `rgba(255,255,255,0.6)`.
+    // So Top Triangle = `rgba(255,255,255,0.6)`.
+    
+    // Implementation:
+    // background: linear-gradient(to bottom right, rgba(255,255,255,0.6) 50%, #f8f9fa 50%);
+    // SVG Line: x1="0" y1="100" x2="100" y2="0". (Bottom-Left to Top-Right).
+    // This matches.
+    
+    // And stroke color?
+    // The grid lines are `var(--deep-blue)`.
+    // So the diagonal line should be `var(--deep-blue)`.
+    
     function render(id, data, startIdx) {
         const el = document.getElementById(id);
         let h = `<div class="grid-row grid-header"><div class="cell num-col" style="position:relative"><svg class="diag-svg" viewBox="0 0 100 100" preserveAspectRatio="none"><line x1="0" y1="0" x2="100" y2="100" stroke="#B22222" stroke-width="1.5"/></svg></div>`;
-        days.forEach(d => h += `<div class="cell"><span class="cell-inner">${d}</span></div>`);
+        // Only Mon-Fri (Index 0-4 of days array)
+        days.slice(0, 5).forEach(d => h += `<div class="cell"><span class="cell-inner">${d}</span></div>`);
         el.innerHTML = h + `</div>` + data.map((r, i) => 
             `<div class="grid-row"><div class="cell num-col"><span class="cell-inner">${r[0]}</span></div>` + 
             r.slice(1).map((c, j) => `<div class="cell ${getLessonClass(c)}" id="c-${startIdx + i}-${j + 1}"><span class="cell-inner">${c}</span></div>`).join('') + 
@@ -287,152 +332,6 @@
         ).join('');
     }
     render('grid-morning', mData, 0); render('grid-afternoon', aData, 4);
-
-    function getCuteVoice(u) {
-        u.lang = 'zh-CN';
-        const voices = window.speechSynthesis.getVoices();
-        let targetVoice = null;
-        // 强制优先寻找 "Yue" (Premium/Enhanced)
-        targetVoice = voices.find(v => v.lang.includes('zh') && (v.name.includes('Yue') || v.name.includes('月')));
-        
-        // 如果没有 Yue，才考虑其他的
-        if (!targetVoice) targetVoice = voices.find(v => v.lang.includes('zh') && v.default);
-        if (!targetVoice) targetVoice = voices.find(v => v.lang.includes('zh'));
-        
-        if (targetVoice) { u.voice = targetVoice; u.pitch = 1.0; u.rate = 1.0; }
-        u.volume = 1;
-    }
-
-    function speakSequence(text, count, intervalMs) {
-        if (isSpeaking) window.speechSynthesis.cancel();
-        stopSpeech = false;
-        isSpeaking = true;
-        
-        const btn = document.getElementById('audioBtn');
-        const span = btn.querySelector('.btn-text');
-        
-        span.innerText = "སྒྲ་བཟོས་ཟིན།"; // Keep text
-        btn.style.background = "var(--orange)"; // Yellow for playing
-        // fitButtonText();
-
-        let remaining = count;
-        const speakOne = () => {
-            if (stopSpeech || remaining <= 0) {
-                isSpeaking = false;
-                span.innerText = "སྒྲ་བཟོས་ཟིན།"; // Audio Activated
-                btn.style.background = "var(--blue)"; // Blue for active
-                // fitButtonText();
-                return;
-            }
-            
-            const u = new SpeechSynthesisUtterance(text);
-            getCuteVoice(u);
-            
-            u.onend = () => {
-                remaining--;
-                if (remaining > 0 && !stopSpeech) {
-                    setTimeout(speakOne, intervalMs);
-                } else {
-                    isSpeaking = false;
-                    span.innerText = "སྒྲ་བཟོས་ཟིན།";
-                    btn.style.background = "var(--blue)"; // Blue for active
-                    // fitButtonText();
-                }
-            };
-            u.onerror = () => { 
-                isSpeaking = false; 
-                span.innerText = "སྒྲ་བཟོས་ཟིན།";
-                btn.style.background = "var(--blue)";
-                // fitButtonText();
-            };
-            
-            window.speechSynthesis.speak(u);
-        };
-        speakOne();
-    }
-
-    let wakeLock = null;
-
-    // Wake Lock
-    async function requestWakeLock() {
-        try {
-            if ('wakeLock' in navigator) {
-                wakeLock = await navigator.wakeLock.request('screen');
-            }
-        } catch (err) {}
-    }
-
-    // Silent Audio for Background
-    let silentAudio = null;
-    function initSilentAudio() {
-        if (!silentAudio) {
-            silentAudio = new Audio();
-            silentAudio.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACAgQAZGF0YQAAAAA=';
-            silentAudio.loop = true;
-            silentAudio.volume = 0.01; 
-            silentAudio.play().catch(()=>{});
-        }
-    }
-
-    // function fitButtonText() { ... } // REMOVED
-
-    function activateAudio() {
-        const btn = document.getElementById('audioBtn');
-        const span = btn.querySelector('.btn-text');
-        
-        if (isSpeaking) {
-            stopSpeech = true;
-            window.speechSynthesis.cancel();
-            isSpeaking = false;
-            span.innerText = "སྒྲ་བཟོས་ཟིན།"; 
-            btn.style.background = "var(--green)"; 
-            // fitButtonText(); // REMOVED: No longer needed
-            return;
-        }
-        
-        requestWakeLock();
-        initSilentAudio();
-
-        try {
-            if (!window.speechSynthesis) return;
-
-            if (window.speechSynthesis.getVoices().length === 0) {
-                window.speechSynthesis.onvoiceschanged = () => activateAudio();
-                return;
-            }
-
-            const u = new SpeechSynthesisUtterance("老师，提醒声音激活成功");
-            getCuteVoice(u);
-            
-            u.onend = () => {
-                span.innerText = "སྒྲ་བཟོས་ཟིན།";
-                btn.style.background = "var(--blue)";
-                // fitButtonText();
-            };
-
-            u.onerror = () => {
-                const uFail = new SpeechSynthesisUtterance("老师，提醒声音激活失败了");
-                getCuteVoice(uFail);
-                window.speechSynthesis.speak(uFail);
-                span.innerText = "སྒྲ་བཟོ་མ་ཐུབ།";
-                btn.style.background = "var(--tibetan-red)";
-                // fitButtonText();
-            };
-
-            window.speechSynthesis.speak(u);
-
-        } catch (e) {
-            span.innerText = "སྒྲ་བཟོ་མ་ཐུབ།";
-            btn.style.background = "var(--tibetan-red)";
-            // fitButtonText();
-        }
-    }
-    // 页面可见性改变时重新申请 Wake Lock，确保切回来时继续常亮
-    document.addEventListener('visibilitychange', async () => {
-        if (wakeLock !== null && document.visibilityState === 'visible') {
-            await requestWakeLock();
-        }
-    });
 
     function doAutoScale() {
         const container = document.querySelector('.content-area');
@@ -447,23 +346,18 @@
         document.getElementById('grid-afternoon').style.height = `${afternoonH}px`;
         
         // Auto Scale Font & Content Fit (Unified)
-        // 1. Calculate base size from grid height
         const cellH = morningH / 5;
         const baseSize = Math.min(window.innerWidth / 16, cellH * 0.5); 
         document.body.style.fontSize = `${baseSize}px`;
         
-        // 2. Calculate Uniform Scale for Grid Content
-        // 以“星期二”这列的文字大小为基准，所有文字都必须和它一样大。
-        
+        // Uniform Scale based on Tuesday
         let targetScale = 1.0;
-        // 找到表头里的星期二 (index 2 in days array, so it's the 3rd cell in header row)
         const headerRow = document.querySelector('.grid-header');
         if (headerRow) {
             const cells = headerRow.querySelectorAll('.cell');
             if (cells[2]) { // Tue
                 const span = cells[2].querySelector('.cell-inner');
                 if (span) {
-                    // Reset to measure
                     span.style.transform = 'none';
                     span.style.display = 'inline-block';
                     const pW = span.parentElement.clientWidth - 4;
@@ -493,10 +387,6 @@
             if (spanH > parentH && parentH > 0) selfScaleH = parentH / spanH;
             
             const selfScale = Math.min(selfScaleW, selfScaleH);
-            
-            // 结合用户意图：“文字大小为星期二的名字来统一”。
-            // 所以最终 scale = Math.min(selfScale, targetScale);
-            
             span.style.transform = `scale(${Math.min(selfScale, targetScale) * 0.95})`;
         });
     }
@@ -504,31 +394,25 @@
     function refresh() {
         const now = new Date(), currentM = now.getHours() * 60 + now.getMinutes(), day = now.getDay() || 7;
         document.getElementById('real-time').innerText = now.toTimeString().slice(0, 8);
+        document.getElementById('weekday-display').innerText = "རེས་གཟའ།" + (days[day-1] || "...");
         
-        // 1. Reset highlights
         document.querySelectorAll('.cell').forEach(c => {
-            // c.style.background = 'transparent'; // Keep background transparent (default) or whatever CSS set
-            // Wait, active-cell sets background. We need to clear inline background if we set it before.
-            c.style.background = ''; // Clear inline background
+            c.style.background = '';
             c.style.color = ''; 
-            c.style.fontWeight = ''; // Clear inline font-weight
+            c.style.fontWeight = '';
         });
         
-        // 2. Highlight Today Header (If Mon-Fri)
         if (day >= 1 && day <= 5) {
              const dayIdx = day; 
              document.querySelectorAll('.grid-header').forEach(header => {
                  const cells = header.querySelectorAll('.cell');
                  if (cells[dayIdx]) {
-                     // 只改变文字颜色，不改变背景色
-                     // cells[dayIdx].style.background = 'rgba(255, 235, 235, 0.9)'; // Removed background highlight
-                     cells[dayIdx].style.color = 'var(--tibetan-red)'; // Text color only
-                     cells[dayIdx].style.fontWeight = 'bold'; // Optional: make it bolder
+                     cells[dayIdx].style.color = 'var(--tibetan-red)'; 
+                     cells[dayIdx].style.fontWeight = 'bold';
                  }
              });
         }
 
-        // 3. Find MY lessons for today
         const myKeys = ["རི་མོ།", "གླུ་གཞས།", "ཡིགཟུགས།"];
         let myLessonIndices = [];
         
@@ -539,16 +423,11 @@
             }
         });
 
-        // 4. Main Loop: Check slots for current status and reminders
         let currentLessonIdx = -1;
-        
         slots.forEach((s, i) => {
             const startM = toM(s.s), endM = toM(s.e);
-            
-            // A. Check Current Lesson Status
             if (currentM >= startM && currentM < endM) {
                 currentLessonIdx = i;
-                // Highlight active cell (only Mon-Fri)
                 if (day >= 1 && day <= 5) {
                     const cellId = `c-${i}-${day}`;
                     const cell = document.getElementById(cellId);
@@ -557,32 +436,14 @@
                     }
                 }
             }
-            
-            // B. Check Reminders (Only Mon-Fri)
-            if (day >= 1 && day <= 5) {
-                // Only for MY lessons
-                if (myLessonIndices.includes(i)) {
-                    // 40 min reminder
-                    if (currentM === (startM - 40) && currentReminderKey !== `r-${day}-${i}-40`) {
-                        currentReminderKey = `r-${day}-${i}-40`;
-                        speakSequence("康老师，离开课只有40分钟，请您准备前往学校，路上注意安全。", 16, 5000);
-                    }
-                    // 5 min reminder
-                    if (currentM === (startM - 5) && currentReminderKey !== `r-${day}-${i}-5`) {
-                        currentReminderKey = `r-${day}-${i}-5`;
-                        speakSequence("康老师，离开课只有5分钟了，请您准备好进教室了，学生们都在等着您呢。", 5, 5000);
-                    }
-                }
-            }
         });
         
         doAutoScale();
 
-        // 5. Update Status Text
         const statusEl = document.getElementById('status-text');
         if (statusEl) {
              if (day >= 6) { 
-                 statusEl.innerText = "དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།"; // Removed extra text
+                 statusEl.innerText = "དགེན་ལགས་གཟའ་མཇུག་སྤྲོ།";
              } else if (currentLessonIdx !== -1 && myLessonIndices.includes(currentLessonIdx)) { 
                  statusEl.innerText = "ད་ལྟ་སློབ་ཚན་ཚོགས་བཞིན་པ་ཡིན།"; 
              } else if (myLessonIndices.length > 0 && currentM >= toM(slots[myLessonIndices[myLessonIndices.length-1]].e)) { 
