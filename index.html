@@ -89,6 +89,8 @@
             padding: 0 10px 10px 10px;
             gap: 5px;
             overflow: hidden;
+            /* 修正：增加底部 padding，防止内容紧贴屏幕边缘被截断 */
+            padding-bottom: max(10px, env(safe-area-inset-bottom)); 
         }
 
         .grid-container {
